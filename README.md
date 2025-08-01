@@ -4,9 +4,24 @@ React + Next.js で構築された学習進捗管理のWebアプリケーショ�
 
 ## 🚀 クイックスタート
 
+### Docker環境（推奨）
+
+```bash
+# プロジェクトルートから
+cd ap-study-project
+docker compose up --build
+
+# ブラウザで http://localhost:3000 を開く
+```
+
+### ローカル環境
+
 ```bash
 # 依存関係のインストール
 npm install
+
+# 環境変数設定
+export NEXT_PUBLIC_API_URL="http://localhost:3001"
 
 # 開発サーバー起動
 npm run dev
@@ -88,7 +103,7 @@ npm run lint         # ESLint実行
 
 | 変数名 | デフォルト値 | 説明 |
 |--------|-------------|------|
-| `NEXT_PUBLIC_API_URL` | `http://localhost:8000` | バックエンドAPI URL |
+| `NEXT_PUBLIC_API_URL` | `http://localhost:3001` | バックエンドAPI URL |
 | `NODE_ENV` | `development` | 実行環境 |
 
 ### 設定例
@@ -96,7 +111,7 @@ npm run lint         # ESLint実行
 **開発環境 (.env.local):**
 
 ```env
-NEXT_PUBLIC_API_URL=http://localhost:8000
+NEXT_PUBLIC_API_URL=http://localhost:3001
 NODE_ENV=development
 NEXT_PUBLIC_APP_NAME="応用情報技術者試験 学習管理アプリ"
 NEXT_PUBLIC_APP_VERSION=1.0.0
