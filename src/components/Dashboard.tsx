@@ -37,55 +37,55 @@ export default function Dashboard({ studyData }: DashboardProps) {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white rounded-lg shadow p-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+        <div className="bg-white rounded-lg shadow p-4 sm:p-6">
           <div className="flex items-center">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <span className="text-2xl">📚</span>
+            <div className="p-2 bg-blue-100 rounded-lg flex-shrink-0">
+              <span className="text-xl sm:text-2xl">📚</span>
             </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">学習進捗</p>
-              <p className="text-2xl font-bold text-gray-900">{progressPercentage.toFixed(1)}%</p>
+            <div className="ml-3 sm:ml-4 min-w-0">
+              <p className="text-sm font-medium text-gray-600 truncate">学習進捗</p>
+              <p className="text-xl sm:text-2xl font-bold text-gray-900">{progressPercentage.toFixed(1)}%</p>
               <p className="text-xs text-gray-500">{completedDays}/{totalDays} 日完了</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white rounded-lg shadow p-4 sm:p-6">
           <div className="flex items-center">
-            <div className="p-2 bg-green-100 rounded-lg">
-              <span className="text-2xl">⏱️</span>
+            <div className="p-2 bg-green-100 rounded-lg flex-shrink-0">
+              <span className="text-xl sm:text-2xl">⏱️</span>
             </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">総学習時間</p>
-              <p className="text-2xl font-bold text-gray-900">{Math.floor(totalStudyTime / 60)}h</p>
+            <div className="ml-3 sm:ml-4 min-w-0">
+              <p className="text-sm font-medium text-gray-600 truncate">総学習時間</p>
+              <p className="text-xl sm:text-2xl font-bold text-gray-900">{Math.floor(totalStudyTime / 60)}h</p>
               <p className="text-xs text-gray-500">{totalStudyTime % 60}分</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white rounded-lg shadow p-4 sm:p-6">
           <div className="flex items-center">
-            <div className="p-2 bg-yellow-100 rounded-lg">
-              <span className="text-2xl">🎯</span>
+            <div className="p-2 bg-yellow-100 rounded-lg flex-shrink-0">
+              <span className="text-xl sm:text-2xl">🎯</span>
             </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">平均理解度</p>
-              <p className="text-2xl font-bold text-gray-900">{averageUnderstanding.toFixed(1)}</p>
+            <div className="ml-3 sm:ml-4 min-w-0">
+              <p className="text-sm font-medium text-gray-600 truncate">平均理解度</p>
+              <p className="text-xl sm:text-2xl font-bold text-gray-900">{averageUnderstanding.toFixed(1)}</p>
               <p className="text-xs text-gray-500">/ 5.0</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white rounded-lg shadow p-4 sm:p-6">
           <div className="flex items-center">
-            <div className="p-2 bg-purple-100 rounded-lg">
-              <span className="text-2xl">📅</span>
+            <div className="p-2 bg-purple-100 rounded-lg flex-shrink-0">
+              <span className="text-xl sm:text-2xl">📅</span>
             </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">現在の週</p>
-              <p className="text-2xl font-bold text-gray-900">第{currentWeek?.weekNumber}週</p>
-              <p className="text-xs text-gray-500">{currentWeek?.title}</p>
+            <div className="ml-3 sm:ml-4 min-w-0">
+              <p className="text-sm font-medium text-gray-600 truncate">現在の週</p>
+              <p className="text-xl sm:text-2xl font-bold text-gray-900">第{currentWeek?.weekNumber}週</p>
+              <p className="text-xs text-gray-500 truncate">{currentWeek?.title}</p>
             </div>
           </div>
         </div>

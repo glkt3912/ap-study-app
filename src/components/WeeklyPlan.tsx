@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { StudyWeek } from '@/data/studyPlan'
+import { apiClient } from '@/lib/api'
 
 interface WeeklyPlanProps {
   studyData: StudyWeek[]
@@ -11,14 +12,37 @@ interface WeeklyPlanProps {
 export default function WeeklyPlan({ studyData, setStudyData }: WeeklyPlanProps) {
   const [selectedWeek, setSelectedWeek] = useState(1)
 
-  const handleTaskComplete = (weekIndex: number, dayIndex: number) => {
+  const handleTaskComplete = async (weekIndex: number, dayIndex: number) => {
     const newData = [...studyData]
     const task = newData[weekIndex].days[dayIndex]
-    task.completed = !task.completed
-    if (task.completed && task.actualTime === 0) {
+    const isCompleting = !task.completed
+    
+    // ローカル状態を即座に更新
+    task.completed = isCompleting
+    if (isCompleting && task.actualTime === 0) {
       task.actualTime = task.estimatedTime
     }
     setStudyData(newData)
+
+    // バックエンドに進捗を保存
+    try {
+      await apiClient.updateStudyProgress(
+        newData[weekIndex].weekNumber,
+        dayIndex,
+        {
+          completed: task.completed,
+          actualTime: task.actualTime
+        }
+      )
+    } catch (error) {
+      console.error('進捗の保存に失敗しました:', error)
+      // エラー時は元の状態に戻す
+      task.completed = !isCompleting
+      if (!task.completed) {
+        task.actualTime = 0
+      }
+      setStudyData([...newData])
+    }
   }
 
   const selectedWeekData = studyData.find(week => week.weekNumber === selectedWeek)
