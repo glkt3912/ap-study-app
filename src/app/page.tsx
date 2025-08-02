@@ -75,38 +75,39 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white shadow-sm border-b">
-        <div className="max-w-6xl mx-auto px-4 py-4">
-          <h1 className="text-2xl font-bold text-gray-900">
+        <div className="max-w-6xl mx-auto px-4 py-3 sm:py-4">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
             応用情報技術者試験 学習管理
           </h1>
-          <p className="text-gray-600 mt-1">
+          <p className="text-sm sm:text-base text-gray-600 mt-1">
             試験まで残り: <span className="font-semibold text-blue-600">約12週間</span>
           </p>
         </div>
       </header>
 
       <nav className="bg-white border-b">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="flex space-x-8">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex overflow-x-auto scrollbar-hide px-4">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`py-4 px-2 border-b-2 font-medium text-sm transition-colors ${
+                className={`flex-shrink-0 py-4 px-3 sm:px-4 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
                   activeTab === tab.id
                     ? 'border-blue-500 text-blue-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
-                <span className="mr-2">{tab.icon}</span>
-                {tab.name}
+                <span className="mr-1 sm:mr-2">{tab.icon}</span>
+                <span className="hidden sm:inline">{tab.name}</span>
+                <span className="sm:hidden text-xs">{tab.name.slice(0, 2)}</span>
               </button>
             ))}
           </div>
         </div>
       </nav>
 
-      <main className="max-w-6xl mx-auto px-4 py-8">
+      <main className="max-w-6xl mx-auto px-2 sm:px-4 py-4 sm:py-8">
         {error && (
           <div className="mb-4 bg-yellow-50 border border-yellow-200 rounded-md p-4">
             <div className="flex">

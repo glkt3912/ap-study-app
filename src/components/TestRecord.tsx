@@ -1,31 +1,17 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { testCategories, afternoonQuestionTypes } from '@/data/studyPlan'
-
-interface MorningTestRecord {
-  date: string
-  category: string
-  totalQuestions: number
-  correctAnswers: number
-  timeSpent: number
-  memo?: string
-}
-
-interface AfternoonTestRecord {
-  date: string
-  questionType: string
-  score: number
-  timeSpent: number
-  memo?: string
-}
+import { apiClient, MorningTest, AfternoonTest, TestStats } from '../lib/api'
 
 export default function TestRecord() {
   const [activeTab, setActiveTab] = useState<'morning' | 'afternoon'>('morning')
-  const [morningTests, setMorningTests] = useState<MorningTestRecord[]>([])
-  const [afternoonTests, setAfternoonTests] = useState<AfternoonTestRecord[]>([])
+  const [morningTests, setMorningTests] = useState<MorningTest[]>([])
+  const [afternoonTests, setAfternoonTests] = useState<AfternoonTest[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   
-  const [newMorningTest, setNewMorningTest] = useState<MorningTestRecord>({
+  const [newMorningTest, setNewMorningTest] = useState<Omit<MorningTest, 'id' | 'accuracy'>>({
     date: new Date().toISOString().split('T')[0],
     category: '',
     totalQuestions: 10,
@@ -34,26 +20,112 @@ export default function TestRecord() {
     memo: ''
   })
 
-  const [newAfternoonTest, setNewAfternoonTest] = useState<AfternoonTestRecord>({
+  const [newAfternoonTest, setNewAfternoonTest] = useState<Omit<AfternoonTest, 'id'>>({
     date: new Date().toISOString().split('T')[0],
-    questionType: '',
+    category: '',
     score: 0,
     timeSpent: 0,
     memo: ''
   })
 
-  const handleMorningSubmit = (e: React.FormEvent) => {
+  // データ取得
+  useEffect(() => {
+    fetchMorningTests()
+    fetchAfternoonTests()
+  }, [])
+
+  const fetchMorningTests = async () => {
+    try {
+      setIsLoading(true)
+      const tests = await apiClient.getMorningTests()
+      setMorningTests(tests.map(test => ({
+        ...test,
+        date: new Date(test.date).toISOString().split('T')[0]
+      })))
+      setError(null)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '午前問題記録の取得に失敗しました')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const fetchAfternoonTests = async () => {
+    try {
+      const tests = await apiClient.getAfternoonTests()
+      setAfternoonTests(tests.map(test => ({
+        ...test,
+        date: new Date(test.date).toISOString().split('T')[0]
+      })))
+    } catch (err) {
+      console.error('午後問題記録の取得に失敗:', err)
+    }
+  }
+
+  const handleMorningSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (newMorningTest.category && newMorningTest.totalQuestions > 0) {
-      setMorningTests([...morningTests, { ...newMorningTest }])
-      setNewMorningTest({
-        date: new Date().toISOString().split('T')[0],
-        category: '',
-        totalQuestions: 10,
-        correctAnswers: 0,
-        timeSpent: 0,
-        memo: ''
-      })
+    if (newMorningTest.category && newMorningTest.totalQuestions > 0 && newMorningTest.timeSpent > 0) {
+      try {
+        setIsLoading(true)
+        const createdTest = await apiClient.createMorningTest({
+          ...newMorningTest,
+          date: new Date(newMorningTest.date).toISOString()
+        })
+        
+        // ローカル状態を更新
+        setMorningTests(prevTests => [{
+          ...createdTest,
+          date: new Date(createdTest.date).toISOString().split('T')[0]
+        }, ...prevTests])
+        
+        // フォームをリセット
+        setNewMorningTest({
+          date: new Date().toISOString().split('T')[0],
+          category: '',
+          totalQuestions: 10,
+          correctAnswers: 0,
+          timeSpent: 0,
+          memo: ''
+        })
+        setError(null)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : '午前問題記録の作成に失敗しました')
+      } finally {
+        setIsLoading(false)
+      }
+    }
+  }
+
+  const handleAfternoonSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (newAfternoonTest.category && newAfternoonTest.score >= 0 && newAfternoonTest.timeSpent > 0) {
+      try {
+        setIsLoading(true)
+        const createdTest = await apiClient.createAfternoonTest({
+          ...newAfternoonTest,
+          date: new Date(newAfternoonTest.date).toISOString()
+        })
+        
+        // ローカル状態を更新
+        setAfternoonTests(prevTests => [{
+          ...createdTest,
+          date: new Date(createdTest.date).toISOString().split('T')[0]
+        }, ...prevTests])
+        
+        // フォームをリセット
+        setNewAfternoonTest({
+          date: new Date().toISOString().split('T')[0],
+          category: '',
+          score: 0,
+          timeSpent: 0,
+          memo: ''
+        })
+        setError(null)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : '午後問題記録の作成に失敗しました')
+      } finally {
+        setIsLoading(false)
+      }
     }
   }
 
@@ -64,7 +136,7 @@ export default function TestRecord() {
     const totalCorrect = morningTests.reduce((acc, test) => acc + test.correctAnswers, 0)
     
     return {
-      averageScore: (totalCorrect / totalQuestions) * 100,
+      averageScore: totalQuestions > 0 ? (totalCorrect / totalQuestions) * 100 : 0,
       totalQuestions: totalQuestions
     }
   }
@@ -105,6 +177,12 @@ export default function TestRecord() {
         </div>
 
         <div className="p-6">
+          {error && (
+            <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
+              <p className="text-red-600 text-sm">{error}</p>
+            </div>
+          )}
+
           {activeTab === 'morning' && (
             <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -170,21 +248,183 @@ export default function TestRecord() {
                       required
                     />
                   </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">所要時間 (分)</label>
+                    <input
+                      type="number"
+                      value={newMorningTest.timeSpent}
+                      onChange={(e) => setNewMorningTest({...newMorningTest, timeSpent: parseInt(e.target.value) || 0})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                      min="1"
+                      required
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">メモ</label>
+                  <textarea
+                    value={newMorningTest.memo || ''}
+                    onChange={(e) => setNewMorningTest({...newMorningTest, memo: e.target.value})}
+                    rows={3}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="演習内容や感想を記録してください"
+                  />
                 </div>
                 <button
                   type="submit"
-                  className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+                  disabled={isLoading}
+                  className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  記録を追加
+                  {isLoading ? '保存中...' : '記録を追加'}
                 </button>
               </form>
+
+              <div className="space-y-4 mt-8">
+                <h3 className="text-lg font-semibold text-gray-900">演習履歴</h3>
+                {morningTests.length === 0 ? (
+                  <p className="text-gray-500 text-center py-8">まだ演習記録がありません</p>
+                ) : (
+                  <div className="space-y-3">
+                    {morningTests.map((test) => (
+                      <div key={test.id} className="border rounded-lg p-4 bg-gray-50">
+                        <div className="flex items-start justify-between mb-2">
+                          <div>
+                            <h4 className="font-medium text-gray-900">{test.category}</h4>
+                            <p className="text-sm text-gray-600">{test.date}</p>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-sm font-medium text-gray-900">
+                              {test.correctAnswers}/{test.totalQuestions} ({test.accuracy?.toFixed(1) || ((test.correctAnswers / test.totalQuestions) * 100).toFixed(1)}%)
+                            </div>
+                            <div className="text-xs text-gray-500">{test.timeSpent}分</div>
+                          </div>
+                        </div>
+                        {test.memo && (
+                          <p className="text-sm text-gray-700 bg-white p-2 rounded border">{test.memo}</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
           {activeTab === 'afternoon' && (
             <div className="space-y-6">
-              <div className="text-center py-8">
-                <p className="text-gray-500">午後問題の記録機能は開発中です</p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="bg-orange-50 rounded-lg p-4">
+                  <div className="text-2xl font-bold text-orange-600">
+                    {afternoonTests.length > 0 ? (afternoonTests.reduce((sum, test) => sum + test.score, 0) / afternoonTests.length).toFixed(1) : '0.0'}
+                  </div>
+                  <div className="text-sm text-orange-800">平均得点</div>
+                </div>
+                <div className="bg-green-50 rounded-lg p-4">
+                  <div className="text-2xl font-bold text-green-600">
+                    {afternoonTests.length > 0 ? Math.max(...afternoonTests.map(test => test.score)) : 0}
+                  </div>
+                  <div className="text-sm text-green-800">最高得点</div>
+                </div>
+                <div className="bg-purple-50 rounded-lg p-4">
+                  <div className="text-2xl font-bold text-purple-600">{afternoonTests.length}</div>
+                  <div className="text-sm text-purple-800">演習回数</div>
+                </div>
+              </div>
+
+              <form onSubmit={handleAfternoonSubmit} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">日付</label>
+                    <input
+                      type="date"
+                      value={newAfternoonTest.date}
+                      onChange={(e) => setNewAfternoonTest({...newAfternoonTest, date: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">分野</label>
+                    <select
+                      value={newAfternoonTest.category}
+                      onChange={(e) => setNewAfternoonTest({...newAfternoonTest, category: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                      required
+                    >
+                      <option value="">分野を選択</option>
+                      {afternoonQuestionTypes.map((type) => (
+                        <option key={type} value={type}>{type}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">得点</label>
+                    <input
+                      type="number"
+                      value={newAfternoonTest.score}
+                      onChange={(e) => setNewAfternoonTest({...newAfternoonTest, score: parseInt(e.target.value) || 0})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                      min="0"
+                      max="100"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">所要時間 (分)</label>
+                    <input
+                      type="number"
+                      value={newAfternoonTest.timeSpent}
+                      onChange={(e) => setNewAfternoonTest({...newAfternoonTest, timeSpent: parseInt(e.target.value) || 0})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                      min="1"
+                      required
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">メモ</label>
+                  <textarea
+                    value={newAfternoonTest.memo || ''}
+                    onChange={(e) => setNewAfternoonTest({...newAfternoonTest, memo: e.target.value})}
+                    rows={3}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="問題内容や解答のポイントを記録してください"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isLoading ? '保存中...' : '記録を追加'}
+                </button>
+              </form>
+
+              <div className="space-y-4 mt-8">
+                <h3 className="text-lg font-semibold text-gray-900">演習履歴</h3>
+                {afternoonTests.length === 0 ? (
+                  <p className="text-gray-500 text-center py-8">まだ演習記録がありません</p>
+                ) : (
+                  <div className="space-y-3">
+                    {afternoonTests.map((test) => (
+                      <div key={test.id} className="border rounded-lg p-4 bg-gray-50">
+                        <div className="flex items-start justify-between mb-2">
+                          <div>
+                            <h4 className="font-medium text-gray-900">{test.category}</h4>
+                            <p className="text-sm text-gray-600">{test.date}</p>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-sm font-medium text-gray-900">{test.score}点</div>
+                            <div className="text-xs text-gray-500">{test.timeSpent}分</div>
+                          </div>
+                        </div>
+                        {test.memo && (
+                          <p className="text-sm text-gray-700 bg-white p-2 rounded border">{test.memo}</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           )}

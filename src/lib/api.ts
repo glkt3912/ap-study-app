@@ -1,6 +1,6 @@
 // API Client for backend communication
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
 
 export interface StudyDay {
   id: number
@@ -24,6 +24,52 @@ export interface StudyWeek {
   progressPercentage: number
   totalStudyTime: number
   averageUnderstanding: number
+}
+
+export interface StudyLog {
+  id?: number
+  date: string
+  subject: string
+  topics: string[]
+  studyTime: number
+  understanding: number
+  memo?: string
+  efficiency?: number
+}
+
+export interface MorningTest {
+  id?: number
+  date: string
+  category: string
+  totalQuestions: number
+  correctAnswers: number
+  accuracy?: number
+  timeSpent: number
+  memo?: string
+}
+
+export interface AfternoonTest {
+  id?: number
+  date: string
+  category: string
+  score: number
+  timeSpent: number
+  memo?: string
+}
+
+export interface TestStats {
+  totalTests: number
+  overallAccuracy?: number
+  averageScore?: number
+  maxScore?: number
+  minScore?: number
+  averageTimeSpent: number
+  categoryStats: {
+    category: string
+    testCount: number
+    averageAccuracy?: number
+    averageScore?: number
+  }[]
 }
 
 export interface ApiResponse<T> {
@@ -97,6 +143,94 @@ class ApiClient {
         dayIndex,
         ...data
       }),
+    })
+  }
+
+  // 学習記録API
+  async getStudyLogs(): Promise<StudyLog[]> {
+    return this.request<StudyLog[]>('/api/studylog')
+  }
+
+  async createStudyLog(studyLog: Omit<StudyLog, 'id' | 'efficiency'>): Promise<StudyLog> {
+    return this.request<StudyLog>('/api/studylog', {
+      method: 'POST',
+      body: JSON.stringify(studyLog),
+    })
+  }
+
+  async updateStudyLog(id: number, studyLog: Partial<Omit<StudyLog, 'id' | 'efficiency'>>): Promise<StudyLog> {
+    return this.request<StudyLog>(`/api/studylog/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(studyLog),
+    })
+  }
+
+  async deleteStudyLog(id: number): Promise<void> {
+    await this.request(`/api/studylog/${id}`, {
+      method: 'DELETE',
+    })
+  }
+
+  async getStudyLogsBySubject(subject: string): Promise<StudyLog[]> {
+    return this.request<StudyLog[]>(`/api/studylog/subject/${encodeURIComponent(subject)}`)
+  }
+
+  // 午前問題記録API
+  async getMorningTests(): Promise<MorningTest[]> {
+    return this.request<MorningTest[]>('/api/test/morning')
+  }
+
+  async createMorningTest(test: Omit<MorningTest, 'id' | 'accuracy'>): Promise<MorningTest> {
+    return this.request<MorningTest>('/api/test/morning', {
+      method: 'POST',
+      body: JSON.stringify(test),
+    })
+  }
+
+  async deleteMorningTest(id: number): Promise<void> {
+    await this.request(`/api/test/morning/${id}`, {
+      method: 'DELETE',
+    })
+  }
+
+  async getMorningTestStats(): Promise<TestStats> {
+    return this.request<TestStats>('/api/test/morning/stats')
+  }
+
+  // 午後問題記録API
+  async getAfternoonTests(): Promise<AfternoonTest[]> {
+    return this.request<AfternoonTest[]>('/api/test/afternoon')
+  }
+
+  async createAfternoonTest(test: Omit<AfternoonTest, 'id'>): Promise<AfternoonTest> {
+    return this.request<AfternoonTest>('/api/test/afternoon', {
+      method: 'POST',
+      body: JSON.stringify(test),
+    })
+  }
+
+  async deleteAfternoonTest(id: number): Promise<void> {
+    await this.request(`/api/test/afternoon/${id}`, {
+      method: 'DELETE',
+    })
+  }
+
+  async getAfternoonTestStats(): Promise<TestStats> {
+    return this.request<TestStats>('/api/test/afternoon/stats')
+  }
+
+  // 期間指定テスト記録取得
+  async getMorningTestsByDateRange(startDate: string, endDate: string): Promise<MorningTest[]> {
+    return this.request<MorningTest[]>('/api/test/morning/date-range', {
+      method: 'POST',
+      body: JSON.stringify({ startDate, endDate }),
+    })
+  }
+
+  async getAfternoonTestsByDateRange(startDate: string, endDate: string): Promise<AfternoonTest[]> {
+    return this.request<AfternoonTest[]>('/api/test/afternoon/date-range', {
+      method: 'POST',
+      body: JSON.stringify({ startDate, endDate }),
     })
   }
 }
