@@ -1,8 +1,25 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts'
+import { useState, useEffect, useCallback } from 'react'
+import dynamic from 'next/dynamic'
+
+// 動的インポートでコード分割
+const StudyTimeChart = dynamic(() => import('./charts/AnalysisCharts').then(mod => ({ default: mod.StudyTimeChart })), {
+  loading: () => <div className="h-[300px] bg-gray-100 rounded animate-pulse" />,
+  ssr: false
+})
+
+const ProgressChart = dynamic(() => import('./charts/AnalysisCharts').then(mod => ({ default: mod.ProgressChart })), {
+  loading: () => <div className="h-[300px] bg-gray-100 rounded animate-pulse" />,
+  ssr: false
+})
+
+const UnderstandingRadarChart = dynamic(() => import('./charts/AnalysisCharts').then(mod => ({ default: mod.UnderstandingRadarChart })), {
+  loading: () => <div className="h-[300px] bg-gray-100 rounded animate-pulse" />,
+  ssr: false
+})
 import { apiClient, StudyLog, MorningTest, AfternoonTest } from '../lib/api'
+import { ChartSkeleton, CardSkeleton } from './ui/Skeleton'
 
 // 分析結果の型定義
 interface StudyPattern {
@@ -101,7 +118,6 @@ interface PredictionResult {
   modelVersion: string
 }
 
-const COLORS = ['#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#6B7280']
 
 export default function Analysis() {
   const [studyLogs, setStudyLogs] = useState<StudyLog[]>([])
@@ -114,11 +130,7 @@ export default function Analysis() {
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [isPredicting, setIsPredicting] = useState(false)
 
-  useEffect(() => {
-    fetchAnalysisData()
-  }, [])
-
-  const fetchAnalysisData = async () => {
+  const fetchAnalysisData = useCallback(async () => {
     try {
       setIsLoading(true)
       const [logs, morningData, afternoonData] = await Promise.all([
@@ -138,7 +150,11 @@ export default function Analysis() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    fetchAnalysisData()
+  }, [fetchAnalysisData])
 
   const fetchLatestAnalysis = async () => {
     try {
@@ -437,29 +453,13 @@ export default function Analysis() {
             {/* 週別学習時間 */}
             <div className="bg-white border rounded-lg p-4">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">週別学習時間推移</h3>
-              <ResponsiveContainer width="100%" height={200}>
-                <LineChart data={weeklyData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="week" />
-                  <YAxis label={{ value: '時間', angle: -90, position: 'insideLeft' }} />
-                  <Tooltip />
-                  <Line type="monotone" dataKey="time" stroke="#3B82F6" strokeWidth={2} />
-                </LineChart>
-              </ResponsiveContainer>
+              <ProgressChart data={weeklyData} />
             </div>
 
             {/* 科目別学習時間 */}
             <div className="bg-white border rounded-lg p-4">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">科目別学習時間</h3>
-              <ResponsiveContainer width="100%" height={200}>
-                <BarChart data={subjectData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="subject" angle={-45} textAnchor="end" height={80} />
-                  <YAxis label={{ value: '時間', angle: -90, position: 'insideLeft' }} />
-                  <Tooltip formatter={(value, name, props) => [value + '時間', props.payload.fullSubject]} />
-                  <Bar dataKey="time" fill="#10B981" />
-                </BarChart>
-              </ResponsiveContainer>
+              <StudyTimeChart data={subjectData} />
             </div>
           </div>
 
@@ -469,17 +469,9 @@ export default function Analysis() {
             <div className="bg-white border rounded-lg p-4">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">分野別理解度</h3>
               {understandingData.length > 0 ? (
-                <ResponsiveContainer width="100%" height={250}>
-                  <RadarChart data={understandingData}>
-                    <PolarGrid />
-                    <PolarAngleAxis dataKey="subject" />
-                    <PolarRadiusAxis angle={0} domain={[0, 5]} />
-                    <Radar name="理解度" dataKey="understanding" stroke="#8B5CF6" fill="#8B5CF6" fillOpacity={0.3} />
-                    <Tooltip formatter={(value, name, props) => [value, props.payload.fullSubject]} />
-                  </RadarChart>
-                </ResponsiveContainer>
+                <UnderstandingRadarChart data={understandingData} />
               ) : (
-                <div className="h-250 flex items-center justify-center text-gray-500">
+                <div className="h-[250px] flex items-center justify-center text-gray-500">
                   学習記録がありません
                 </div>
               )}

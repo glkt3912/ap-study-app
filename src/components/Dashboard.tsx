@@ -1,12 +1,30 @@
 'use client'
 
 import { StudyWeek } from '@/data/studyPlan'
+import { CardSkeleton } from './ui/Skeleton'
 
 interface DashboardProps {
   studyData: StudyWeek[]
+  isLoading?: boolean
 }
 
-export default function Dashboard({ studyData }: DashboardProps) {
+export default function Dashboard({ studyData, isLoading = false }: DashboardProps) {
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+          <CardSkeleton />
+          <CardSkeleton />
+          <CardSkeleton />
+          <CardSkeleton />
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <CardSkeleton />
+          <CardSkeleton />
+        </div>
+      </div>
+    )
+  }
   const totalDays = studyData.reduce((acc, week) => acc + week.days.length, 0)
   const completedDays = studyData.reduce(
     (acc, week) => acc + week.days.filter(day => day.completed).length,
