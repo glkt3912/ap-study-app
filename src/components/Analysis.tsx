@@ -19,7 +19,7 @@ const UnderstandingRadarChart = dynamic(() => import('./charts/AnalysisCharts').
   ssr: false
 })
 import { apiClient, StudyLog, MorningTest, AfternoonTest } from '../lib/api'
-import { ChartSkeleton, CardSkeleton } from './ui/Skeleton'
+// import { ChartSkeleton, CardSkeleton } from './ui/Skeleton'
 
 // 分析結果の型定義
 interface StudyPattern {
@@ -124,11 +124,11 @@ export default function Analysis() {
   const [morningTests, setMorningTests] = useState<MorningTest[]>([])
   const [afternoonTests, setAfternoonTests] = useState<AfternoonTest[]>([])
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null)
-  const [predictionResult, setPredictionResult] = useState<PredictionResult | null>(null)
-  const [examDate, setExamDate] = useState('')
+  // const [predictionResult, setPredictionResult] = useState<PredictionResult | null>(null)
+  // const [examDate, setExamDate] = useState('')
   const [isLoading, setIsLoading] = useState(true)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
-  const [isPredicting, setIsPredicting] = useState(false)
+  // const [isPredicting, setIsPredicting] = useState(false)
 
   const fetchAnalysisData = useCallback(async () => {
     try {
