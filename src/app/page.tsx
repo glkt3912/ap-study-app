@@ -6,6 +6,7 @@ import WeeklyPlan from '@/components/WeeklyPlan'
 import StudyLog from '@/components/StudyLog'
 import TestRecord from '@/components/TestRecord'
 import Analysis from '@/components/Analysis'
+import Quiz from '@/components/Quiz'
 import { studyPlanData } from '@/data/studyPlan'
 import { apiClient, StudyWeek } from '@/lib/api'
 
@@ -52,6 +53,7 @@ export default function Home() {
     { id: 'plan', name: '学習計画', icon: '📅' },
     { id: 'log', name: '学習記録', icon: '✏️' },
     { id: 'test', name: '問題演習', icon: '📝' },
+    { id: 'quiz', name: 'Quiz', icon: '🧭' },
     { id: 'analysis', name: '分析', icon: '📈' }
   ]
 
@@ -65,6 +67,8 @@ export default function Home() {
         return <StudyLog />
       case 'test':
         return <TestRecord />
+      case 'quiz':
+        return <Quiz />
       case 'analysis':
         return <Analysis />
       default:

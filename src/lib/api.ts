@@ -78,6 +78,62 @@ export interface ApiResponse<T> {
   error?: string;
 }
 
+// Quiz関連インターfaces
+export interface Question {
+  id: string;
+  year: number;
+  season: string;
+  section: string;
+  number: number;
+  category: string;
+  subcategory?: string;
+  difficulty: number;
+  question: string;
+  choices: string[];
+  tags?: string[];
+}
+
+export interface QuizSession {
+  id: number;
+  userId?: string;
+  sessionType: "category" | "random" | "review" | "weak_points";
+  category?: string;
+  totalQuestions: number;
+  correctAnswers: number;
+  totalTime: number;
+  avgTimePerQ: number;
+  score: number;
+  startedAt: string;
+  completedAt?: string;
+  isCompleted: boolean;
+}
+
+export interface UserAnswer {
+  id: number;
+  userId?: string;
+  questionId: string;
+  userAnswer: string;
+  isCorrect: boolean;
+  timeSpent?: number;
+  attemptNumber: number;
+  createdAt: string;
+}
+
+export interface QuizCategory {
+  category: string;
+  questionCount: number;
+}
+
+export interface QuizStats {
+  totalSessions: number;
+  averageScore: number;
+  categoryStats: {
+    category: string;
+    sessionCount: number;
+    averageScore: number;
+  }[];
+}
+
 class ApiClient {
   private async request<T>(
     endpoint: string,
@@ -297,6 +353,91 @@ class ApiClient {
   ): Promise<any[]> {
     const params = userId ? `?userId=${encodeURIComponent(userId)}` : "";
     return this.request(`/api/analysis/prediction/exam/${examDate}${params}`);
+  }
+
+  // Quiz API
+  async getQuestions(options?: {
+    category?: string;
+    limit?: number;
+    random?: boolean;
+  }): Promise<Question[]> {
+    const params = new URLSearchParams();
+    if (options?.category) params.append("category", options.category);
+    if (options?.limit) params.append("limit", options.limit.toString());
+    if (options?.random) params.append("random", "true");
+    
+    const query = params.toString();
+    return this.request<Question[]>(`/api/quiz/questions${query ? `?${query}` : ""}`);
+  }
+
+  async getQuizCategories(): Promise<QuizCategory[]> {
+    return this.request<QuizCategory[]>("/api/quiz/categories");
+  }
+
+  async startQuizSession(options: {
+    sessionType: "category" | "random" | "review" | "weak_points";
+    questionCount: number;
+    category?: string;
+  }): Promise<{
+    sessionId: number;
+    questions: Question[];
+    totalQuestions: number;
+    sessionType: string;
+    category?: string;
+  }> {
+    return this.request("/api/quiz/start", {
+      method: "POST",
+      headers: {
+        "X-User-ID": "test-user", // TODO: 実際のユーザーID取得
+      },
+      body: JSON.stringify(options),
+    });
+  }
+
+  async submitQuizAnswer(options: {
+    sessionId: number;
+    questionId: string;
+    userAnswer: string;
+    timeSpent?: number;
+  }): Promise<{
+    answerId: number;
+    isCorrect: boolean;
+    correctAnswer: string;
+  }> {
+    return this.request("/api/quiz/answer", {
+      method: "POST",
+      headers: {
+        "X-User-ID": "test-user", // TODO: 実際のユーザーID取得
+      },
+      body: JSON.stringify(options),
+    });
+  }
+
+  async completeQuizSession(sessionId: number): Promise<QuizSession> {
+    return this.request("/api/quiz/complete", {
+      method: "POST",
+      headers: {
+        "X-User-ID": "test-user", // TODO: 実際のユーザーID取得
+      },
+      body: JSON.stringify({ sessionId }),
+    });
+  }
+
+  async getQuizSessions(limit?: number): Promise<QuizSession[]> {
+    const params = limit ? `?limit=${limit}` : "";
+    return this.request<QuizSession[]>(`/api/quiz/sessions${params}`, {
+      headers: {
+        "X-User-ID": "test-user", // TODO: 実際のユーザーID取得
+      },
+    });
+  }
+
+  async getQuizStats(): Promise<QuizStats> {
+    return this.request<QuizStats>("/api/quiz/stats", {
+      headers: {
+        "X-User-ID": "test-user", // TODO: 実際のユーザーID取得
+      },
+    });
   }
 }
 
