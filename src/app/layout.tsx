@@ -33,21 +33,7 @@ export default function RootLayout({
     <html lang="ja">
       <body className={inter.className}>
         {children}
-        <script dangerouslySetInnerHTML={{
-          __html: `
-            if ('serviceWorker' in navigator) {
-              window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-                  .then((registration) => {
-                    console.log('SW registered: ', registration);
-                  })
-                  .catch((registrationError) => {
-                    console.log('SW registration failed: ', registrationError);
-                  });
-              });
-            }
-          `
-        }} />
+        {/* Service Worker disabled for debugging */}
       </body>
     </html>
   )

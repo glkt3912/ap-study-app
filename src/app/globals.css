@@ -2,6 +2,27 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Test CSS to verify styles are loading */
+.test-red { 
+  background-color: red !important; 
+  color: white !important;
+  padding: 1rem !important;
+}
+.test-blue { 
+  background-color: blue !important; 
+  color: white !important;
+  padding: 1rem !important;
+}
+
+/* Force visible test class */
+.css-loaded-test {
+  background: linear-gradient(45deg, #ff0000, #00ff00) !important;
+  color: white !important;
+  padding: 20px !important;
+  border: 3px solid #000 !important;
+  font-weight: bold !important;
+}
+
 /* Hide scrollbar for mobile navigation */
 .scrollbar-hide {
   -ms-overflow-style: none;
