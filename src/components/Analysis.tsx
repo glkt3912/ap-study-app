@@ -4,13 +4,115 @@ import { useState, useEffect } from 'react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts'
 import { apiClient, StudyLog, MorningTest, AfternoonTest } from '../lib/api'
 
+// 分析結果の型定義
+interface StudyPattern {
+  totalStudyTime: number
+  averageStudyTime: number
+  studyFrequency: number
+  bestStudyTime: string
+  consistencyScore: number
+}
+
+interface WeaknessAnalysis {
+  weakSubjects: Array<{
+    subject: string
+    understanding: number
+    studyTime: number
+    testScore: number
+    improvement: number
+  }>
+  weakTopics: Array<{
+    topic: string
+    subject: string
+    understanding: number
+    testAccuracy: number
+    priority: number
+  }>
+}
+
+interface StudyRecommendation {
+  dailyStudyTime: number
+  weeklyGoal: number
+  focusSubjects: string[]
+  reviewSchedule: Array<{
+    subject: string
+    nextReviewDate: string
+    priority: number
+  }>
+}
+
+interface AnalysisResult {
+  id: number
+  analysisDate: string
+  studyPattern: StudyPattern
+  weaknessAnalysis: WeaknessAnalysis
+  studyRecommendation: StudyRecommendation
+  overallScore: number
+}
+
+// 予測結果の型定義
+interface PassProbability {
+  currentProbability: number
+  targetProbability: number
+  confidenceLevel: number
+  factors: Array<{
+    factor: string
+    impact: number
+    description: string
+  }>
+}
+
+interface StudyTimePrediction {
+  requiredDailyHours: number
+  totalRemainingHours: number
+  estimatedCompletionDate: string
+  currentProgress: number
+  recommendedIntensity: 'low' | 'medium' | 'high' | 'intensive'
+}
+
+interface ScorePrediction {
+  predictedMorningScore: number
+  predictedAfternoonScore: number
+  overallScore: number
+  weakAreas: Array<{
+    area: string
+    currentLevel: number
+    targetLevel: number
+    improvementNeeded: number
+  }>
+  strongAreas: string[]
+}
+
+interface ExamReadiness {
+  readinessLevel: 'not_ready' | 'needs_improvement' | 'almost_ready' | 'ready'
+  readinessScore: number
+  criticalAreas: string[]
+  recommendations: string[]
+}
+
+interface PredictionResult {
+  id: number
+  predictionDate: string
+  examDate: string
+  passProbability: PassProbability
+  studyTimePrediction: StudyTimePrediction
+  scorePrediction: ScorePrediction
+  examReadiness: ExamReadiness
+  modelVersion: string
+}
+
 const COLORS = ['#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#6B7280']
 
 export default function Analysis() {
   const [studyLogs, setStudyLogs] = useState<StudyLog[]>([])
   const [morningTests, setMorningTests] = useState<MorningTest[]>([])
   const [afternoonTests, setAfternoonTests] = useState<AfternoonTest[]>([])
+  const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null)
+  const [predictionResult, setPredictionResult] = useState<PredictionResult | null>(null)
+  const [examDate, setExamDate] = useState('')
   const [isLoading, setIsLoading] = useState(true)
+  const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [isPredicting, setIsPredicting] = useState(false)
 
   useEffect(() => {
     fetchAnalysisData()
@@ -27,10 +129,58 @@ export default function Analysis() {
       setStudyLogs(logs)
       setMorningTests(morningData)
       setAfternoonTests(afternoonData)
+      
+      // 最新の分析結果を取得
+      await fetchLatestAnalysis()
+      await fetchLatestPrediction()
     } catch (error) {
       console.error('分析データの取得に失敗:', error)
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const fetchLatestAnalysis = async () => {
+    try {
+      const result = await apiClient.getLatestAnalysis()
+      setAnalysisResult(result)
+    } catch (error) {
+      console.error('最新分析結果の取得に失敗:', error)
+    }
+  }
+
+  const fetchLatestPrediction = async () => {
+    try {
+      const result = await apiClient.getLatestPrediction()
+      setPredictionResult(result)
+    } catch (error) {
+      console.error('最新予測結果の取得に失敗:', error)
+    }
+  }
+
+  const runAnalysis = async () => {
+    try {
+      setIsAnalyzing(true)
+      const result = await apiClient.runAnalysis()
+      setAnalysisResult(result)
+    } catch (error) {
+      console.error('分析実行に失敗:', error)
+    } finally {
+      setIsAnalyzing(false)
+    }
+  }
+
+  const runPrediction = async () => {
+    if (!examDate) return
+    
+    try {
+      setIsPredicting(true)
+      const result = await apiClient.runPrediction(examDate)
+      setPredictionResult(result)
+    } catch (error) {
+      console.error('予測実行に失敗:', error)
+    } finally {
+      setIsPredicting(false)
     }
   }
 
@@ -142,6 +292,126 @@ export default function Analysis() {
         </div>
 
         <div className="p-6">
+          {/* 分析実行ボタン */}
+          <div className="mb-6 flex justify-between items-center">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900">AI学習分析</h3>
+              <p className="text-sm text-gray-600">学習データを分析して個別の改善提案を生成します</p>
+            </div>
+            <button
+              onClick={runAnalysis}
+              disabled={isAnalyzing || studyLogs.length === 0}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center space-x-2"
+            >
+              {isAnalyzing ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  <span>分析中...</span>
+                </>
+              ) : (
+                <>
+                  <span>🧠</span>
+                  <span>分析実行</span>
+                </>
+              )}
+            </button>
+          </div>
+
+          {/* AI分析結果 */}
+          {analysisResult && (
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-6 mb-8">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xl font-semibold text-gray-900">AI学習分析結果</h3>
+                <div className="flex items-center space-x-2">
+                  <span className="text-2xl font-bold text-indigo-600">{analysisResult.overallScore}</span>
+                  <span className="text-sm text-indigo-800">総合スコア</span>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* 学習パターン */}
+                <div className="bg-white rounded-lg p-4">
+                  <h4 className="font-semibold text-gray-900 mb-3">学習パターン</h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">総学習時間:</span>
+                      <span className="font-medium">{Math.floor(analysisResult.studyPattern.totalStudyTime / 60)}h {analysisResult.studyPattern.totalStudyTime % 60}m</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">平均学習時間:</span>
+                      <span className="font-medium">{analysisResult.studyPattern.averageStudyTime}分/日</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">学習頻度:</span>
+                      <span className="font-medium">{analysisResult.studyPattern.studyFrequency}日/週</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">継続性:</span>
+                      <span className="font-medium">{analysisResult.studyPattern.consistencyScore}%</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 弱点分析 */}
+                <div className="bg-white rounded-lg p-4">
+                  <h4 className="font-semibold text-gray-900 mb-3">弱点分析</h4>
+                  <div className="space-y-2">
+                    {analysisResult.weaknessAnalysis.weakSubjects.slice(0, 3).map((subject, index) => (
+                      <div key={index} className="flex items-center justify-between">
+                        <span className="text-sm text-gray-600 truncate">{subject.subject}</span>
+                        <div className="flex items-center space-x-2">
+                          <div className="w-8 h-2 bg-gray-200 rounded">
+                            <div 
+                              className={`h-2 rounded ${
+                                subject.understanding < 2 ? 'bg-red-400' :
+                                subject.understanding < 3 ? 'bg-orange-400' :
+                                subject.understanding < 4 ? 'bg-yellow-400' : 'bg-green-400'
+                              }`}
+                              style={{ width: `${(subject.understanding / 5) * 100}%` }}
+                            ></div>
+                          </div>
+                          <span className="text-xs text-gray-500">{subject.understanding.toFixed(1)}</span>
+                        </div>
+                      </div>
+                    ))}
+                    {analysisResult.weaknessAnalysis.weakSubjects.length === 0 && (
+                      <p className="text-sm text-green-600">弱点分野は見つかりませんでした👍</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* 学習推奨 */}
+                <div className="bg-white rounded-lg p-4">
+                  <h4 className="font-semibold text-gray-900 mb-3">学習推奨</h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">推奨学習時間:</span>
+                      <span className="font-medium">{analysisResult.studyRecommendation.dailyStudyTime}分/日</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">週間目標:</span>
+                      <span className="font-medium">{Math.floor(analysisResult.studyRecommendation.weeklyGoal / 60)}h {analysisResult.studyRecommendation.weeklyGoal % 60}m</span>
+                    </div>
+                    <div className="mt-3">
+                      <span className="text-gray-600 text-xs">重点科目:</span>
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        {analysisResult.studyRecommendation.focusSubjects.map((subject, index) => (
+                          <span key={index} className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">
+                            {subject}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="mt-4 text-xs text-gray-500">
+                分析日時: {new Date(analysisResult.analysisDate).toLocaleString('ja-JP')}
+              </div>
+            </div>
+          )}
+
           {/* 統計サマリー */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
             <div className="bg-blue-50 rounded-lg p-4">

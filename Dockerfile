@@ -9,12 +9,8 @@ RUN npm install
 # Copy source code
 COPY . .
 
-# Build application
-RUN npm run build
-
-# Remove dev dependencies
-RUN npm prune --omit=dev
+# Development mode - no build needed
 
 EXPOSE 3000
 
-CMD ["npm", "start"]
+CMD ["npm", "run", "dev"]

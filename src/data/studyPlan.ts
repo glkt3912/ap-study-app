@@ -1,20 +1,20 @@
 export interface StudyDay {
-  day: string
-  subject: string
-  topics: string[]
-  estimatedTime: number
-  completed: boolean
-  actualTime: number
-  understanding: number
-  memo?: string
+  day: string;
+  subject: string;
+  topics: string[];
+  estimatedTime: number;
+  completed: boolean;
+  actualTime: number;
+  understanding: number;
+  memo?: string;
 }
 
 export interface StudyWeek {
-  weekNumber: number
-  title: string
-  goals: string[]
-  days: StudyDay[]
-  phase: string
+  weekNumber: number;
+  title: string;
+  goals: string[];
+  days: StudyDay[];
+  phase: string;
 }
 
 export const studyPlanData: StudyWeek[] = [
@@ -177,7 +177,7 @@ export const studyPlanData: StudyWeek[] = [
       },
     ],
   },
-]
+];
 
 export const testCategories = [
   "基礎理論",
@@ -190,7 +190,7 @@ export const testCategories = [
   "システム戦略",
   "経営戦略",
   "企業と法務",
-]
+];
 
 export const afternoonQuestionTypes = [
   "経営戦略・情報戦略",
@@ -201,4 +201,4 @@ export const afternoonQuestionTypes = [
   "システム開発",
   "プロジェクトマネジメント",
   "サービスマネジメント",
-]
+];
