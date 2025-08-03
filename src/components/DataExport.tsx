@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { StudyWeek } from '@/data/studyPlan'
+import { apiClient } from '../lib/api'
 
 interface DataExportProps {
   studyData: StudyWeek[]
@@ -107,6 +108,47 @@ export default function DataExport({ studyData }: DataExportProps) {
     }
   }
 
+  // Quiz学習データのエクスポート
+  const exportQuizData = async (format: 'json' | 'csv') => {
+    setIsExporting(true)
+    try {
+      const data = await apiClient.exportQuizData({
+        format,
+        period: 90, // 過去90日分
+      })
+
+      if (format === 'csv') {
+        // CSVの場合はBlobとして返される
+        const url = URL.createObjectURL(data)
+        const link = document.createElement('a')
+        link.href = url
+        link.download = `quiz-data-${new Date().toISOString().split('T')[0]}.csv`
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        URL.revokeObjectURL(url)
+      } else {
+        // JSONの場合は通常の処理
+        const dataStr = JSON.stringify(data, null, 2)
+        const dataBlob = new Blob([dataStr], { type: 'application/json' })
+        const url = URL.createObjectURL(dataBlob)
+        
+        const link = document.createElement('a')
+        link.href = url
+        link.download = `quiz-data-${new Date().toISOString().split('T')[0]}.json`
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        URL.revokeObjectURL(url)
+      }
+    } catch (error) {
+      console.error('Quiz データエクスポートエラー:', error)
+      alert('エクスポートに失敗しました。しばらく待ってから再試行してください。')
+    } finally {
+      setIsExporting(false)
+    }
+  }
+
   const stats = generateStats()
 
   return (
@@ -144,29 +186,61 @@ export default function DataExport({ studyData }: DataExportProps) {
       </div>
 
       {/* エクスポートボタン */}
-      <div className="space-y-4">
+      <div className="space-y-6">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
           エクスポート形式を選択
         </h3>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <button
-            onClick={exportToJSON}
-            disabled={isExporting}
-            className="flex items-center justify-center px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded-lg transition-colors"
-          >
-            <span className="mr-2">📄</span>
-            JSON形式でエクスポート
-          </button>
-          
-          <button
-            onClick={exportToCSV}
-            disabled={isExporting}
-            className="flex items-center justify-center px-6 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white rounded-lg transition-colors"
-          >
-            <span className="mr-2">📊</span>
-            CSV形式でエクスポート
-          </button>
+        {/* 学習計画データ */}
+        <div>
+          <h4 className="text-md font-medium text-gray-800 dark:text-gray-200 mb-3">
+            📚 学習計画データ
+          </h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <button
+              onClick={exportToJSON}
+              disabled={isExporting}
+              className="flex items-center justify-center px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded-lg transition-colors"
+            >
+              <span className="mr-2">📄</span>
+              JSON形式でエクスポート
+            </button>
+            
+            <button
+              onClick={exportToCSV}
+              disabled={isExporting}
+              className="flex items-center justify-center px-6 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white rounded-lg transition-colors"
+            >
+              <span className="mr-2">📊</span>
+              CSV形式でエクスポート
+            </button>
+          </div>
+        </div>
+
+        {/* Quiz学習データ */}
+        <div>
+          <h4 className="text-md font-medium text-gray-800 dark:text-gray-200 mb-3">
+            🧠 Quiz学習データ (過去90日分)
+          </h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <button
+              onClick={() => exportQuizData('json')}
+              disabled={isExporting}
+              className="flex items-center justify-center px-6 py-3 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 text-white rounded-lg transition-colors"
+            >
+              <span className="mr-2">🧠</span>
+              Quiz JSON エクスポート
+            </button>
+            
+            <button
+              onClick={() => exportQuizData('csv')}
+              disabled={isExporting}
+              className="flex items-center justify-center px-6 py-3 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-400 text-white rounded-lg transition-colors"
+            >
+              <span className="mr-2">📈</span>
+              Quiz CSV エクスポート
+            </button>
+          </div>
         </div>
 
         {isExporting && (
@@ -182,6 +256,8 @@ export default function DataExport({ studyData }: DataExportProps) {
           💡 エクスポート機能について
         </h4>
         <ul className="text-sm text-gray-600 dark:text-gray-300 space-y-1">
+          <li>• <strong>学習計画データ</strong>: 週別学習計画と進捗データ</li>
+          <li>• <strong>Quiz学習データ</strong>: 問題演習履歴、正答率、学習分析結果</li>
           <li>• <strong>JSON形式</strong>: データの完全なバックアップ、他システムでの活用</li>
           <li>• <strong>CSV形式</strong>: Excel等での分析、表計算ソフトでの管理</li>
           <li>• ファイル名には日付が自動で含まれます</li>

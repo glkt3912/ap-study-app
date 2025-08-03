@@ -1,7 +1,15 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, lazy, Suspense } from "react";
 import { apiClient, Question, QuizCategory, QuizSession } from "../lib/api";
+
+const LineChart = lazy(() => import('recharts').then(module => ({ default: module.LineChart })));
+const Line = lazy(() => import('recharts').then(module => ({ default: module.Line })));
+const XAxis = lazy(() => import('recharts').then(module => ({ default: module.XAxis })));
+const YAxis = lazy(() => import('recharts').then(module => ({ default: module.YAxis })));
+const CartesianGrid = lazy(() => import('recharts').then(module => ({ default: module.CartesianGrid })));
+const Tooltip = lazy(() => import('recharts').then(module => ({ default: module.Tooltip })));
+const ResponsiveContainer = lazy(() => import('recharts').then(module => ({ default: module.ResponsiveContainer })));
 
 interface QuizState {
   session: null | {
@@ -16,6 +24,27 @@ interface QuizState {
   loading: boolean;
   error: string | null;
   result: QuizSession | null;
+  recommendations: {
+    reason: string;
+    weakCategories?: string[];
+    questions: Question[];
+  } | null;
+  progress: {
+    overall: {
+      totalQuestions: number;
+      answeredQuestions: number;
+      progressRate: number;
+    };
+    categoryProgress: any[];
+    recentActivity: QuizSession[];
+  } | null;
+  weakPoints: any[];
+  learningTrends: {
+    period: number;
+    dailyTrends: any[];
+    cumulativeProgress: any[];
+    categoryTrends: any[];
+  } | null;
 }
 
 export default function Quiz() {
@@ -25,25 +54,47 @@ export default function Quiz() {
     loading: false,
     error: null,
     result: null,
+    recommendations: null,
+    progress: null,
+    weakPoints: [],
+    learningTrends: null,
   });
+  
+  const [activeTab, setActiveTab] = useState<"quiz" | "progress" | "recommendations" | "trends">("quiz");
 
-  // カテゴリ一覧取得
+  // 初期データ取得
   useEffect(() => {
-    const loadCategories = async () => {
+    const loadInitialData = async () => {
       try {
         setState(prev => ({ ...prev, loading: true }));
-        const categories = await apiClient.getQuizCategories();
-        setState(prev => ({ ...prev, categories, loading: false }));
+        
+        const [categories, progress, recommendations, weakPoints, learningTrends] = await Promise.all([
+          apiClient.getQuizCategories(),
+          apiClient.getQuizProgress().catch(() => null),
+          apiClient.getRecommendedQuestions(10).catch(() => null),
+          apiClient.getWeakPoints(5).catch(() => []),
+          apiClient.getLearningTrends(30).catch(() => null),
+        ]);
+        
+        setState(prev => ({ 
+          ...prev, 
+          categories, 
+          progress,
+          recommendations,
+          weakPoints,
+          learningTrends,
+          loading: false 
+        }));
       } catch (error) {
         setState(prev => ({
           ...prev,
-          error: error instanceof Error ? error.message : "カテゴリの取得に失敗しました",
+          error: error instanceof Error ? error.message : "データの取得に失敗しました",
           loading: false,
         }));
       }
     };
 
-    loadCategories();
+    loadInitialData();
   }, []);
 
   // Quiz開始
@@ -410,6 +461,258 @@ export default function Quiz() {
           </ul>
         </div>
       </div>
+
+      {/* タブナビゲーション */}
+      <div className="flex overflow-x-auto border-b border-gray-200 mb-6 scrollbar-hide">
+        {[
+          { key: "quiz", label: "問題演習", shortLabel: "演習" },
+          { key: "progress", label: "学習進捗", shortLabel: "進捗" },
+          { key: "recommendations", label: "おすすめ問題", shortLabel: "推奨" },
+          { key: "trends", label: "学習トレンド", shortLabel: "トレンド" }
+        ].map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key as any)}
+            className={`flex-shrink-0 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
+              activeTab === tab.key
+                ? "border-blue-500 text-blue-600"
+                : "border-transparent text-gray-500 hover:text-gray-700"
+            }`}
+          >
+            <span className="hidden sm:inline">{tab.label}</span>
+            <span className="sm:hidden">{tab.shortLabel}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* 進捗タブ */}
+      {activeTab === "progress" && state.progress && (
+        <div className="space-y-6">
+          {/* 全体進捗 */}
+          <div className="bg-gray-50 rounded-lg p-6">
+            <h3 className="text-lg font-semibold mb-4">全体進捗</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-blue-600">
+                  {state.progress.overall.totalQuestions}
+                </div>
+                <div className="text-sm text-gray-600">総問題数</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-green-600">
+                  {state.progress.overall.answeredQuestions}
+                </div>
+                <div className="text-sm text-gray-600">回答済み問題数</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-purple-600">
+                  {state.progress.overall.progressRate}%
+                </div>
+                <div className="text-sm text-gray-600">進捗率</div>
+              </div>
+            </div>
+            <div className="mt-4">
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div
+                  className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                  style={{ width: `${state.progress.overall.progressRate}%` }}
+                ></div>
+              </div>
+            </div>
+          </div>
+
+          {/* 最近の活動 */}
+          <div className="bg-gray-50 rounded-lg p-6">
+            <h3 className="text-lg font-semibold mb-4">最近の学習活動</h3>
+            <div className="space-y-3">
+              {state.progress.recentActivity.slice(0, 5).map((session) => (
+                <div key={session.id} className="flex items-center justify-between p-3 bg-white rounded-lg">
+                  <div>
+                    <div className="font-medium">{session.category || "ランダム問題"}</div>
+                    <div className="text-sm text-gray-600">
+                      {new Date(session.completedAt || session.startedAt).toLocaleDateString()}
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="font-bold text-lg text-green-600">{session.score}点</div>
+                    <div className="text-sm text-gray-600">
+                      {session.correctAnswers}/{session.totalQuestions}問正解
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 推奨問題タブ */}
+      {activeTab === "recommendations" && (
+        <div className="space-y-6">
+          {/* 苦手分野 */}
+          {state.weakPoints.length > 0 && (
+            <div className="bg-red-50 rounded-lg p-6">
+              <h3 className="text-lg font-semibold mb-4 text-red-800">苦手分野</h3>
+              <div className="space-y-2">
+                {state.weakPoints.map((weak: any, index: number) => (
+                  <div key={index} className="flex items-center justify-between p-3 bg-white rounded-lg">
+                    <span className="font-medium">{weak.category}</span>
+                    <div className="text-right">
+                      <div className="text-sm text-red-600">
+                        正答率: {Math.round(weak.accuracy_rate)}%
+                      </div>
+                      <div className="text-xs text-gray-600">
+                        {weak.total_answers}問回答
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* 推奨問題 */}
+          {state.recommendations && (
+            <div className="bg-green-50 rounded-lg p-6">
+              <h3 className="text-lg font-semibold mb-4 text-green-800">おすすめ問題</h3>
+              <div className="mb-4 p-3 bg-white rounded-lg">
+                <div className="text-sm font-medium text-green-700">
+                  推奨理由: {state.recommendations.reason === "weak_category_focus" ? "苦手分野の強化" : "一般的な学習"}
+                </div>
+                {state.recommendations.weakCategories && (
+                  <div className="text-xs text-gray-600 mt-1">
+                    重点カテゴリ: {state.recommendations.weakCategories.join(", ")}
+                  </div>
+                )}
+              </div>
+              <button
+                onClick={() => {
+                  if (state.recommendations) {
+                    startQuiz("weak_points", Math.min(state.recommendations.questions.length, 10));
+                  }
+                }}
+                className="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors"
+              >
+                推奨問題で学習開始 ({Math.min(state.recommendations.questions.length, 10)}問)
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* 学習トレンドタブ */}
+      {activeTab === "trends" && (
+        <div className="space-y-6">
+          {state.learningTrends ? (
+            <>
+              {/* 日別学習トレンド */}
+              <div className="bg-gray-50 rounded-lg p-6">
+                <h3 className="text-lg font-semibold mb-4">日別学習トレンド (過去30日)</h3>
+                <Suspense fallback={<div className="h-64 flex items-center justify-center">グラフを読み込み中...</div>}>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <LineChart data={state.learningTrends.dailyTrends}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis 
+                        dataKey="study_date" 
+                        tickFormatter={(value) => new Date(value).toLocaleDateString('ja-JP', { month: 'short', day: 'numeric' })}
+                      />
+                      <YAxis />
+                      <Tooltip 
+                        labelFormatter={(value) => new Date(value).toLocaleDateString('ja-JP')}
+                        formatter={(value: number, name: string) => [
+                          name === 'daily_questions' ? `${value}問` : 
+                          name === 'avg_score' ? `${value.toFixed(1)}点` : 
+                          `${value}分`,
+                          name === 'daily_questions' ? '問題数' : 
+                          name === 'avg_score' ? '平均スコア' : 
+                          '学習時間'
+                        ]}
+                      />
+                      <Line 
+                        type="monotone" 
+                        dataKey="daily_questions" 
+                        stroke="#3B82F6" 
+                        strokeWidth={2}
+                        name="daily_questions"
+                      />
+                      <Line 
+                        type="monotone" 
+                        dataKey="avg_score" 
+                        stroke="#10B981" 
+                        strokeWidth={2}
+                        name="avg_score"
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </Suspense>
+              </div>
+
+              {/* 累積進捗 */}
+              <div className="bg-gray-50 rounded-lg p-6">
+                <h3 className="text-lg font-semibold mb-4">累積学習進捗</h3>
+                <Suspense fallback={<div className="h-64 flex items-center justify-center">グラフを読み込み中...</div>}>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <LineChart data={state.learningTrends.cumulativeProgress}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis 
+                        dataKey="study_date" 
+                        tickFormatter={(value) => new Date(value).toLocaleDateString('ja-JP', { month: 'short', day: 'numeric' })}
+                      />
+                      <YAxis />
+                      <Tooltip 
+                        labelFormatter={(value) => new Date(value).toLocaleDateString('ja-JP')}
+                        formatter={(value: number, name: string) => [
+                          `${value}問`,
+                          '累積問題数'
+                        ]}
+                      />
+                      <Line 
+                        type="monotone" 
+                        dataKey="cumulative_questions" 
+                        stroke="#8B5CF6" 
+                        strokeWidth={3}
+                        name="cumulative_questions"
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </Suspense>
+              </div>
+
+              {/* カテゴリ別トレンド */}
+              {state.learningTrends.categoryTrends.length > 0 && (
+                <div className="bg-gray-50 rounded-lg p-6">
+                  <h3 className="text-lg font-semibold mb-4">カテゴリ別学習状況</h3>
+                  <div className="space-y-3">
+                    {state.learningTrends.categoryTrends.map((category: any, index: number) => (
+                      <div key={index} className="flex items-center justify-between p-3 bg-white rounded-lg">
+                        <span className="font-medium">{category.category}</span>
+                        <div className="flex items-center space-x-4">
+                          <div className="text-sm text-gray-600">
+                            {category.questions_attempted}問
+                          </div>
+                          <div className="text-sm text-green-600">
+                            正答率: {Math.round(category.accuracy_rate * 100)}%
+                          </div>
+                          <div className="w-20 bg-gray-200 rounded-full h-2">
+                            <div
+                              className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                              style={{ width: `${Math.min(category.accuracy_rate * 100, 100)}%` }}
+                            ></div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="bg-gray-50 rounded-lg p-6 text-center">
+              <p className="text-gray-600">学習データが不足しています。問題演習を行うとトレンドが表示されます。</p>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

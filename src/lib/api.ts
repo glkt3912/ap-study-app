@@ -160,7 +160,6 @@ class ApiClient {
 
       return data.data;
     } catch (error) {
-      console.error("API request failed:", error);
       throw error;
     }
   }
@@ -437,6 +436,193 @@ class ApiClient {
       headers: {
         "X-User-ID": "test-user", // TODO: 実際のユーザーID取得
       },
+    });
+  }
+
+  // 新しいQuiz API機能
+  async getWeakPoints(limit?: number): Promise<any[]> {
+    const params = limit ? `?limit=${limit}` : "";
+    return this.request<any[]>(`/api/quiz/weak-points${params}`, {
+      headers: {
+        "X-User-ID": "test-user",
+      },
+    });
+  }
+
+  async getRecommendedQuestions(limit?: number): Promise<{
+    reason: string;
+    weakCategories?: string[];
+    questions: Question[];
+  }> {
+    const params = limit ? `?limit=${limit}` : "";
+    return this.request(`/api/quiz/recommendations${params}`, {
+      headers: {
+        "X-User-ID": "test-user",
+      },
+    });
+  }
+
+  async getQuizProgress(): Promise<{
+    overall: {
+      totalQuestions: number;
+      answeredQuestions: number;
+      progressRate: number;
+    };
+    categoryProgress: any[];
+    recentActivity: QuizSession[];
+  }> {
+    return this.request("/api/quiz/progress", {
+      headers: {
+        "X-User-ID": "test-user",
+      },
+    });
+  }
+
+  async getDetailedAnalysis(options?: {
+    category?: string;
+    period?: number;
+  }): Promise<{
+    period: number;
+    category?: string;
+    efficiencyAnalysis: any[];
+    errorPatterns: any[];
+    timeAnalysis: any[];
+    reviewEffectiveness: any[];
+  }> {
+    const params = new URLSearchParams();
+    if (options?.category) params.append("category", options.category);
+    if (options?.period) params.append("period", options.period.toString());
+    
+    const query = params.toString();
+    return this.request(`/api/quiz/detailed-analysis${query ? `?${query}` : ""}`, {
+      headers: {
+        "X-User-ID": "test-user",
+      },
+    });
+  }
+
+  async getLearningTrends(days?: number): Promise<{
+    period: number;
+    dailyTrends: any[];
+    cumulativeProgress: any[];
+    categoryTrends: any[];
+  }> {
+    const params = days ? `?days=${days}` : "";
+    return this.request(`/api/quiz/learning-trends${params}`, {
+      headers: {
+        "X-User-ID": "test-user",
+      },
+    });
+  }
+
+  async exportQuizData(options: {
+    format?: "json" | "csv";
+    period?: number;
+    categories?: string[];
+  }): Promise<any> {
+    const response = await fetch(`${API_BASE_URL}/api/quiz/export`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-User-ID": "test-user",
+      },
+      body: JSON.stringify(options),
+    });
+
+    if (options.format === "csv") {
+      return response.blob();
+    }
+
+    const data = await response.json();
+    if (!data.success) {
+      throw new Error(data.error || "Export failed");
+    }
+    return data.data;
+  }
+
+  // 拡張された分析API
+  async getPerformanceMetrics(period?: number): Promise<{
+    period: number;
+    studyConsistency: any;
+    learningEfficiency: any;
+    growthAnalysis: any[];
+    categoryBalance: any[];
+  }> {
+    const params = period ? `?period=${period}` : "";
+    return this.request(`/api/analysis/performance-metrics${params}`, {
+      headers: {
+        "X-User-ID": "test-user",
+      },
+    });
+  }
+
+  async evaluateExamReadiness(options: {
+    examDate: string;
+    targetScore?: number;
+  }): Promise<{
+    examDate: string;
+    daysToExam: number;
+    targetScore: number;
+    currentAbility: any;
+    categoryReadiness: any[];
+    overallReadiness: string;
+    studyRecommendations: any[];
+    passProbability: number;
+  }> {
+    return this.request("/api/analysis/exam-readiness", {
+      method: "POST",
+      headers: {
+        "X-User-ID": "test-user",
+      },
+      body: JSON.stringify(options),
+    });
+  }
+
+  async getLearningPattern(): Promise<{
+    timePattern: any[];
+    frequencyPattern: any[];
+    volumePerformanceCorrelation: any[];
+    recommendations: {
+      optimalTimeSlot: string;
+      optimalDayOfWeek: string;
+      recommendedDailyQuestions: number;
+    };
+  }> {
+    return this.request("/api/analysis/learning-pattern", {
+      headers: {
+        "X-User-ID": "test-user",
+      },
+    });
+  }
+
+  // 復習システムAPI
+  async generateReviewSchedule(): Promise<{ message: string; generated_count: number }> {
+    return this.request("/api/analysis/review/generate", {
+      method: "POST",
+      headers: {
+        "X-User-ID": "test-user",
+      },
+    });
+  }
+
+  async getTodayReviews(): Promise<any[]> {
+    return this.request("/api/analysis/review/today", {
+      headers: {
+        "X-User-ID": "test-user",
+      },
+    });
+  }
+
+  async completeReview(reviewItemId: string, understanding: number): Promise<{ message: string }> {
+    return this.request("/api/analysis/review/complete", {
+      method: "POST",
+      headers: {
+        "X-User-ID": "test-user",
+      },
+      body: JSON.stringify({
+        review_item_id: reviewItemId,
+        understanding_after: understanding,
+      }),
     });
   }
 }

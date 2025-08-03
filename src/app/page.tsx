@@ -9,6 +9,8 @@ import Analysis from '@/components/Analysis'
 import Quiz from '@/components/Quiz'
 import DataExport from '@/components/DataExport'
 import DiagnosticHub from '@/components/DiagnosticHub'
+import { AdvancedAnalysis } from '@/components/AdvancedAnalysis'
+import { ReviewSystem } from '@/components/ReviewSystem'
 // import ThemeToggle from '@/components/ui/ThemeToggle'
 import { studyPlanData } from '@/data/studyPlan'
 import { apiClient } from '@/lib/api'
@@ -82,6 +84,8 @@ export default function Home() {
     { id: 'test', name: '問題演習', icon: '📝' },
     { id: 'quiz', name: 'Quiz', icon: '🧭' },
     { id: 'analysis', name: '分析', icon: '📈' },
+    { id: 'advanced', name: '高度分析', icon: '🎯' },
+    { id: 'review', name: '復習システム', icon: '🔄' },
     { id: 'export', name: 'エクスポート', icon: '💾' },
     { id: 'debug', name: '診断', icon: '🧪' }
   ]
@@ -100,6 +104,10 @@ export default function Home() {
         return <Quiz />
       case 'analysis':
         return <Analysis />
+      case 'advanced':
+        return <AdvancedAnalysis />
+      case 'review':
+        return <ReviewSystem />
       case 'export':
         return <DataExport studyData={studyData} />
       case 'debug':
