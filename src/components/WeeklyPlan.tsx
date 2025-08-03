@@ -1,12 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { StudyWeek } from '@/data/studyPlan'
 import { apiClient } from '@/lib/api'
 
 interface WeeklyPlanProps {
   studyData: StudyWeek[]
-  setStudyData: (data: StudyWeek[]) => void
+  setStudyData: React.Dispatch<React.SetStateAction<StudyWeek[]>>
 }
 
 export default function WeeklyPlan({ studyData, setStudyData }: WeeklyPlanProps) {
@@ -14,7 +14,12 @@ export default function WeeklyPlan({ studyData, setStudyData }: WeeklyPlanProps)
 
   const handleTaskComplete = async (weekIndex: number, dayIndex: number) => {
     const newData = [...studyData]
-    const task = newData[weekIndex].days[dayIndex]
+    const week = newData[weekIndex]
+    if (!week) return
+    
+    const task = week.days[dayIndex]
+    if (!task) return
+    
     const isCompleting = !task.completed
     
     // ローカル状態を即座に更新
@@ -27,7 +32,7 @@ export default function WeeklyPlan({ studyData, setStudyData }: WeeklyPlanProps)
     // バックエンドに進捗を保存
     try {
       await apiClient.updateStudyProgress(
-        newData[weekIndex].weekNumber,
+        week.weekNumber,
         dayIndex,
         {
           completed: task.completed,
@@ -35,7 +40,7 @@ export default function WeeklyPlan({ studyData, setStudyData }: WeeklyPlanProps)
         }
       )
     } catch (error) {
-      console.error('進捗の保存に失敗しました:', error)
+      // 進捗の保存に失敗しました
       // エラー時は元の状態に戻す
       task.completed = !isCompleting
       if (!task.completed) {

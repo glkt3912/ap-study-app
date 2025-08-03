@@ -67,56 +67,7 @@ interface AnalysisResult {
   overallScore: number
 }
 
-// 予測結果の型定義
-interface PassProbability {
-  currentProbability: number
-  targetProbability: number
-  confidenceLevel: number
-  factors: Array<{
-    factor: string
-    impact: number
-    description: string
-  }>
-}
 
-interface StudyTimePrediction {
-  requiredDailyHours: number
-  totalRemainingHours: number
-  estimatedCompletionDate: string
-  currentProgress: number
-  recommendedIntensity: 'low' | 'medium' | 'high' | 'intensive'
-}
-
-interface ScorePrediction {
-  predictedMorningScore: number
-  predictedAfternoonScore: number
-  overallScore: number
-  weakAreas: Array<{
-    area: string
-    currentLevel: number
-    targetLevel: number
-    improvementNeeded: number
-  }>
-  strongAreas: string[]
-}
-
-interface ExamReadiness {
-  readinessLevel: 'not_ready' | 'needs_improvement' | 'almost_ready' | 'ready'
-  readinessScore: number
-  criticalAreas: string[]
-  recommendations: string[]
-}
-
-interface PredictionResult {
-  id: number
-  predictionDate: string
-  examDate: string
-  passProbability: PassProbability
-  studyTimePrediction: StudyTimePrediction
-  scorePrediction: ScorePrediction
-  examReadiness: ExamReadiness
-  modelVersion: string
-}
 
 
 export default function Analysis() {
@@ -144,9 +95,8 @@ export default function Analysis() {
       
       // 最新の分析結果を取得
       await fetchLatestAnalysis()
-      await fetchLatestPrediction()
     } catch (error) {
-      console.error('分析データの取得に失敗:', error)
+      // 分析データの取得に失敗
     } finally {
       setIsLoading(false)
     }
@@ -161,18 +111,10 @@ export default function Analysis() {
       const result = await apiClient.getLatestAnalysis()
       setAnalysisResult(result)
     } catch (error) {
-      console.error('最新分析結果の取得に失敗:', error)
+      // 最新分析結果の取得に失敗
     }
   }
 
-  const fetchLatestPrediction = async () => {
-    try {
-      const result = await apiClient.getLatestPrediction()
-      setPredictionResult(result)
-    } catch (error) {
-      console.error('最新予測結果の取得に失敗:', error)
-    }
-  }
 
   const runAnalysis = async () => {
     try {
@@ -180,25 +122,12 @@ export default function Analysis() {
       const result = await apiClient.runAnalysis()
       setAnalysisResult(result)
     } catch (error) {
-      console.error('分析実行に失敗:', error)
+      // 分析実行に失敗
     } finally {
       setIsAnalyzing(false)
     }
   }
 
-  const runPrediction = async () => {
-    if (!examDate) return
-    
-    try {
-      setIsPredicting(true)
-      const result = await apiClient.runPrediction(examDate)
-      setPredictionResult(result)
-    } catch (error) {
-      console.error('予測実行に失敗:', error)
-    } finally {
-      setIsPredicting(false)
-    }
-  }
 
   // 学習時間の週別データ
   const getWeeklyStudyData = () => {
@@ -207,7 +136,9 @@ export default function Analysis() {
       const date = new Date(log.date)
       const weekStart = new Date(date.setDate(date.getDate() - date.getDay()))
       const week = weekStart.toISOString().split('T')[0]
-      weeklyData[week] = (weeklyData[week] || 0) + log.studyTime
+      if (week) {
+        weeklyData[week] = (weeklyData[week] || 0) + log.studyTime
+      }
     })
     
     return Object.entries(weeklyData)
@@ -242,8 +173,11 @@ export default function Analysis() {
       if (!subjectUnderstanding[log.subject]) {
         subjectUnderstanding[log.subject] = { total: 0, count: 0 }
       }
-      subjectUnderstanding[log.subject].total += log.understanding
-      subjectUnderstanding[log.subject].count += 1
+      const subjectData = subjectUnderstanding[log.subject]
+      if (subjectData) {
+        subjectData.total += log.understanding
+        subjectData.count += 1
+      }
     })
     
     return Object.entries(subjectUnderstanding)

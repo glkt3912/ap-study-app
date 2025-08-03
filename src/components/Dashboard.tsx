@@ -187,7 +187,7 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
         </div>
         <div className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {['基礎固め期', '応用知識習得期', '総仕上げ期'].map((phase, index) => {
+            {['基礎固め期', '応用知識習得期', '総仕上げ期'].map((phase) => {
               const phaseWeeks = studyData.filter(week => week.phase === phase)
               const phaseProgress = phaseWeeks.length > 0 ? 
                 (phaseWeeks.reduce((acc, week) => 

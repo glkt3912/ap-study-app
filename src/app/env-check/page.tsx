@@ -31,8 +31,8 @@ export default function EnvCheckPage() {
       const navigation = window.performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming
       
       setPerformance({
-        loadTime: Math.round(navigation.loadEventEnd - navigation.navigationStart),
-        domReady: Math.round(navigation.domContentLoadedEventEnd - navigation.navigationStart),
+        loadTime: Math.round(navigation.loadEventEnd - navigation.startTime),
+        domReady: Math.round(navigation.domContentLoadedEventEnd - navigation.startTime),
         memoryUsage: 'memory' in window.performance ? 
           Math.round((window.performance as typeof window.performance & { memory: { usedJSHeapSize: number } }).memory.usedJSHeapSize / 1024 / 1024) : null
       })

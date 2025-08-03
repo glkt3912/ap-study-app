@@ -37,31 +37,21 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     }
     
     setMounted(true)
-    console.log('Initial theme set to:', initialTheme)
   }, [])
 
   // テーマが変更されたときの処理
   useEffect(() => {
-    console.log('Theme effect triggered, mounted:', mounted, 'theme:', theme)
     // DOM操作は常に実行（mountedに関係なく）
     localStorage.setItem('ap-study-theme', theme)
     if (theme === 'dark') {
       document.documentElement.classList.add('dark')
-      console.log('Added dark class to html element')
     } else {
       document.documentElement.classList.remove('dark')
-      console.log('Removed dark class from html element')
     }
-    console.log('HTML element classes:', document.documentElement.classList.toString())
-  }, [theme])
+  }, [theme, mounted])
 
   const toggleTheme = () => {
-    console.log('toggleTheme called, current theme:', theme)
-    setTheme(prev => {
-      const newTheme = prev === 'light' ? 'dark' : 'light'
-      console.log('Setting theme to:', newTheme)
-      return newTheme
-    })
+    setTheme(prev => prev === 'light' ? 'dark' : 'light')
   }
 
   // Hydration mismatchを防ぐため、mounted前は何もしない

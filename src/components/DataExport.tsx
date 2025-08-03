@@ -27,7 +27,7 @@ export default function DataExport({ studyData }: DataExportProps) {
       document.body.removeChild(link)
       URL.revokeObjectURL(url)
     } catch (error) {
-      console.error('JSON エクスポートエラー:', error)
+      // JSON エクスポートエラー
     } finally {
       setIsExporting(false)
     }
@@ -79,7 +79,7 @@ export default function DataExport({ studyData }: DataExportProps) {
       document.body.removeChild(link)
       URL.revokeObjectURL(url)
     } catch (error) {
-      console.error('CSV エクスポートエラー:', error)
+      // CSV エクスポートエラー
     } finally {
       setIsExporting(false)
     }
@@ -142,7 +142,7 @@ export default function DataExport({ studyData }: DataExportProps) {
         URL.revokeObjectURL(url)
       }
     } catch (error) {
-      console.error('Quiz データエクスポートエラー:', error)
+      // Quiz データエクスポートエラー
       alert('エクスポートに失敗しました。しばらく待ってから再試行してください。')
     } finally {
       setIsExporting(false)

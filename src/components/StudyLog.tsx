@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { apiClient, type StudyLog } from '../lib/api'
+import { apiClient } from '../lib/api'
 
 interface StudyLogEntry {
   id?: number
@@ -16,15 +16,15 @@ interface StudyLogEntry {
 
 export default function StudyLog() {
   const [logs, setLogs] = useState<StudyLogEntry[]>([])
+  const [isLoading, setIsLoading] = useState(false)
   const [newLog, setNewLog] = useState<StudyLogEntry>({
-    date: new Date().toISOString().split('T')[0],
+    date: new Date().toISOString().split('T')[0] || '',
     subject: '',
     topics: [],
     studyTime: 0,
     understanding: 0,
     memo: ''
   })
-  const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [topicInput, setTopicInput] = useState('')
   const [selectedSubject, setSelectedSubject] = useState<string>('')
@@ -57,7 +57,7 @@ export default function StudyLog() {
       const studyLogs = await apiClient.getStudyLogs()
       setLogs(studyLogs.map(log => ({
         ...log,
-        date: new Date(log.date).toISOString().split('T')[0]
+        date: new Date(log.date).toISOString().split('T')[0] || ''
       })))
       setError(null)
     } catch (err) {
@@ -80,12 +80,12 @@ export default function StudyLog() {
         // ローカル状態を更新
         setLogs(prevLogs => [{
           ...createdLog,
-          date: new Date(createdLog.date).toISOString().split('T')[0]
+          date: new Date(createdLog.date).toISOString().split('T')[0] || ''
         }, ...prevLogs])
         
         // フォームをリセット
         setNewLog({
-          date: new Date().toISOString().split('T')[0],
+          date: new Date().toISOString().split('T')[0] || '',
           subject: '',
           topics: [],
           studyTime: 0,
@@ -119,14 +119,6 @@ export default function StudyLog() {
     })
   }
 
-  const getTotalStudyTime = () => {
-    return logs.reduce((total, log) => total + log.studyTime, 0)
-  }
-
-  const getAverageUnderstanding = () => {
-    if (logs.length === 0) return 0
-    return logs.reduce((total, log) => total + log.understanding, 0) / logs.length
-  }
 
   // フィルタリング機能
   const getFilteredLogs = () => {
@@ -184,9 +176,12 @@ export default function StudyLog() {
       if (!subjectStats[log.subject]) {
         subjectStats[log.subject] = { time: 0, count: 0, understanding: 0 }
       }
-      subjectStats[log.subject].time += log.studyTime
-      subjectStats[log.subject].count += 1
-      subjectStats[log.subject].understanding += log.understanding
+      const subjectData = subjectStats[log.subject]
+      if (subjectData) {
+        subjectData.time += log.studyTime
+        subjectData.count += 1
+        subjectData.understanding += log.understanding
+      }
     })
     
     const topSubjects = Object.entries(subjectStats)
@@ -350,9 +345,10 @@ export default function StudyLog() {
 
             <button
               type="submit"
-              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+              disabled={isLoading}
+              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              記録を追加
+              {isLoading ? '保存中...' : '記録を追加'}
             </button>
           </form>
 
@@ -419,7 +415,7 @@ export default function StudyLog() {
                 </div>
                 <div className="bg-purple-50 rounded-lg p-4">
                   <div className="text-xl font-bold text-purple-600">
-                    {filteredStats.topSubjects.length > 0 ? filteredStats.topSubjects[0].subject.substring(0, 8) : 'なし'}
+                    {filteredStats.topSubjects.length > 0 ? filteredStats.topSubjects[0]?.subject.substring(0, 8) : 'なし'}
                   </div>
                   <div className="text-sm text-purple-800">最多学習分野</div>
                 </div>

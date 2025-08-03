@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { testCategories, afternoonQuestionTypes } from '@/data/studyPlan'
-import { apiClient, MorningTest, AfternoonTest, TestStats } from '../lib/api'
+import { apiClient, MorningTest, AfternoonTest } from '../lib/api'
 
 export default function TestRecord() {
   const [activeTab, setActiveTab] = useState<'morning' | 'afternoon'>('morning')
@@ -12,7 +12,7 @@ export default function TestRecord() {
   const [error, setError] = useState<string | null>(null)
   
   const [newMorningTest, setNewMorningTest] = useState<Omit<MorningTest, 'id' | 'accuracy'>>({
-    date: new Date().toISOString().split('T')[0],
+    date: new Date().toISOString().split('T')[0] || '',
     category: '',
     totalQuestions: 10,
     correctAnswers: 0,
@@ -21,7 +21,7 @@ export default function TestRecord() {
   })
 
   const [newAfternoonTest, setNewAfternoonTest] = useState<Omit<AfternoonTest, 'id'>>({
-    date: new Date().toISOString().split('T')[0],
+    date: new Date().toISOString().split('T')[0] || '',
     category: '',
     score: 0,
     timeSpent: 0,
@@ -40,7 +40,7 @@ export default function TestRecord() {
       const tests = await apiClient.getMorningTests()
       setMorningTests(tests.map(test => ({
         ...test,
-        date: new Date(test.date).toISOString().split('T')[0]
+        date: new Date(test.date).toISOString().split('T')[0] || ''
       })))
       setError(null)
     } catch (err) {
@@ -55,10 +55,10 @@ export default function TestRecord() {
       const tests = await apiClient.getAfternoonTests()
       setAfternoonTests(tests.map(test => ({
         ...test,
-        date: new Date(test.date).toISOString().split('T')[0]
+        date: new Date(test.date).toISOString().split('T')[0] || ''
       })))
     } catch (err) {
-      console.error('午後問題記録の取得に失敗:', err)
+      // 午後問題記録の取得に失敗
     }
   }
 
@@ -75,12 +75,12 @@ export default function TestRecord() {
         // ローカル状態を更新
         setMorningTests(prevTests => [{
           ...createdTest,
-          date: new Date(createdTest.date).toISOString().split('T')[0]
+          date: new Date(createdTest.date).toISOString().split('T')[0] || ''
         }, ...prevTests])
         
         // フォームをリセット
         setNewMorningTest({
-          date: new Date().toISOString().split('T')[0],
+          date: new Date().toISOString().split('T')[0] || '',
           category: '',
           totalQuestions: 10,
           correctAnswers: 0,
@@ -109,12 +109,12 @@ export default function TestRecord() {
         // ローカル状態を更新
         setAfternoonTests(prevTests => [{
           ...createdTest,
-          date: new Date(createdTest.date).toISOString().split('T')[0]
+          date: new Date(createdTest.date).toISOString().split('T')[0] || ''
         }, ...prevTests])
         
         // フォームをリセット
         setNewAfternoonTest({
-          date: new Date().toISOString().split('T')[0],
+          date: new Date().toISOString().split('T')[0] || '',
           category: '',
           score: 0,
           timeSpent: 0,

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { apiClient } from '@/lib/api'
 
 interface ApiTestResult {
@@ -16,12 +16,12 @@ export default function ApiTestPage() {
   const [tests, setTests] = useState<ApiTestResult[]>([])
   const [isRunning, setIsRunning] = useState(false)
 
-  const apiEndpoints = [
+  const apiEndpoints = useMemo(() => [
     { name: 'Health Check', endpoint: '/api/health', method: 'GET' },
     { name: 'Study Plan', endpoint: '/api/study-plan', method: 'GET' },
     { name: 'Study Log', endpoint: '/api/study-log', method: 'GET' },
     { name: 'Test Records', endpoint: '/api/test-records', method: 'GET' },
-  ]
+  ], [])
 
   const runSingleTest = async (endpoint: string, method: string = 'GET'): Promise<ApiTestResult> => {
     const startTime = performance.now()

@@ -109,7 +109,7 @@ export default function Quiz() {
       const sessionData = await apiClient.startQuizSession({
         sessionType,
         questionCount,
-        category,
+        ...(category && { category }),
       });
 
       setState(prev => ({
@@ -144,7 +144,7 @@ export default function Quiz() {
         ...prev.session,
         answers: {
           ...prev.session.answers,
-          [prev.session.questions[prev.session.currentIndex].id]: answer,
+          [prev.session.questions[prev.session.currentIndex]?.id || '']: answer,
         },
       } : null,
     }));
@@ -155,6 +155,8 @@ export default function Quiz() {
     if (!state.session) return;
 
     const currentQuestion = state.session.questions[state.session.currentIndex];
+    if (!currentQuestion) return;
+    
     const userAnswer = state.session.answers[currentQuestion.id];
     const timeSpent = Math.round((Date.now() - state.session.questionStartTime) / 1000);
 
@@ -304,6 +306,8 @@ export default function Quiz() {
   // Quiz進行中
   if (state.session) {
     const currentQuestion = state.session.questions[state.session.currentIndex];
+    if (!currentQuestion) return null;
+    
     const userAnswer = state.session.answers[currentQuestion.id];
     const progress = ((state.session.currentIndex + 1) / state.session.questions.length) * 100;
 
@@ -619,13 +623,10 @@ export default function Quiz() {
                       <YAxis />
                       <Tooltip 
                         labelFormatter={(value) => new Date(value).toLocaleDateString('ja-JP')}
-                        formatter={(value: number, name: string) => [
-                          name === 'daily_questions' ? `${value}問` : 
-                          name === 'avg_score' ? `${value.toFixed(1)}点` : 
-                          `${value}分`,
-                          name === 'daily_questions' ? '問題数' : 
-                          name === 'avg_score' ? '平均スコア' : 
-                          '学習時間'
+                        formatter={(value, name) => [
+                          typeof value === 'number' && name === 'avg_score' ? `${value.toFixed(1)}点` : 
+                          typeof value === 'number' && name === 'daily_questions' ? `${value}問` : 
+                          `${value}分`
                         ]}
                       />
                       <Line 
@@ -661,7 +662,7 @@ export default function Quiz() {
                       <YAxis />
                       <Tooltip 
                         labelFormatter={(value) => new Date(value).toLocaleDateString('ja-JP')}
-                        formatter={(value: number, name: string) => [
+                        formatter={(value) => [
                           `${value}問`,
                           '累積問題数'
                         ]}

@@ -15,18 +15,9 @@ interface ReviewItem {
   priority_score: number;
 }
 
-interface ReviewSession {
-  id: string;
-  review_item_id: string;
-  reviewed_at: string;
-  understanding_after: number;
-  time_spent: number;
-}
-
 export function ReviewSystem() {
   const [todayReviews, setTodayReviews] = useState<ReviewItem[]>([]);
   const [activeReview, setActiveReview] = useState<ReviewItem | null>(null);
-  const [reviewSessions, setReviewSessions] = useState<ReviewSession[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentUnderstanding, setCurrentUnderstanding] = useState(3);
