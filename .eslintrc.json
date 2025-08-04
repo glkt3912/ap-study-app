@@ -5,6 +5,8 @@
     "react-hooks/exhaustive-deps": "error",
     "prefer-const": "error",
     "no-var": "error",
-    "no-unused-vars": "error"
+    "no-unused-vars": ["error", {
+      "argsIgnorePattern": "^_"
+    }]
   }
 }

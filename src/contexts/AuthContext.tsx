@@ -13,9 +13,9 @@ interface AuthContextType {
   user: User | null
   userId: string
   isAuthenticated: boolean
-  login: (userName: string, userEmail?: string) => void
+  login: (_name: string, _email?: string) => void
   logout: () => void
-  updateUser: (userUpdates: Partial<User>) => void
+  updateUser: (_updates: Partial<User>) => void
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -24,7 +24,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [mounted, setMounted] = useState(false)
 
-  const createNewUser = () => {
+  const generateUserId = useCallback((): string => {
+    return `user_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`
+  }, [])
+
+  const createNewUser = useCallback(() => {
     const newUser: User = {
       id: generateUserId(),
       name: 'ゲストユーザー',
@@ -32,7 +36,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     setUser(newUser)
     localStorage.setItem('ap-study-user', JSON.stringify(newUser))
-  }
+  }, [generateUserId])
 
   // Generate or retrieve user ID
   useEffect(() => {
@@ -57,11 +61,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setMounted(true)
   }, [createNewUser])
 
-  const generateUserId = (): string => {
-    return `user_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`
-  }
-
-  const login = (name: string, email?: string) => {
+  const login = useCallback((name: string, email?: string) => {
     if (!user) return
     
     const updatedUser: User = {
@@ -72,20 +72,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     
     setUser(updatedUser)
     localStorage.setItem('ap-study-user', JSON.stringify(updatedUser))
-  }
+  }, [user])
 
-  const logout = () => {
+  const logout = useCallback(() => {
     localStorage.removeItem('ap-study-user')
     createNewUser()
-  }
+  }, [createNewUser])
 
-  const updateUser = (updates: Partial<User>) => {
+  const updateUser = useCallback((updates: Partial<User>) => {
     if (!user) return
     
     const updatedUser = { ...user, ...updates }
     setUser(updatedUser)
     localStorage.setItem('ap-study-user', JSON.stringify(updatedUser))
-  }
+  }, [user])
 
   // Prevent hydration mismatch
   if (!mounted) {
