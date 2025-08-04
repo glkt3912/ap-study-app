@@ -94,7 +94,7 @@ interface LearningPattern {
 }
 
 export function AdvancedAnalysis() {
-  const [activeTab, setActiveTab] = useState<"performance" | "readiness" | "pattern">("performance");
+  const [activeTab, setActiveTab] = useState<"performance" | "readiness" | "pattern" | "efficiency">("performance");
   const [performanceMetrics, setPerformanceMetrics] = useState<PerformanceMetrics | null>(null);
   const [examReadiness, setExamReadiness] = useState<ExamReadiness | null>(null);
   const [learningPattern, setLearningPattern] = useState<LearningPattern | null>(null);
@@ -181,7 +181,8 @@ export function AdvancedAnalysis() {
         {[
           { key: "performance", label: "パフォーマンス指標", shortLabel: "指標" },
           { key: "readiness", label: "試験準備度", shortLabel: "準備度" },
-          { key: "pattern", label: "学習パターン", shortLabel: "パターン" }
+          { key: "pattern", label: "学習パターン", shortLabel: "パターン" },
+          { key: "efficiency", label: "学習効率分析", shortLabel: "効率" }
         ].map((tab) => (
           <button
             key={tab.key}
@@ -567,6 +568,42 @@ export function AdvancedAnalysis() {
           </div>
         </div>
       )}
+
+      {/* 学習効率分析タブ */}
+      {activeTab === "efficiency" && (
+        <div className="space-y-6">
+          <div className="bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded">
+            <div className="flex items-center">
+              <span className="mr-2">📊</span>
+              <span className="font-medium">新機能: 学習効率分析</span>
+            </div>
+            <p className="text-sm mt-1">
+              時間帯別・分野別の学習効率を詳細に分析し、個人最適化された学習提案を提供します。
+            </p>
+          </div>
+          
+          {/* LearningEfficiencyDashboardコンポーネントを埋め込み */}
+          <div className="bg-gray-50 rounded-lg p-1">
+            <div className="bg-white rounded">
+              <Suspense fallback={
+                <div className="h-96 flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                  <span className="ml-3">学習効率分析を読み込み中...</span>
+                </div>
+              }>
+                <LearningEfficiencyDashboardComponent />
+              </Suspense>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
+// 動的インポート用のLazy Componentを定義
+const LearningEfficiencyDashboardComponent = lazy(() => 
+  import('./LearningEfficiencyDashboard').then(module => ({
+    default: module.LearningEfficiencyDashboard
+  }))
+);

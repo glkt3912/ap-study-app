@@ -625,6 +625,76 @@ class ApiClient {
       }),
     });
   }
+
+  // 学習効率分析API
+  async generateLearningEfficiencyAnalysis(options: {
+    userId: string;
+    timeRange: {
+      startDate: Date;
+      endDate: Date;
+    };
+  }): Promise<{
+    id: string;
+    userId: string;
+    analysisDate: string;
+    timeRange: {
+      startDate: string;
+      endDate: string;
+    };
+    hourlyEfficiency: Array<{
+      hour: number;
+      avgStudyTime: number;
+      avgUnderstanding: number;
+      completionRate: number;
+      efficiencyScore: number;
+    }>;
+    subjectEfficiency: Array<{
+      subject: string;
+      totalStudyTime: number;
+      avgUnderstanding: number;
+      completionRate: number;
+      difficultyLevel: number;
+      learningVelocity: number;
+    }>;
+    recommendations: Array<{
+      type: 'time_optimization' | 'subject_focus' | 'schedule_adjustment';
+      priority: 'high' | 'medium' | 'low';
+      title: string;
+      description: string;
+      expectedImprovement: number;
+    }>;
+    overallScore: number;
+  }> {
+    return this.request("/api/learning-efficiency-analysis/generate", {
+      method: "POST",
+      headers: {
+        "X-User-ID": options.userId,
+      },
+      body: JSON.stringify({
+        userId: options.userId,
+        timeRange: {
+          startDate: options.timeRange.startDate.toISOString(),
+          endDate: options.timeRange.endDate.toISOString(),
+        },
+      }),
+    });
+  }
+
+  async getLearningEfficiencyAnalysis(analysisId: string): Promise<any> {
+    return this.request(`/api/learning-efficiency-analysis/${analysisId}`, {
+      headers: {
+        "X-User-ID": "test-user",
+      },
+    });
+  }
+
+  async getUserLearningEfficiencyAnalyses(userId: string): Promise<any[]> {
+    return this.request(`/api/learning-efficiency-analysis/user/${userId}`, {
+      headers: {
+        "X-User-ID": userId,
+      },
+    });
+  }
 }
 
 export const apiClient = new ApiClient();
