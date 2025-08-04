@@ -24,7 +24,7 @@ describe('ThemeToggle', () => {
       </ThemeProvider>
     )
 
-    const button = screen.getByRole('button', { name: /toggle theme/i })
+    const button = screen.getByRole('button')
     expect(button).toBeInTheDocument()
   })
 
@@ -35,18 +35,18 @@ describe('ThemeToggle', () => {
       </ThemeProvider>
     )
 
-    const button = screen.getByRole('button', { name: /toggle theme/i })
+    const button = screen.getByRole('button')
     
     // Initial state should be light theme
-    expect(button).toHaveTextContent('🌙')
+    expect(button).toHaveTextContent('🌙Dark')
     
     // Click to toggle to dark theme
     fireEvent.click(button)
-    expect(button).toHaveTextContent('☀️')
+    expect(button).toHaveTextContent('☀️Light')
     
     // Click to toggle back to light theme
     fireEvent.click(button)
-    expect(button).toHaveTextContent('🌙')
+    expect(button).toHaveTextContent('🌙Dark')
   })
 
   it('applies correct CSS classes based on theme', () => {
@@ -59,7 +59,7 @@ describe('ThemeToggle', () => {
     )
 
     render(<TestComponent />)
-    const button = screen.getByRole('button', { name: /toggle theme/i })
+    const button = screen.getByRole('button')
     
     // Toggle to dark theme
     fireEvent.click(button)

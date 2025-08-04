@@ -165,8 +165,9 @@ class ApiClient {
   }
 
   // 学習計画API
-  async getStudyPlan(): Promise<StudyWeek[]> {
-    return this.request<StudyWeek[]>("/api/study/plan");
+  async getStudyPlan(userId?: string): Promise<StudyWeek[]> {
+    const url = userId ? `/api/study/plan?userId=${userId}` : "/api/study/plan";
+    return this.request<StudyWeek[]>(url);
   }
 
   async getStudyWeek(weekNumber: number): Promise<StudyWeek> {

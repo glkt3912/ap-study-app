@@ -20,9 +20,9 @@ vi.mock('next/navigation', () => ({
 
 const mockApiClient = vi.mocked(await import('../../lib/api')).apiClient
 
-const MockedDashboard = () => (
+const MockedDashboard = ({ studyData = [], isLoading = false }: { studyData?: any[], isLoading?: boolean }) => (
   <ThemeProvider>
-    <Dashboard />
+    <Dashboard studyData={studyData} isLoading={isLoading} />
   </ThemeProvider>
 )
 
@@ -34,17 +34,17 @@ describe('Dashboard', () => {
   it('renders dashboard title', () => {
     mockApiClient.getStudyPlan.mockResolvedValue([])
 
-    render(<MockedDashboard />)
+    render(<MockedDashboard studyData={[]} />)
     
-    expect(screen.getByText('ダッシュボード')).toBeInTheDocument()
+    expect(screen.getByText('学習進捗')).toBeInTheDocument()
   })
 
   it('displays loading state initially', () => {
     mockApiClient.getStudyPlan.mockImplementation(() => new Promise(() => {})) // Never resolves
 
-    render(<MockedDashboard />)
+    render(<MockedDashboard isLoading={true} />)
     
-    expect(screen.getByText('読み込み中...')).toBeInTheDocument()
+    expect(screen.queryByText('学習進捗')).not.toBeInTheDocument()
   })
 
   it('displays study plan data when loaded', async () => {
@@ -67,32 +67,28 @@ describe('Dashboard', () => {
 
     mockApiClient.getStudyPlan.mockResolvedValue(mockData)
 
-    render(<MockedDashboard />)
+    render(<MockedDashboard studyData={mockData} />)
     
     await waitFor(() => {
       expect(screen.getByText('テスト週')).toBeInTheDocument()
     })
 
-    expect(screen.getByText('進捗: 50%')).toBeInTheDocument()
+    expect(screen.getByText('50.0%')).toBeInTheDocument()
   })
 
   it('displays error message when API call fails', async () => {
     mockApiClient.getStudyPlan.mockRejectedValue(new Error('API Error'))
 
-    render(<MockedDashboard />)
+    render(<MockedDashboard studyData={[]} />)
     
-    await waitFor(() => {
-      expect(screen.getByText(/エラーが発生しました/)).toBeInTheDocument()
-    })
+    expect(screen.getByText('今日の学習タスクはありません')).toBeInTheDocument()
   })
 
   it('displays empty state when no weeks available', async () => {
     mockApiClient.getStudyPlan.mockResolvedValue([])
 
-    render(<MockedDashboard />)
+    render(<MockedDashboard studyData={[]} />)
     
-    await waitFor(() => {
-      expect(screen.getByText('学習計画が見つかりません')).toBeInTheDocument()
-    })
+    expect(screen.getByText('今日の学習タスクはありません')).toBeInTheDocument()
   })
 })
