@@ -135,31 +135,83 @@ export interface QuizStats {
 }
 
 class ApiClient {
+  private getAuthHeaders(): Record<string, string> {
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
+
+    // ブラウザ環境でのみLocalStorageにアクセス
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('ap-study-token');
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+    }
+
+    return headers;
+  }
+
   private async request<T>(
     endpoint: string,
     options?: RequestInit
   ): Promise<T> {
+    const startTime = performance.now();
+    const method = options?.method || 'GET';
+    const url = `${API_BASE_URL}${endpoint}`;
+
     try {
-      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      const response = await fetch(url, {
         headers: {
-          "Content-Type": "application/json",
+          ...this.getAuthHeaders(),
           ...options?.headers,
         },
         ...options,
       });
 
+      const duration = performance.now() - startTime;
+
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const error = new Error(`HTTP error! status: ${response.status}`);
+        
+        // 監視システムにAPI エラーを記録
+        if (typeof window !== 'undefined') {
+          const { monitoring } = await import('./monitoring');
+          monitoring.trackApiCall(endpoint, method, duration, response.status, error);
+        }
+        
+        throw error;
       }
 
       const data = await response.json();
 
       if (!data.success) {
-        throw new Error(data.error || "API request failed");
+        const error = new Error(data.error || "API request failed");
+        
+        // 監視システムにAPI エラーを記録
+        if (typeof window !== 'undefined') {
+          const { monitoring } = await import('./monitoring');
+          monitoring.trackApiCall(endpoint, method, duration, response.status, error);
+        }
+        
+        throw error;
+      }
+
+      // 監視システムに成功したAPI呼び出しを記録
+      if (typeof window !== 'undefined') {
+        const { monitoring } = await import('./monitoring');
+        monitoring.trackApiCall(endpoint, method, duration, response.status);
       }
 
       return data.data;
     } catch (error) {
+      const duration = performance.now() - startTime;
+      
+      // 監視システムにネットワークエラーを記録
+      if (typeof window !== 'undefined') {
+        const { monitoring } = await import('./monitoring');
+        monitoring.trackApiCall(endpoint, method, duration, 0, error as Error);
+      }
+      
       throw error;
     }
   }
@@ -387,9 +439,6 @@ class ApiClient {
   }> {
     return this.request("/api/quiz/start", {
       method: "POST",
-      headers: {
-        "X-User-ID": "test-user", // TODO: 実際のユーザーID取得
-      },
       body: JSON.stringify(options),
     });
   }
@@ -406,9 +455,6 @@ class ApiClient {
   }> {
     return this.request("/api/quiz/answer", {
       method: "POST",
-      headers: {
-        "X-User-ID": "test-user", // TODO: 実際のユーザーID取得
-      },
       body: JSON.stringify(options),
     });
   }
@@ -416,38 +462,23 @@ class ApiClient {
   async completeQuizSession(sessionId: number): Promise<QuizSession> {
     return this.request("/api/quiz/complete", {
       method: "POST",
-      headers: {
-        "X-User-ID": "test-user", // TODO: 実際のユーザーID取得
-      },
       body: JSON.stringify({ sessionId }),
     });
   }
 
   async getQuizSessions(limit?: number): Promise<QuizSession[]> {
     const params = limit ? `?limit=${limit}` : "";
-    return this.request<QuizSession[]>(`/api/quiz/sessions${params}`, {
-      headers: {
-        "X-User-ID": "test-user", // TODO: 実際のユーザーID取得
-      },
-    });
+    return this.request<QuizSession[]>(`/api/quiz/sessions${params}`);
   }
 
   async getQuizStats(): Promise<QuizStats> {
-    return this.request<QuizStats>("/api/quiz/stats", {
-      headers: {
-        "X-User-ID": "test-user", // TODO: 実際のユーザーID取得
-      },
-    });
+    return this.request<QuizStats>("/api/quiz/stats");
   }
 
   // 新しいQuiz API機能
   async getWeakPoints(limit?: number): Promise<any[]> {
     const params = limit ? `?limit=${limit}` : "";
-    return this.request<any[]>(`/api/quiz/weak-points${params}`, {
-      headers: {
-        "X-User-ID": "test-user",
-      },
-    });
+    return this.request<any[]>(`/api/quiz/weak-points${params}`);
   }
 
   async getRecommendedQuestions(limit?: number): Promise<{
@@ -456,11 +487,7 @@ class ApiClient {
     questions: Question[];
   }> {
     const params = limit ? `?limit=${limit}` : "";
-    return this.request(`/api/quiz/recommendations${params}`, {
-      headers: {
-        "X-User-ID": "test-user",
-      },
-    });
+    return this.request(`/api/quiz/recommendations${params}`);
   }
 
   async getQuizProgress(): Promise<{
@@ -472,11 +499,7 @@ class ApiClient {
     categoryProgress: any[];
     recentActivity: QuizSession[];
   }> {
-    return this.request("/api/quiz/progress", {
-      headers: {
-        "X-User-ID": "test-user",
-      },
-    });
+    return this.request("/api/quiz/progress");
   }
 
   async getDetailedAnalysis(options?: {
@@ -495,11 +518,7 @@ class ApiClient {
     if (options?.period) params.append("period", options.period.toString());
     
     const query = params.toString();
-    return this.request(`/api/quiz/detailed-analysis${query ? `?${query}` : ""}`, {
-      headers: {
-        "X-User-ID": "test-user",
-      },
-    });
+    return this.request(`/api/quiz/detailed-analysis${query ? `?${query}` : ""}`);
   }
 
   async getLearningTrends(days?: number): Promise<{
@@ -509,11 +528,7 @@ class ApiClient {
     categoryTrends: any[];
   }> {
     const params = days ? `?days=${days}` : "";
-    return this.request(`/api/quiz/learning-trends${params}`, {
-      headers: {
-        "X-User-ID": "test-user",
-      },
-    });
+    return this.request(`/api/quiz/learning-trends${params}`);
   }
 
   async exportQuizData(options: {
@@ -524,8 +539,7 @@ class ApiClient {
     const response = await fetch(`${API_BASE_URL}/api/quiz/export`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
-        "X-User-ID": "test-user",
+        ...this.getAuthHeaders(),
       },
       body: JSON.stringify(options),
     });
@@ -550,11 +564,7 @@ class ApiClient {
     categoryBalance: any[];
   }> {
     const params = period ? `?period=${period}` : "";
-    return this.request(`/api/analysis/performance-metrics${params}`, {
-      headers: {
-        "X-User-ID": "test-user",
-      },
-    });
+    return this.request(`/api/analysis/performance-metrics${params}`);
   }
 
   async evaluateExamReadiness(options: {
@@ -572,9 +582,6 @@ class ApiClient {
   }> {
     return this.request("/api/analysis/exam-readiness", {
       method: "POST",
-      headers: {
-        "X-User-ID": "test-user",
-      },
       body: JSON.stringify(options),
     });
   }
@@ -589,37 +596,23 @@ class ApiClient {
       recommendedDailyQuestions: number;
     };
   }> {
-    return this.request("/api/analysis/learning-pattern", {
-      headers: {
-        "X-User-ID": "test-user",
-      },
-    });
+    return this.request("/api/analysis/learning-pattern");
   }
 
   // 復習システムAPI
   async generateReviewSchedule(): Promise<{ message: string; generated_count: number }> {
     return this.request("/api/analysis/review/generate", {
       method: "POST",
-      headers: {
-        "X-User-ID": "test-user",
-      },
     });
   }
 
   async getTodayReviews(): Promise<any[]> {
-    return this.request("/api/analysis/review/today", {
-      headers: {
-        "X-User-ID": "test-user",
-      },
-    });
+    return this.request("/api/analysis/review/today");
   }
 
   async completeReview(reviewItemId: string, understanding: number): Promise<{ message: string }> {
     return this.request("/api/analysis/review/complete", {
       method: "POST",
-      headers: {
-        "X-User-ID": "test-user",
-      },
       body: JSON.stringify({
         review_item_id: reviewItemId,
         understanding_after: understanding,
@@ -668,9 +661,6 @@ class ApiClient {
   }> {
     return this.request("/api/learning-efficiency-analysis/generate", {
       method: "POST",
-      headers: {
-        "X-User-ID": options.userId,
-      },
       body: JSON.stringify({
         userId: options.userId,
         timeRange: {
@@ -682,19 +672,11 @@ class ApiClient {
   }
 
   async getLearningEfficiencyAnalysis(analysisId: string): Promise<any> {
-    return this.request(`/api/learning-efficiency-analysis/${analysisId}`, {
-      headers: {
-        "X-User-ID": "test-user",
-      },
-    });
+    return this.request(`/api/learning-efficiency-analysis/${analysisId}`);
   }
 
   async getUserLearningEfficiencyAnalyses(userId: string): Promise<any[]> {
-    return this.request(`/api/learning-efficiency-analysis/user/${userId}`, {
-      headers: {
-        "X-User-ID": userId,
-      },
-    });
+    return this.request(`/api/learning-efficiency-analysis/user/${userId}`);
   }
 }
 

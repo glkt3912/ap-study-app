@@ -11,17 +11,21 @@ import DataExport from '@/components/DataExport'
 import DiagnosticHub from '@/components/DiagnosticHub'
 import { AdvancedAnalysis } from '@/components/AdvancedAnalysis'
 import { ReviewSystem } from '@/components/ReviewSystem'
+import { AuthModal } from '@/components/auth'
+import { useAuth } from '@/contexts/AuthContext'
 // import ThemeToggle from '@/components/ui/ThemeToggle'
 import { studyPlanData } from '@/data/studyPlan'
 import { apiClient } from '@/lib/api'
 
 export default function Home() {
+  const { isAuthenticated, user, isLoading: authLoading } = useAuth()
   const [activeTab, setActiveTab] = useState('dashboard')
   const [studyData, setStudyData] = useState(studyPlanData)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isDarkMode, setIsDarkMode] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [showAuthModal, setShowAuthModal] = useState(false)
 
   // ダークモード初期化
   useEffect(() => {
@@ -131,6 +135,32 @@ export default function Home() {
               </p>
             </div>
             <div className="flex items-center space-x-3">
+              {/* 認証状態表示・ログインボタン */}
+              {isAuthenticated && user ? (
+                <div className="flex items-center space-x-3">
+                  <span className="text-sm text-gray-600 dark:text-gray-300">
+                    {user.name || user.email}
+                  </span>
+                  <button
+                    onClick={() => {
+                      // ログアウト処理実装予定
+                      setShowAuthModal(true)
+                    }}
+                    className="text-sm px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                  >
+                    ログアウト
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setShowAuthModal(true)}
+                  className="text-sm px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                  disabled={authLoading}
+                >
+                  {authLoading ? '読み込み中...' : 'ログイン'}
+                </button>
+              )}
+              
               {mounted ? (
                 <button
                   onClick={toggleDarkMode}
@@ -196,6 +226,12 @@ export default function Home() {
           renderContent()
         )}
       </main>
+      
+      {/* 認証モーダル */}
+      <AuthModal 
+        isOpen={showAuthModal} 
+        onClose={() => setShowAuthModal(false)} 
+      />
     </div>
   )
 }

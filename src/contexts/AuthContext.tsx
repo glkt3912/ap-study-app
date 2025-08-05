@@ -3,88 +3,167 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react'
 
 interface User {
-  id: string
+  id: number
   name: string
-  email?: string
+  email: string
+  role: 'user' | 'admin'
   createdAt: Date
 }
 
 interface AuthContextType {
   user: User | null
-  userId: string
+  userId: number
+  token: string | null
   isAuthenticated: boolean
-  login: (_name: string, _email?: string) => void
+  login: (_email: string, _password: string) => Promise<boolean>
+  signup: (_email: string, _password: string, _name?: string) => Promise<boolean>
   logout: () => void
   updateUser: (_updates: Partial<User>) => void
+  isLoading: boolean
+  error: string | null
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
+  const [token, setToken] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [mounted, setMounted] = useState(false)
 
-  const generateUserId = useCallback((): string => {
-    return `user_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`
+  // トークン検証とユーザー情報取得
+  const verifyToken = useCallback(async (token: string): Promise<boolean> => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setUser({
+          ...data.data.user,
+          createdAt: new Date(data.data.user.createdAt)
+        })
+        return true
+      }
+      return false
+    } catch {
+      return false
+    }
   }, [])
 
-  const createNewUser = useCallback(() => {
-    const newUser: User = {
-      id: generateUserId(),
-      name: 'ゲストユーザー',
-      createdAt: new Date()
-    }
-    setUser(newUser)
-    localStorage.setItem('ap-study-user', JSON.stringify(newUser))
-  }, [generateUserId])
-
-  // Generate or retrieve user ID
+  // 初期化時にトークンをチェック
   useEffect(() => {
-    const storedUser = localStorage.getItem('ap-study-user')
+    const initAuth = async () => {
+      const storedToken = localStorage.getItem('ap-study-token')
+      
+      if (storedToken) {
+        const isValid = await verifyToken(storedToken)
+        if (isValid) {
+          setToken(storedToken)
+        } else {
+          localStorage.removeItem('ap-study-token')
+        }
+      }
+      
+      setIsLoading(false)
+      setMounted(true)
+    }
+
+    initAuth()
+  }, [verifyToken])
+
+  const login = useCallback(async (email: string, password: string): Promise<boolean> => {
+    setIsLoading(true)
+    setError(null)
     
-    if (storedUser) {
-      try {
-        const userData = JSON.parse(storedUser)
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      })
+
+      const data = await response.json()
+
+      if (response.ok && data.success) {
+        const { token: newToken, user: userData } = data.data
+        setToken(newToken)
         setUser({
           ...userData,
           createdAt: new Date(userData.createdAt)
         })
-      } catch {
-        // Create new user if parsing fails
-        createNewUser()
+        localStorage.setItem('ap-study-token', newToken)
+        return true
+      } else {
+        setError(data.message || 'ログインに失敗しました')
+        return false
       }
-    } else {
-      // Create new user if none exists
-      createNewUser()
+    } catch (err) {
+      setError('ネットワークエラーが発生しました')
+      return false
+    } finally {
+      setIsLoading(false)
     }
-    
-    setMounted(true)
-  }, [createNewUser])
+  }, [])
 
-  const login = useCallback((name: string, email?: string) => {
-    if (!user) return
+  const signup = useCallback(async (email: string, password: string, name?: string): Promise<boolean> => {
+    setIsLoading(true)
+    setError(null)
     
-    const updatedUser: User = {
-      ...user,
-      name,
-      ...(email && { email })
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/auth/signup`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password, name }),
+      })
+
+      const data = await response.json()
+
+      if (response.ok && data.success) {
+        const { token: newToken, user: userData } = data.data
+        setToken(newToken)
+        setUser({
+          ...userData,
+          createdAt: new Date(userData.createdAt)
+        })
+        localStorage.setItem('ap-study-token', newToken)
+        return true
+      } else {
+        setError(data.message || 'アカウント作成に失敗しました')
+        return false
+      }
+    } catch (err) {
+      setError('ネットワークエラーが発生しました')
+      return false
+    } finally {
+      setIsLoading(false)
     }
-    
-    setUser(updatedUser)
-    localStorage.setItem('ap-study-user', JSON.stringify(updatedUser))
-  }, [user])
+  }, [])
 
   const logout = useCallback(() => {
-    localStorage.removeItem('ap-study-user')
-    createNewUser()
-  }, [createNewUser])
+    setUser(null)
+    setToken(null)
+    setError(null)
+    localStorage.removeItem('ap-study-token')
+  }, [])
 
   const updateUser = useCallback((updates: Partial<User>) => {
     if (!user) return
     
     const updatedUser = { ...user, ...updates }
     setUser(updatedUser)
-    localStorage.setItem('ap-study-user', JSON.stringify(updatedUser))
   }, [user])
 
   // Prevent hydration mismatch
@@ -94,11 +173,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const contextValue: AuthContextType = {
     user,
-    userId: user?.id || 'anonymous',
-    isAuthenticated: user !== null && user.name !== 'ゲストユーザー',
+    userId: user?.id || 0,
+    token,
+    isAuthenticated: user !== null && token !== null,
     login,
+    signup,
     logout,
-    updateUser
+    updateUser,
+    isLoading,
+    error
   }
 
   return (
