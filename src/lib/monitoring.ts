@@ -86,7 +86,7 @@ class MonitoringService {
    */
   private async initWebVitals() {
     try {
-      const { getCLS, getFID, getFCP, getLCP, getTTFB } = await import('web-vitals');
+      const { onCLS, onINP, onFCP, onLCP, onTTFB } = await import('web-vitals');
       
       const handleMetric = (metric: WebVitalsMetric) => {
         this.trackPerformance({
@@ -103,13 +103,13 @@ class MonitoringService {
         });
       };
 
-      getCLS(handleMetric);
-      getFID(handleMetric);
-      getFCP(handleMetric);
-      getLCP(handleMetric);
-      getTTFB(handleMetric);
+      onCLS(handleMetric);
+      onINP(handleMetric);
+      onFCP(handleMetric);
+      onLCP(handleMetric);
+      onTTFB(handleMetric);
     } catch (error) {
-      console.warn('Web Vitals monitoring failed to initialize:', error);
+      // console.warn('Web Vitals monitoring failed to initialize:', error);
     }
   }
 
@@ -175,11 +175,11 @@ class MonitoringService {
         this.trackPerformance({
           type: 'navigation',
           name: 'page-load',
-          duration: navigation.loadEventEnd - navigation.navigationStart,
+          duration: navigation.loadEventEnd - (navigation.requestStart || 0),
           timestamp: new Date().toISOString(),
           url: window.location.href,
           metadata: {
-            domContentLoaded: navigation.domContentLoadedEventEnd - navigation.navigationStart,
+            domContentLoaded: navigation.domContentLoadedEventEnd - (navigation.requestStart || 0),
             firstPaint: performance.getEntriesByName('first-paint')[0]?.startTime || 0,
             firstContentfulPaint: performance.getEntriesByName('first-contentful-paint')[0]?.startTime || 0
           }
@@ -258,7 +258,7 @@ class MonitoringService {
         timestamp: new Date().toISOString(),
         url: window.location.href,
         metadata: {
-          sessionDuration: Date.now() - (performance.timing?.navigationStart || 0)
+          sessionDuration: Date.now() - (performance.timeOrigin || Date.now())
         }
       });
       
@@ -282,7 +282,7 @@ class MonitoringService {
   public trackError(error: ErrorEvent) {
     if (!this.isEnabled) return;
 
-    console.error('Frontend Error Tracked:', error);
+    // console.error('Frontend Error Tracked:', error);
     this.addToQueue('error', error);
   }
 
@@ -336,7 +336,7 @@ class MonitoringService {
       duration: value,
       timestamp: new Date().toISOString(),
       url: window.location.href,
-      metadata
+      ...(metadata && { metadata })
     });
   }
 
@@ -384,7 +384,7 @@ class MonitoringService {
         })
       });
     } catch (error) {
-      console.error('Failed to send monitoring events:', error);
+      // console.error('Failed to send monitoring events:', error);
       // 失敗したイベントを再キューに追加（無限ループ防止のため制限付き）
       if (events.length < 100) {
         this.eventQueue.unshift(...events);

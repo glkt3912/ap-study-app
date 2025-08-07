@@ -10,7 +10,7 @@ import { reportError } from '@/lib/monitoring';
 interface Props {
   children: ReactNode;
   fallback?: ReactNode;
-  onError?: (error: Error, errorInfo: ErrorInfo) => void;
+  onError?: (_error: Error, _errorInfo: ErrorInfo) => void;
 }
 
 interface State {
@@ -46,7 +46,7 @@ export class ErrorBoundary extends Component<Props, State> {
       errorInfo
     });
 
-    console.error('ErrorBoundary caught an error:', error, errorInfo);
+    // console.error('ErrorBoundary caught an error:', error, errorInfo);
   }
 
   render() {

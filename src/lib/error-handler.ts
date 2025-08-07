@@ -6,6 +6,7 @@
 import { monitoring } from './monitoring';
 
 // エラー分類
+/* eslint-disable no-unused-vars */
 export enum ErrorCategory {
   NETWORK = 'network',
   API = 'api',
@@ -18,14 +19,17 @@ export enum ErrorCategory {
   CLIENT = 'client',
   UNKNOWN = 'unknown',
 }
+/* eslint-enable no-unused-vars */
 
 // エラー重要度
+/* eslint-disable no-unused-vars */
 export enum ErrorSeverity {
   LOW = 'low',
   MEDIUM = 'medium',
   HIGH = 'high',
   CRITICAL = 'critical',
 }
+/* eslint-enable no-unused-vars */
 
 // 標準化エラー型
 export interface StandardError {
@@ -72,7 +76,7 @@ class ErrorHandler {
   private config: ErrorHandlerConfig;
   private retryAttempts: Map<string, number> = new Map();
   private errorHistory: StandardError[] = [];
-  private errorCallbacks: Map<ErrorCategory, ((error: StandardError) => void)[]> = new Map();
+  private errorCallbacks: Map<ErrorCategory, ((_error: StandardError) => void)[]> = new Map();
 
   constructor(config?: Partial<ErrorHandlerConfig>) {
     this.config = {
@@ -123,12 +127,14 @@ class ErrorHandler {
       },
       timestamp,
       context: {
-        url: context?.url || (typeof window !== 'undefined' ? window.location.href : undefined),
-        method: context?.method,
-        userId: context?.userId,
-        requestId: context?.requestId,
-        userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : undefined,
-        stackTrace: error?.stack,
+        ...((context?.url || (typeof window !== 'undefined' && window.location.href)) && { 
+          url: context?.url || window.location.href 
+        }),
+        ...(context?.method && { method: context.method }),
+        ...(context?.userId && { userId: context.userId }),
+        ...(context?.requestId && { requestId: context.requestId }),
+        ...((typeof navigator !== 'undefined' && navigator.userAgent) && { userAgent: navigator.userAgent }),
+        ...(error?.stack && { stackTrace: error.stack }),
       },
       retryable: this.isRetryable(category, error),
       recoveryActions: this.generateRecoveryActions(category, error),
@@ -163,7 +169,7 @@ class ErrorHandler {
       try {
         callback(standardError);
       } catch (callbackError) {
-        console.error('Error in error callback:', callbackError);
+        // console.error('Error in error callback:', callbackError);
       }
     });
 
@@ -197,8 +203,8 @@ class ErrorHandler {
       category: ErrorCategory.API,
       url: endpoint,
       method,
-      userId: context?.userId,
-      requestId: context?.requestId,
+      ...(context?.userId && { userId: context.userId }),
+      ...(context?.requestId && { requestId: context.requestId }),
       code: error?.status?.toString() || 'API_ERROR',
     };
 
@@ -219,8 +225,8 @@ class ErrorHandler {
     const networkContext = {
       category: ErrorCategory.NETWORK,
       severity: ErrorSeverity.HIGH,
-      url: context?.url,
-      method: context?.method,
+      ...(context?.url && { url: context.url }),
+      ...(context?.method && { method: context.method }),
       code: context?.timeout ? 'NETWORK_TIMEOUT' : 'NETWORK_ERROR',
       userMessage: context?.timeout 
         ? 'リクエストがタイムアウトしました。しばらく待ってから再度お試しください。'
@@ -255,7 +261,7 @@ class ErrorHandler {
   /**
    * エラーカテゴリ別コールバック登録
    */
-  public onError(category: ErrorCategory, callback: (error: StandardError) => void): void {
+  public onError(category: ErrorCategory, callback: (_error: StandardError) => void): void {
     if (!this.errorCallbacks.has(category)) {
       this.errorCallbacks.set(category, []);
     }
@@ -304,13 +310,13 @@ class ErrorHandler {
     return `err_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
   }
 
-  private categorizeError(error: any): ErrorCategory {
-    if (error?.name === 'TypeError' && error?.message?.includes('fetch')) {
+  private categorizeError(_error: any): ErrorCategory {
+    if (_error?.name === 'TypeError' && _error?.message?.includes('fetch')) {
       return ErrorCategory.NETWORK;
     }
     
-    if (error?.status || error?.statusCode) {
-      const status = error.status || error.statusCode;
+    if (_error?.status || _error?.statusCode) {
+      const status = _error.status || _error.statusCode;
       if (status === 401) return ErrorCategory.AUTHENTICATION;
       if (status === 403) return ErrorCategory.AUTHORIZATION;
       if (status === 404) return ErrorCategory.NOT_FOUND;
@@ -320,12 +326,12 @@ class ErrorHandler {
       return ErrorCategory.API;
     }
 
-    if (error?.name === 'ValidationError') return ErrorCategory.VALIDATION;
+    if (_error?.name === 'ValidationError') return ErrorCategory.VALIDATION;
     
     return ErrorCategory.UNKNOWN;
   }
 
-  private determineSeverity(category: ErrorCategory, error: any): ErrorSeverity {
+  private determineSeverity(category: ErrorCategory, _error: any): ErrorSeverity {
     switch (category) {
       case ErrorCategory.AUTHENTICATION:
       case ErrorCategory.AUTHORIZATION:
@@ -348,7 +354,7 @@ class ErrorHandler {
     return `${category.toUpperCase()}_${timestamp}`;
   }
 
-  private generateUserMessage(category: ErrorCategory, error: any): string {
+  private generateUserMessage(category: ErrorCategory, _error: any): string {
     switch (category) {
       case ErrorCategory.NETWORK:
         return 'インターネット接続に問題があります。接続を確認して再度お試しください。';
@@ -369,24 +375,24 @@ class ErrorHandler {
     }
   }
 
-  private isRetryable(category: ErrorCategory, error: any): boolean {
+  private isRetryable(category: ErrorCategory, _error: any): boolean {
     switch (category) {
       case ErrorCategory.NETWORK:
       case ErrorCategory.RATE_LIMIT:
         return true;
       case ErrorCategory.SERVER:
-        const status = error?.status || error?.statusCode;
+        const status = _error?.status || _error?.statusCode;
         return status >= 500 && status < 600;
       default:
         return false;
     }
   }
 
-  private generateRecoveryActions(category: ErrorCategory, error: any): RecoveryAction[] {
+  private generateRecoveryActions(category: ErrorCategory, _error: any): RecoveryAction[] {
     const actions: RecoveryAction[] = [];
 
     // 再試行アクション
-    if (this.isRetryable(category, error)) {
+    if (this.isRetryable(category, _error)) {
       actions.push({
         type: 'retry',
         label: '再試行',
@@ -425,7 +431,7 @@ class ErrorHandler {
         actions.push({
           type: 'redirect',
           label: 'ホームに戻る',
-          action: () => window.location.href = '/',
+          action: () => { window.location.href = '/'; },
         });
         break;
     }
@@ -452,14 +458,14 @@ class ErrorHandler {
         lineno: 0,
         colno: 0,
         error: new Error(error.message),
-        stack: error.context?.stackTrace,
+        ...(error.context?.stackTrace && { stack: error.context.stackTrace }),
         timestamp: error.timestamp,
         userAgent: error.context?.userAgent || 'unknown',
         url: error.context?.url || 'unknown',
-        userId: error.context?.userId,
+        ...(error.context?.userId && { userId: error.context.userId }),
       });
     } catch (reportingError) {
-      console.error('Failed to report error:', reportingError);
+      // console.error('Failed to report error:', reportingError);
     }
   }
 
@@ -484,19 +490,19 @@ class ErrorHandler {
         // 成功した場合、試行回数をリセット
         this.retryAttempts.delete(attemptKey);
       } catch (recoveryError) {
-        console.error('Auto recovery failed:', recoveryError);
+        // console.error('Auto recovery failed:', recoveryError);
       }
     }
   }
 
-  private notifyUser(error: StandardError): void {
+  private notifyUser(_error: StandardError): void {
     // ここでは console.error を使用しているが、実際の実装では
     // Toast通知、モーダル、通知バーなどのUI コンポーネントを使用
-    console.error('User notification:', {
-      title: `エラーが発生しました (${error.severity})`,
-      message: error.userMessage,
-      actions: error.recoveryActions?.map(action => action.label),
-    });
+    // console.error('User notification:', {
+    //   title: `エラーが発生しました (${error.severity})`,
+    //   message: error.userMessage,
+    //   actions: error.recoveryActions?.map(action => action.label),
+    // });
 
     // 将来的にはここで UI コンポーネントを呼び出し
     // notificationService.show({

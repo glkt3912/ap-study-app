@@ -108,7 +108,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setError(data.message || 'ログインに失敗しました')
         return false
       }
-    } catch (err) {
+    } catch {
       setError('ネットワークエラーが発生しました')
       return false
     } finally {
@@ -144,7 +144,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setError(data.message || 'アカウント作成に失敗しました')
         return false
       }
-    } catch (err) {
+    } catch {
       setError('ネットワークエラーが発生しました')
       return false
     } finally {
@@ -194,6 +194,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext)
   if (context === undefined) {
+    // サーバーサイドでは警告なしでデフォルト値を返す
+    if (typeof window === 'undefined') {
+      return {
+        user: null,
+        userId: 0,
+        token: null,
+        isAuthenticated: false,
+        login: async () => false,
+        signup: async () => false,
+        logout: () => {},
+        updateUser: () => {},
+        isLoading: false,
+        error: null
+      } as AuthContextType
+    }
     throw new Error('useAuth must be used within an AuthProvider')
   }
   return context

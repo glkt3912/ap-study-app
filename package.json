@@ -13,7 +13,15 @@
     "test:coverage": "vitest run --coverage",
     "test:ui": "vitest --ui",
     "generate-types": "node scripts/generate-types.js",
-    "prebuild": "npm run generate-types || true"
+    "prebuild": "npm run generate-types || true",
+    "quality:security": "./scripts/frontend-security-check.sh",
+    "quality:performance": "./scripts/frontend-performance-test.sh",
+    "quality:ui": "./scripts/frontend-ui-quality-check.sh",
+    "quality:all": "./scripts/frontend-quality-check.sh all",
+    "quality:critical": "./scripts/frontend-quality-check.sh critical",
+    "pr:collect-data": "./scripts/collect-pr-data.sh",
+    "pr:claude": "./scripts/generate-pr-with-claude.sh",
+    "pr:check": "./scripts/frontend-quality-check.sh all"
   },
   "dependencies": {
     "@apidevtools/swagger-parser": "^12.0.0",
