@@ -163,7 +163,7 @@ class ErrorHandler {
       try {
         callback(standardError);
       } catch (callbackError) {
-        console.error('Error in error callback:', callbackError);
+        // console.error('Error in error callback:', callbackError);
       }
     });
 
@@ -459,7 +459,7 @@ class ErrorHandler {
         userId: error.context?.userId,
       });
     } catch (reportingError) {
-      console.error('Failed to report error:', reportingError);
+      // console.error('Failed to report error:', reportingError);
     }
   }
 
@@ -484,7 +484,7 @@ class ErrorHandler {
         // 成功した場合、試行回数をリセット
         this.retryAttempts.delete(attemptKey);
       } catch (recoveryError) {
-        console.error('Auto recovery failed:', recoveryError);
+        // console.error('Auto recovery failed:', recoveryError);
       }
     }
   }
@@ -492,11 +492,11 @@ class ErrorHandler {
   private notifyUser(error: StandardError): void {
     // ここでは console.error を使用しているが、実際の実装では
     // Toast通知、モーダル、通知バーなどのUI コンポーネントを使用
-    console.error('User notification:', {
-      title: `エラーが発生しました (${error.severity})`,
-      message: error.userMessage,
-      actions: error.recoveryActions?.map(action => action.label),
-    });
+    // console.error('User notification:', {
+    //   title: `エラーが発生しました (${error.severity})`,
+    //   message: error.userMessage,
+    //   actions: error.recoveryActions?.map(action => action.label),
+    // });
 
     // 将来的にはここで UI コンポーネントを呼び出し
     // notificationService.show({

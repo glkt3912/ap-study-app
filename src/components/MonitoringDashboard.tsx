@@ -5,7 +5,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { apiClient } from '@/lib/api';
+// import { apiClient } from '@/lib/api';
 import { monitoring } from '@/lib/monitoring';
 
 interface SystemMetrics {
@@ -77,10 +77,10 @@ const MonitoringDashboard: React.FC = () => {
         throw new Error(data.error || 'Failed to fetch metrics');
       }
     } catch (err) {
-      console.error('Failed to fetch metrics:', err);
+      // console.error('Failed to fetch metrics:', err);
       setError(err instanceof Error ? err.message : 'Unknown error');
     }
-  }, []);
+  }, [checkAlertConditions]);
 
   // ヘルスチェック
   const fetchHealth = useCallback(async () => {
@@ -94,7 +94,7 @@ const MonitoringDashboard: React.FC = () => {
         throw new Error(data.error || 'Failed to fetch health');
       }
     } catch (err) {
-      console.error('Failed to fetch health:', err);
+      // console.error('Failed to fetch health:', err);
       setError(err instanceof Error ? err.message : 'Unknown error');
     }
   }, []);
@@ -107,7 +107,7 @@ const MonitoringDashboard: React.FC = () => {
     try {
       await Promise.all([fetchMetrics(), fetchHealth()]);
     } catch (err) {
-      console.error('Failed to refresh data:', err);
+      // console.error('Failed to refresh data:', err);
     } finally {
       setIsLoading(false);
     }
@@ -208,15 +208,15 @@ const MonitoringDashboard: React.FC = () => {
         monitoring.trackCustomMetric('metrics_reset', 1);
       }
     } catch (err) {
-      console.error('Failed to reset metrics:', err);
+      // console.error('Failed to reset metrics:', err);
     }
   };
 
   // ユーティリティ関数
-  const formatBytes = (bytes: number) => {
-    const mb = bytes / 1024 / 1024;
-    return `${mb.toFixed(1)} MB`;
-  };
+  // const formatBytes = (bytes: number) => {
+  //   const mb = bytes / 1024 / 1024;
+  //   return `${mb.toFixed(1)} MB`;
+  // };
 
   const formatUptime = (seconds: number) => {
     const hours = Math.floor(seconds / 3600);

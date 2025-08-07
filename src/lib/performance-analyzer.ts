@@ -118,7 +118,7 @@ class PerformanceAnalyzer {
         try {
           callback(analysis);
         } catch (error) {
-          console.error('Error in performance analysis callback:', error);
+          // console.error('Error in performance analysis callback:', error);
         }
       });
 
