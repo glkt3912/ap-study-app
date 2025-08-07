@@ -64,55 +64,6 @@ const MonitoringDashboard: React.FC = () => {
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [refreshInterval, setRefreshInterval] = useState(30); // 秒
 
-  // メトリクス取得
-  const fetchMetrics = useCallback(async () => {
-    try {
-      const response = await fetch('/api/monitoring/metrics');
-      const data = await response.json();
-      
-      if (data.success) {
-        setMetrics(data.data);
-        checkAlertConditions(data.data);
-      } else {
-        throw new Error(data.error || 'Failed to fetch metrics');
-      }
-    } catch (err) {
-      // console.error('Failed to fetch metrics:', err);
-      setError(err instanceof Error ? err.message : 'Unknown error');
-    }
-  }, [checkAlertConditions]);
-
-  // ヘルスチェック
-  const fetchHealth = useCallback(async () => {
-    try {
-      const response = await fetch('/api/monitoring/health');
-      const data = await response.json();
-      
-      if (data.success) {
-        setHealth(data.data);
-      } else {
-        throw new Error(data.error || 'Failed to fetch health');
-      }
-    } catch (err) {
-      // console.error('Failed to fetch health:', err);
-      setError(err instanceof Error ? err.message : 'Unknown error');
-    }
-  }, []);
-
-  // データ更新
-  const refreshData = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      await Promise.all([fetchMetrics(), fetchHealth()]);
-    } catch (err) {
-      // console.error('Failed to refresh data:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [fetchMetrics, fetchHealth]);
-
   // アラート条件チェック
   const checkAlertConditions = useCallback((metrics: SystemMetrics) => {
     const newAlerts: AlertLevel[] = [];
@@ -172,6 +123,55 @@ const MonitoringDashboard: React.FC = () => {
 
     setAlerts(prev => [...newAlerts, ...prev.slice(0, 49)]); // 最新50件まで保持
   }, []);
+
+  // メトリクス取得
+  const fetchMetrics = useCallback(async () => {
+    try {
+      const response = await fetch('/api/monitoring/metrics');
+      const data = await response.json();
+      
+      if (data.success) {
+        setMetrics(data.data);
+        checkAlertConditions(data.data);
+      } else {
+        throw new Error(data.error || 'Failed to fetch metrics');
+      }
+    } catch (err) {
+      // console.error('Failed to fetch metrics:', err);
+      setError(err instanceof Error ? err.message : 'Unknown error');
+    }
+  }, [checkAlertConditions]);
+
+  // ヘルスチェック
+  const fetchHealth = useCallback(async () => {
+    try {
+      const response = await fetch('/api/monitoring/health');
+      const data = await response.json();
+      
+      if (data.success) {
+        setHealth(data.data);
+      } else {
+        throw new Error(data.error || 'Failed to fetch health');
+      }
+    } catch (err) {
+      // console.error('Failed to fetch health:', err);
+      setError(err instanceof Error ? err.message : 'Unknown error');
+    }
+  }, []);
+
+  // データ更新
+  const refreshData = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      await Promise.all([fetchMetrics(), fetchHealth()]);
+    } catch (err) {
+      // console.error('Failed to refresh data:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [fetchMetrics, fetchHealth]);
 
   // 自動更新設定
   useEffect(() => {
