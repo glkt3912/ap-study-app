@@ -6,6 +6,7 @@
 import { monitoring } from './monitoring';
 
 // エラー分類
+/* eslint-disable no-unused-vars */
 export enum ErrorCategory {
   NETWORK = 'network',
   API = 'api',
@@ -18,14 +19,17 @@ export enum ErrorCategory {
   CLIENT = 'client',
   UNKNOWN = 'unknown',
 }
+/* eslint-enable no-unused-vars */
 
 // エラー重要度
+/* eslint-disable no-unused-vars */
 export enum ErrorSeverity {
   LOW = 'low',
   MEDIUM = 'medium',
   HIGH = 'high',
   CRITICAL = 'critical',
 }
+/* eslint-enable no-unused-vars */
 
 // 標準化エラー型
 export interface StandardError {
@@ -255,7 +259,7 @@ class ErrorHandler {
   /**
    * エラーカテゴリ別コールバック登録
    */
-  public onError(category: ErrorCategory, callback: (error: StandardError) => void): void {
+  public onError(category: ErrorCategory, callback: (_error: StandardError) => void): void {
     if (!this.errorCallbacks.has(category)) {
       this.errorCallbacks.set(category, []);
     }
@@ -304,13 +308,13 @@ class ErrorHandler {
     return `err_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
   }
 
-  private categorizeError(error: any): ErrorCategory {
-    if (error?.name === 'TypeError' && error?.message?.includes('fetch')) {
+  private categorizeError(_error: any): ErrorCategory {
+    if (_error?.name === 'TypeError' && _error?.message?.includes('fetch')) {
       return ErrorCategory.NETWORK;
     }
     
-    if (error?.status || error?.statusCode) {
-      const status = error.status || error.statusCode;
+    if (_error?.status || _error?.statusCode) {
+      const status = _error.status || _error.statusCode;
       if (status === 401) return ErrorCategory.AUTHENTICATION;
       if (status === 403) return ErrorCategory.AUTHORIZATION;
       if (status === 404) return ErrorCategory.NOT_FOUND;
@@ -320,7 +324,7 @@ class ErrorHandler {
       return ErrorCategory.API;
     }
 
-    if (error?.name === 'ValidationError') return ErrorCategory.VALIDATION;
+    if (_error?.name === 'ValidationError') return ErrorCategory.VALIDATION;
     
     return ErrorCategory.UNKNOWN;
   }
