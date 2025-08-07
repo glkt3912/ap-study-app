@@ -86,7 +86,7 @@ class MonitoringService {
    */
   private async initWebVitals() {
     try {
-      const { onCLS, onFID, onFCP, onLCP, onTTFB } = await import('web-vitals');
+      const { onCLS, onINP, onFCP, onLCP, onTTFB } = await import('web-vitals');
       
       const handleMetric = (metric: WebVitalsMetric) => {
         this.trackPerformance({
@@ -104,7 +104,7 @@ class MonitoringService {
       };
 
       onCLS(handleMetric);
-      onFID(handleMetric);
+      onINP(handleMetric);
       onFCP(handleMetric);
       onLCP(handleMetric);
       onTTFB(handleMetric);

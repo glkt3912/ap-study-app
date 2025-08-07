@@ -185,20 +185,20 @@ class PerformanceAnalyzer {
         import('web-vitals').then(({ onCLS }) => 
           new Promise<number>(resolve => onCLS((metric: any) => resolve(metric.value)))
         ).catch(() => 0),
-        import('web-vitals').then(({ onFID }) => 
-          new Promise<number>(resolve => onFID((metric: any) => resolve(metric.value)))
+        import('web-vitals').then(({ onINP }) => 
+          new Promise<number>(resolve => onINP((metric: any) => resolve(metric.value)))
         ).catch(() => 0),
         import('web-vitals').then(({ onLCP }) => 
           new Promise<number>(resolve => onLCP((metric: any) => resolve(metric.value)))
         ).catch(() => 0),
-      ]).then(([cls, fid, lcp]) => {
+      ]).then(([cls, inp, lcp]) => {
         resolve({
           domContentLoaded: navigation.domContentLoadedEventEnd - (navigation.requestStart || 0),
           loadComplete: navigation.loadEventEnd - (navigation.requestStart || 0),
           firstPaint: paintEntries.find(entry => entry.name === 'first-paint')?.startTime || 0,
           firstContentfulPaint: paintEntries.find(entry => entry.name === 'first-contentful-paint')?.startTime || 0,
           largestContentfulPaint: lcp,
-          firstInputDelay: fid,
+          firstInputDelay: inp,
           cumulativeLayoutShift: cls,  
           timeToInteractive: this.estimateTimeToInteractive(navigation),
         });
