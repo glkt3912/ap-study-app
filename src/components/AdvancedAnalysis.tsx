@@ -162,22 +162,22 @@ export function AdvancedAnalysis() {
 
   const getReadinessColor = (level: string) => {
     switch (level) {
-      case "excellent": return "text-green-600 bg-green-100";
-      case "good": return "text-blue-600 bg-blue-100";
-      case "needs_improvement": return "text-yellow-600 bg-yellow-100";
-      case "critical": return "text-red-600 bg-red-100";
-      default: return "text-gray-600 bg-gray-100";
+      case "excellent": return "text-green-600 bg-green-100 dark:text-green-400 dark:bg-green-900/20";
+      case "good": return "text-blue-600 bg-blue-100 dark:text-blue-400 dark:bg-blue-900/20";
+      case "needs_improvement": return "text-yellow-600 bg-yellow-100 dark:text-yellow-400 dark:bg-yellow-900/20";
+      case "critical": return "text-red-600 bg-red-100 dark:text-red-400 dark:bg-red-900/20";
+      default: return "text-gray-600 bg-gray-100 dark:text-gray-400 dark:bg-gray-700";
     }
   };
 
   const dayNames = ["日", "月", "火", "水", "木", "金", "土"];
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">高度な学習分析</h2>
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+      <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">高度な学習分析</h2>
 
       {/* タブナビゲーション */}
-      <div className="flex overflow-x-auto border-b border-gray-200 mb-6 scrollbar-hide">
+      <div className="flex overflow-x-auto border-b border-gray-200 dark:border-gray-700 mb-6 scrollbar-hide">
         {[
           { key: "performance", label: "パフォーマンス指標", shortLabel: "指標" },
           { key: "readiness", label: "試験準備度", shortLabel: "準備度" },
@@ -189,8 +189,8 @@ export function AdvancedAnalysis() {
             onClick={() => setActiveTab(tab.key as any)}
             className={`flex-shrink-0 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
               activeTab === tab.key
-                ? "border-blue-500 text-blue-600"
-                : "border-transparent text-gray-500 hover:text-gray-700"
+                ? "border-blue-500 text-blue-600 dark:border-blue-400 dark:text-blue-400"
+                : "border-transparent text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-white"
             }`}
           >
             <span className="hidden sm:inline">{tab.label}</span>
@@ -200,7 +200,7 @@ export function AdvancedAnalysis() {
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 text-red-700 dark:text-red-300 px-4 py-3 rounded mb-4">
           {error}
         </div>
       )}
@@ -208,7 +208,7 @@ export function AdvancedAnalysis() {
       {loading && (
         <div className="flex justify-center items-center py-8">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-          <span className="ml-2 text-gray-600">読み込み中...</span>
+          <span className="ml-2 text-gray-600 dark:text-gray-300">読み込み中...</span>
         </div>
       )}
 
@@ -216,69 +216,69 @@ export function AdvancedAnalysis() {
       {activeTab === "performance" && performanceMetrics && !loading && (
         <div className="space-y-6">
           {/* 学習継続性 */}
-          <div className="bg-gray-50 rounded-lg p-4">
-            <h3 className="font-semibold text-lg mb-3">学習継続性</h3>
+          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+            <h3 className="font-semibold text-lg mb-3 text-gray-800 dark:text-white">学習継続性</h3>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
               <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600">
+                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                   {performanceMetrics.studyConsistency.study_days}
                 </div>
-                <div className="text-sm text-gray-600">学習日数</div>
+                <div className="text-sm text-gray-600 dark:text-gray-300">学習日数</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-green-600">
+                <div className="text-2xl font-bold text-green-600 dark:text-green-400">
                   {Math.round(performanceMetrics.studyConsistency.consistency_rate)}%
                 </div>
-                <div className="text-sm text-gray-600">継続率</div>
+                <div className="text-sm text-gray-600 dark:text-gray-300">継続率</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-purple-600">
+                <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
                   {performanceMetrics.studyConsistency.total_sessions}
                 </div>
-                <div className="text-sm text-gray-600">総セッション数</div>
+                <div className="text-sm text-gray-600 dark:text-gray-300">総セッション数</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-orange-600">
+                <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">
                   {Math.round(performanceMetrics.studyConsistency.avg_session_duration || 0)}分
                 </div>
-                <div className="text-sm text-gray-600">平均学習時間</div>
+                <div className="text-sm text-gray-600 dark:text-gray-300">平均学習時間</div>
               </div>
             </div>
           </div>
 
           {/* 学習効率 */}
-          <div className="bg-gray-50 rounded-lg p-4">
-            <h3 className="font-semibold text-lg mb-3">学習効率</h3>
+          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+            <h3 className="font-semibold text-lg mb-3 text-gray-800 dark:text-white">学習効率</h3>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
               <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600">
+                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                   {Math.round(performanceMetrics.learningEfficiency.avg_score || 0)}点
                 </div>
-                <div className="text-sm text-gray-600">平均スコア</div>
+                <div className="text-sm text-gray-600 dark:text-gray-300">平均スコア</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-green-600">
+                <div className="text-2xl font-bold text-green-600 dark:text-green-400">
                   {Math.round(performanceMetrics.learningEfficiency.avg_time_per_question || 0)}秒
                 </div>
-                <div className="text-sm text-gray-600">問題あたり平均時間</div>
+                <div className="text-sm text-gray-600 dark:text-gray-300">問題あたり平均時間</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-purple-600">
+                <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
                   {performanceMetrics.learningEfficiency.total_questions_attempted || 0}
                 </div>
-                <div className="text-sm text-gray-600">総回答問題数</div>
+                <div className="text-sm text-gray-600 dark:text-gray-300">総回答問題数</div>
               </div>
             </div>
           </div>
 
           {/* カテゴリバランス */}
-          <div className="bg-gray-50 rounded-lg p-4">
-            <h3 className="font-semibold text-lg mb-3">カテゴリ別学習バランス</h3>
+          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+            <h3 className="font-semibold text-lg mb-3 text-gray-800 dark:text-white">カテゴリ別学習バランス</h3>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
               {/* 円グラフ */}
               <div>
-                <h4 className="font-medium mb-3">問題数の分布</h4>
-                <Suspense fallback={<div className="h-48 flex items-center justify-center">グラフを読み込み中...</div>}>
+                <h4 className="font-medium mb-3 text-gray-700 dark:text-gray-300">問題数の分布</h4>
+                <Suspense fallback={<div className="h-48 flex items-center justify-center text-gray-500">グラフを読み込み中...</div>}>
                   <ResponsiveContainer width="100%" height={200}>
                     <PieChart>
                       <Pie
@@ -305,18 +305,18 @@ export function AdvancedAnalysis() {
               <div className="space-y-2">
                 {performanceMetrics.categoryBalance.map((category, index) => (
                   <div key={index} className="flex items-center justify-between">
-                    <span className="text-sm font-medium">{category.category}</span>
+                    <span className="text-sm font-medium text-gray-800 dark:text-gray-200">{category.category}</span>
                     <div className="flex items-center space-x-2">
-                      <div className="w-24 bg-gray-200 rounded-full h-2">
+                      <div className="w-24 bg-gray-200 dark:bg-gray-600 rounded-full h-2">
                         <div
                           className="bg-blue-500 h-2 rounded-full"
                           style={{ width: `${Math.min(category.proportion, 100)}%` }}
                         ></div>
                       </div>
-                      <span className="text-sm text-gray-600 w-12">
+                      <span className="text-sm text-gray-600 dark:text-gray-300 w-12">
                         {Math.round(category.proportion)}%
                       </span>
-                      <span className="text-sm text-green-600 w-12">
+                      <span className="text-sm text-green-600 dark:text-green-400 w-12">
                         {Math.round(category.accuracy_rate * 100)}%
                       </span>
                     </div>
@@ -328,9 +328,9 @@ export function AdvancedAnalysis() {
 
           {/* 成長分析グラフ */}
           {performanceMetrics.growthAnalysis.length > 0 && (
-            <div className="bg-gray-50 rounded-lg p-4">
-              <h3 className="font-semibold text-lg mb-3">週次成長分析</h3>
-              <Suspense fallback={<div className="h-64 flex items-center justify-center">グラフを読み込み中...</div>}>
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+              <h3 className="font-semibold text-lg mb-3 text-gray-800 dark:text-white">週次成長分析</h3>
+              <Suspense fallback={<div className="h-64 flex items-center justify-center text-gray-500">グラフを読み込み中...</div>}>
                 <ResponsiveContainer width="100%" height={300}>
                   <LineChart data={performanceMetrics.growthAnalysis}>
                     <CartesianGrid strokeDasharray="3 3" />
@@ -378,22 +378,22 @@ export function AdvancedAnalysis() {
       {activeTab === "readiness" && (
         <div className="space-y-6">
           {/* 試験設定 */}
-          <div className="bg-gray-50 rounded-lg p-4">
-            <h3 className="font-semibold text-lg mb-3">試験設定</h3>
+          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+            <h3 className="font-semibold text-lg mb-3 text-gray-800 dark:text-white">試験設定</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   試験日
                 </label>
                 <input
                   type="date"
                   value={examDate}
                   onChange={(e) => setExamDate(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   目標点数
                 </label>
                 <input
@@ -402,7 +402,7 @@ export function AdvancedAnalysis() {
                   onChange={(e) => setTargetScore(parseInt(e.target.value))}
                   min="0"
                   max="100"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                 />
               </div>
             </div>
@@ -419,44 +419,44 @@ export function AdvancedAnalysis() {
           {examReadiness && !loading && (
             <div className="space-y-4">
               {/* 総合評価 */}
-              <div className="bg-gray-50 rounded-lg p-4">
-                <h3 className="font-semibold text-lg mb-3">総合評価</h3>
+              <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                <h3 className="font-semibold text-lg mb-3 text-gray-800 dark:text-white">総合評価</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-blue-600">
+                    <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                       {examReadiness.daysToExam}日
                     </div>
-                    <div className="text-sm text-gray-600">試験まで</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-300">試験まで</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-green-600">
+                    <div className="text-2xl font-bold text-green-600 dark:text-green-400">
                       {Math.round(examReadiness.passProbability)}%
                     </div>
-                    <div className="text-sm text-gray-600">合格予測</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-300">合格予測</div>
                   </div>
                   <div className="text-center">
                     <div className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${
-                      examReadiness.overallReadiness === "excellent" ? "bg-green-100 text-green-800" :
-                      examReadiness.overallReadiness === "good" ? "bg-blue-100 text-blue-800" :
-                      examReadiness.overallReadiness === "needs_improvement" ? "bg-yellow-100 text-yellow-800" :
-                      "bg-red-100 text-red-800"
+                      examReadiness.overallReadiness === "excellent" ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400" :
+                      examReadiness.overallReadiness === "good" ? "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400" :
+                      examReadiness.overallReadiness === "needs_improvement" ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400" :
+                      "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400"
                     }`}>
                       {examReadiness.overallReadiness}
                     </div>
-                    <div className="text-sm text-gray-600 mt-1">総合準備度</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-300 mt-1">総合準備度</div>
                   </div>
                 </div>
               </div>
 
               {/* カテゴリ別準備度 */}
-              <div className="bg-gray-50 rounded-lg p-4">
-                <h3 className="font-semibold text-lg mb-3">カテゴリ別準備度</h3>
+              <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                <h3 className="font-semibold text-lg mb-3 text-gray-800 dark:text-white">カテゴリ別準備度</h3>
                 <div className="space-y-2">
                   {examReadiness.categoryReadiness.map((category, index) => (
                     <div key={index} className="flex items-center justify-between">
-                      <span className="text-sm font-medium">{category.category}</span>
+                      <span className="text-sm font-medium text-gray-800 dark:text-gray-200">{category.category}</span>
                       <div className="flex items-center space-x-2">
-                        <span className="text-sm text-gray-600">
+                        <span className="text-sm text-gray-600 dark:text-gray-300">
                           {Math.round(category.accuracy_rate * 100)}%
                         </span>
                         <span className={`px-2 py-1 rounded text-xs ${getReadinessColor(category.readiness_level)}`}>
@@ -469,15 +469,15 @@ export function AdvancedAnalysis() {
               </div>
 
               {/* 学習推奨 */}
-              <div className="bg-gray-50 rounded-lg p-4">
-                <h3 className="font-semibold text-lg mb-3">学習推奨</h3>
+              <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                <h3 className="font-semibold text-lg mb-3 text-gray-800 dark:text-white">学習推奨</h3>
                 <div className="space-y-2">
                   {examReadiness.studyRecommendations.map((rec, index) => (
                     <div key={index} className="flex items-start space-x-2">
                       <span className={`inline-block w-2 h-2 rounded-full mt-2 ${
                         rec.priority === "high" ? "bg-red-500" : "bg-yellow-500"
                       }`}></span>
-                      <span className="text-sm">{rec.recommendation}</span>
+                      <span className="text-sm text-gray-700 dark:text-gray-300">{rec.recommendation}</span>
                     </div>
                   ))}
                 </div>
@@ -491,45 +491,45 @@ export function AdvancedAnalysis() {
       {activeTab === "pattern" && learningPattern && !loading && (
         <div className="space-y-6">
           {/* 推奨学習条件 */}
-          <div className="bg-gray-50 rounded-lg p-4">
-            <h3 className="font-semibold text-lg mb-3">推奨学習条件</h3>
+          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+            <h3 className="font-semibold text-lg mb-3 text-gray-800 dark:text-white">推奨学習条件</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="text-center">
-                <div className="text-xl font-bold text-blue-600">
+                <div className="text-xl font-bold text-blue-600 dark:text-blue-400">
                   {learningPattern.recommendations.optimalTimeSlot}
                 </div>
-                <div className="text-sm text-gray-600">最適学習時間帯</div>
+                <div className="text-sm text-gray-600 dark:text-gray-300">最適学習時間帯</div>
               </div>
               <div className="text-center">
-                <div className="text-xl font-bold text-green-600">
+                <div className="text-xl font-bold text-green-600 dark:text-green-400">
                   {learningPattern.recommendations.optimalDayOfWeek}
                 </div>
-                <div className="text-sm text-gray-600">最適学習曜日</div>
+                <div className="text-sm text-gray-600 dark:text-gray-300">最適学習曜日</div>
               </div>
               <div className="text-center">
-                <div className="text-xl font-bold text-purple-600">
+                <div className="text-xl font-bold text-purple-600 dark:text-purple-400">
                   {learningPattern.recommendations.recommendedDailyQuestions}問
                 </div>
-                <div className="text-sm text-gray-600">推奨日次問題数</div>
+                <div className="text-sm text-gray-600 dark:text-gray-300">推奨日次問題数</div>
               </div>
             </div>
           </div>
 
           {/* 時間帯別パフォーマンス */}
-          <div className="bg-gray-50 rounded-lg p-4">
-            <h3 className="font-semibold text-lg mb-3">時間帯別パフォーマンス</h3>
+          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+            <h3 className="font-semibold text-lg mb-3 text-gray-800 dark:text-white">時間帯別パフォーマンス</h3>
             <div className="space-y-2">
               {learningPattern.timePattern.map((time, index) => (
                 <div key={index} className="flex items-center justify-between">
-                  <span className="text-sm font-medium">{time.study_hour}時台</span>
+                  <span className="text-sm font-medium text-gray-800 dark:text-gray-200">{time.study_hour}時台</span>
                   <div className="flex items-center space-x-4">
-                    <span className="text-sm text-gray-600">
+                    <span className="text-sm text-gray-600 dark:text-gray-300">
                       {time.session_count}セッション
                     </span>
-                    <span className="text-sm text-green-600">
+                    <span className="text-sm text-green-600 dark:text-green-400">
                       {Math.round(time.avg_score)}点
                     </span>
-                    <div className="w-16 bg-gray-200 rounded-full h-2">
+                    <div className="w-16 bg-gray-200 dark:bg-gray-600 rounded-full h-2">
                       <div
                         className="bg-blue-500 h-2 rounded-full"
                         style={{ width: `${(time.avg_score / 100) * 100}%` }}
@@ -542,20 +542,20 @@ export function AdvancedAnalysis() {
           </div>
 
           {/* 曜日別パフォーマンス */}
-          <div className="bg-gray-50 rounded-lg p-4">
-            <h3 className="font-semibold text-lg mb-3">曜日別パフォーマンス</h3>
+          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+            <h3 className="font-semibold text-lg mb-3 text-gray-800 dark:text-white">曜日別パフォーマンス</h3>
             <div className="space-y-2">
               {learningPattern.frequencyPattern.map((day, index) => (
                 <div key={index} className="flex items-center justify-between">
-                  <span className="text-sm font-medium">{dayNames[day.day_of_week]}曜日</span>
+                  <span className="text-sm font-medium text-gray-800 dark:text-gray-200">{dayNames[day.day_of_week]}曜日</span>
                   <div className="flex items-center space-x-4">
-                    <span className="text-sm text-gray-600">
+                    <span className="text-sm text-gray-600 dark:text-gray-300">
                       {day.session_count}セッション
                     </span>
-                    <span className="text-sm text-green-600">
+                    <span className="text-sm text-green-600 dark:text-green-400">
                       {Math.round(day.avg_score)}点
                     </span>
-                    <div className="w-16 bg-gray-200 rounded-full h-2">
+                    <div className="w-16 bg-gray-200 dark:bg-gray-600 rounded-full h-2">
                       <div
                         className="bg-green-500 h-2 rounded-full"
                         style={{ width: `${(day.avg_score / 100) * 100}%` }}
@@ -572,7 +572,7 @@ export function AdvancedAnalysis() {
       {/* 学習効率分析タブ */}
       {activeTab === "efficiency" && (
         <div className="space-y-6">
-          <div className="bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded">
+          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 text-blue-800 dark:text-blue-300 px-4 py-3 rounded">
             <div className="flex items-center">
               <span className="mr-2">📊</span>
               <span className="font-medium">新機能: 学習効率分析</span>
@@ -583,12 +583,12 @@ export function AdvancedAnalysis() {
           </div>
           
           {/* LearningEfficiencyDashboardコンポーネントを埋め込み */}
-          <div className="bg-gray-50 rounded-lg p-1">
-            <div className="bg-white rounded">
+          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-1">
+            <div className="bg-white dark:bg-gray-800 rounded">
               <Suspense fallback={
                 <div className="h-96 flex items-center justify-center">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-                  <span className="ml-3">学習効率分析を読み込み中...</span>
+                  <span className="ml-3 text-gray-600 dark:text-gray-300">学習効率分析を読み込み中...</span>
                 </div>
               }>
                 <LearningEfficiencyDashboardComponent />
