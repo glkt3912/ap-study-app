@@ -118,7 +118,7 @@ describe('API Client', () => {
       expect(mockFetch).toHaveBeenCalledWith('http://localhost:8000/api/quiz/start', {
         method: 'POST',
         headers: {
-          'X-User-ID': 'test-user',
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify(sessionOptions),
       })

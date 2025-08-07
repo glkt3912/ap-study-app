@@ -108,7 +108,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setError(data.message || 'ログインに失敗しました')
         return false
       }
-    } catch (err) {
+    } catch {
       setError('ネットワークエラーが発生しました')
       return false
     } finally {
@@ -144,7 +144,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setError(data.message || 'アカウント作成に失敗しました')
         return false
       }
-    } catch (err) {
+    } catch {
       setError('ネットワークエラーが発生しました')
       return false
     } finally {

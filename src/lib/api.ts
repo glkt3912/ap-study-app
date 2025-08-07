@@ -95,7 +95,7 @@ export interface Question {
 
 export interface QuizSession {
   id: number;
-  userId?: string;
+  userId?: number;
   sessionType: "category" | "random" | "review" | "weak_points";
   category?: string;
   totalQuestions: number;
@@ -110,7 +110,7 @@ export interface QuizSession {
 
 export interface UserAnswer {
   id: number;
-  userId?: string;
+  userId?: number;
   questionId: string;
   userAnswer: string;
   isCorrect: boolean;

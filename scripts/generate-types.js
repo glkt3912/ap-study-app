@@ -92,7 +92,7 @@ export interface StudyDay {
     typesContent += `// Quiz and Test types (inferred from API structure)
 export interface QuizSession {
   id: number;
-  userId?: string;
+  userId?: number;
   sessionType: 'category' | 'random' | 'review' | 'weak_points';
   category?: string;
   totalQuestions: number;
@@ -255,7 +255,7 @@ export interface StudyDay {
 
 export interface QuizSession {
   id: number;
-  userId?: string;
+  userId?: number;
   sessionType: 'category' | 'random' | 'review' | 'weak_points';
   category?: string;
   totalQuestions: number;
