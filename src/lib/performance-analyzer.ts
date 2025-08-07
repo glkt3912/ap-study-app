@@ -78,7 +78,7 @@ interface OptimizationSuggestion {
 class PerformanceAnalyzer {
   private metrics: PerformanceMetrics | null = null;
   private isAnalyzing = false;
-  private analysisCallbacks: ((analysis: PerformanceAnalysis) => void)[] = [];
+  private analysisCallbacks: ((_analysis: PerformanceAnalysis) => void)[] = [];
 
   /**
    * パフォーマンス分析を実行
@@ -546,7 +546,7 @@ class PerformanceAnalyzer {
   }
 
   // コールバック登録
-  public onAnalysisComplete(callback: (analysis: PerformanceAnalysis) => void): void {
+  public onAnalysisComplete(callback: (_analysis: PerformanceAnalysis) => void): void {
     this.analysisCallbacks.push(callback);
   }
 
@@ -584,7 +584,7 @@ class PerformanceAnalyzer {
 
   private calculateInteractivityScore(
     navigation: PerformanceMetrics['navigation'],
-    interaction: PerformanceMetrics['userInteraction']
+    _interaction: PerformanceMetrics['userInteraction']
   ): number {
     const fid = navigation.firstInputDelay;
     const tti = navigation.timeToInteractive;

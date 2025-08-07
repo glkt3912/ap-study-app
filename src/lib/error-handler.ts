@@ -72,7 +72,7 @@ class ErrorHandler {
   private config: ErrorHandlerConfig;
   private retryAttempts: Map<string, number> = new Map();
   private errorHistory: StandardError[] = [];
-  private errorCallbacks: Map<ErrorCategory, ((error: StandardError) => void)[]> = new Map();
+  private errorCallbacks: Map<ErrorCategory, ((_error: StandardError) => void)[]> = new Map();
 
   constructor(config?: Partial<ErrorHandlerConfig>) {
     this.config = {
@@ -325,7 +325,7 @@ class ErrorHandler {
     return ErrorCategory.UNKNOWN;
   }
 
-  private determineSeverity(category: ErrorCategory, error: any): ErrorSeverity {
+  private determineSeverity(category: ErrorCategory, _error: any): ErrorSeverity {
     switch (category) {
       case ErrorCategory.AUTHENTICATION:
       case ErrorCategory.AUTHORIZATION:
@@ -348,7 +348,7 @@ class ErrorHandler {
     return `${category.toUpperCase()}_${timestamp}`;
   }
 
-  private generateUserMessage(category: ErrorCategory, error: any): string {
+  private generateUserMessage(category: ErrorCategory, _error: any): string {
     switch (category) {
       case ErrorCategory.NETWORK:
         return 'インターネット接続に問題があります。接続を確認して再度お試しください。';
@@ -369,24 +369,24 @@ class ErrorHandler {
     }
   }
 
-  private isRetryable(category: ErrorCategory, error: any): boolean {
+  private isRetryable(category: ErrorCategory, _error: any): boolean {
     switch (category) {
       case ErrorCategory.NETWORK:
       case ErrorCategory.RATE_LIMIT:
         return true;
       case ErrorCategory.SERVER:
-        const status = error?.status || error?.statusCode;
+        const status = _error?.status || _error?.statusCode;
         return status >= 500 && status < 600;
       default:
         return false;
     }
   }
 
-  private generateRecoveryActions(category: ErrorCategory, error: any): RecoveryAction[] {
+  private generateRecoveryActions(category: ErrorCategory, _error: any): RecoveryAction[] {
     const actions: RecoveryAction[] = [];
 
     // 再試行アクション
-    if (this.isRetryable(category, error)) {
+    if (this.isRetryable(category, _error)) {
       actions.push({
         type: 'retry',
         label: '再試行',
@@ -489,7 +489,7 @@ class ErrorHandler {
     }
   }
 
-  private notifyUser(error: StandardError): void {
+  private notifyUser(_error: StandardError): void {
     // ここでは console.error を使用しているが、実際の実装では
     // Toast通知、モーダル、通知バーなどのUI コンポーネントを使用
     // console.error('User notification:', {

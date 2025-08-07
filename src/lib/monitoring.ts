@@ -109,7 +109,7 @@ class MonitoringService {
       getLCP(handleMetric);
       getTTFB(handleMetric);
     } catch (error) {
-      console.warn('Web Vitals monitoring failed to initialize:', error);
+      // console.warn('Web Vitals monitoring failed to initialize:', error);
     }
   }
 
@@ -282,7 +282,7 @@ class MonitoringService {
   public trackError(error: ErrorEvent) {
     if (!this.isEnabled) return;
 
-    console.error('Frontend Error Tracked:', error);
+    // console.error('Frontend Error Tracked:', error);
     this.addToQueue('error', error);
   }
 
@@ -384,7 +384,7 @@ class MonitoringService {
         })
       });
     } catch (error) {
-      console.error('Failed to send monitoring events:', error);
+      // console.error('Failed to send monitoring events:', error);
       // 失敗したイベントを再キューに追加（無限ループ防止のため制限付き）
       if (events.length < 100) {
         this.eventQueue.unshift(...events);
