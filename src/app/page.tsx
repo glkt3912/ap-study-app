@@ -3,7 +3,7 @@
 import dynamicImport from 'next/dynamic'
 
 // useAuthを使用するコンポーネントを動的にインポート
-const ClientHome = dynamicImport(() => import('@/components/ClientHome'), {
+const ClientHome = dynamicImport(() => import('../components/ClientHome'), {
   ssr: false,
   loading: () => (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
