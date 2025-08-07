@@ -85,10 +85,10 @@ export function LearningEfficiencyDashboard() {
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'high': return 'bg-red-100 text-red-800 border-red-200';
-      case 'medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'low': return 'bg-green-100 text-green-800 border-green-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+      case 'high': return 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-700';
+      case 'medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-400 dark:border-yellow-700';
+      case 'low': return 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-700';
+      default: return 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600';
     }
   };
 
@@ -116,23 +116,23 @@ export function LearningEfficiencyDashboard() {
   })) || [];
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4 sm:mb-0">学習効率分析ダッシュボード</h2>
+        <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4 sm:mb-0">学習効率分析ダッシュボード</h2>
         <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
           <div className="flex items-center space-x-2">
             <input
               type="date"
               value={dateRange.startDate}
               onChange={(e) => setDateRange(prev => ({ ...prev, startDate: e.target.value }))}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             />
-            <span className="text-gray-500">〜</span>
+            <span className="text-gray-500 dark:text-gray-400">〜</span>
             <input
               type="date"
               value={dateRange.endDate}
               onChange={(e) => setDateRange(prev => ({ ...prev, endDate: e.target.value }))}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             />
           </div>
           <button
@@ -146,7 +146,7 @@ export function LearningEfficiencyDashboard() {
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 text-red-700 dark:text-red-300 px-4 py-3 rounded mb-6">
           <div className="flex items-center">
             <span className="mr-2">⚠️</span>
             {error}
@@ -157,28 +157,28 @@ export function LearningEfficiencyDashboard() {
       {loading && (
         <div className="flex justify-center items-center py-12">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-          <span className="ml-3 text-gray-600">学習効率を分析中...</span>
+          <span className="ml-3 text-gray-600 dark:text-gray-300">学習効率を分析中...</span>
         </div>
       )}
 
       {analysis && !loading && (
         <div className="space-y-8">
           {/* 総合スコア */}
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-6">
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg p-6">
             <div className="text-center">
-              <div className="text-4xl font-bold text-blue-600 mb-2">
+              <div className="text-4xl font-bold text-blue-600 dark:text-blue-400 mb-2">
                 {analysis.overallScore}
               </div>
-              <div className="text-lg text-gray-700 mb-1">総合学習効率スコア</div>
-              <div className="text-sm text-gray-500">
+              <div className="text-lg text-gray-700 dark:text-gray-300 mb-1">総合学習効率スコア</div>
+              <div className="text-sm text-gray-500 dark:text-gray-400">
                 {new Date(analysis.timeRange.startDate).toLocaleDateString()} 〜 {new Date(analysis.timeRange.endDate).toLocaleDateString()}
               </div>
             </div>
           </div>
 
           {/* 推奨事項 */}
-          <div className="bg-gray-50 rounded-lg p-6">
-            <h3 className="text-xl font-semibold text-gray-800 mb-4">🎯 改善提案</h3>
+          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
+            <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">🎯 改善提案</h3>
             <div className="space-y-4">
               {analysis.recommendations.map((rec, index) => (
                 <div
@@ -206,10 +206,10 @@ export function LearningEfficiencyDashboard() {
           </div>
 
           {/* 時間帯別効率 */}
-          <div className="bg-gray-50 rounded-lg p-6">
-            <h3 className="text-xl font-semibold text-gray-800 mb-4">⏰ 時間帯別学習効率</h3>
+          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
+            <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">⏰ 時間帯別学習効率</h3>
             <div className="h-80">
-              <Suspense fallback={<div className="h-full flex items-center justify-center">グラフを読み込み中...</div>}>
+              <Suspense fallback={<div className="h-full flex items-center justify-center text-gray-500">グラフを読み込み中...</div>}>
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={hourlyChartData}>
                     <CartesianGrid strokeDasharray="3 3" />
@@ -240,10 +240,10 @@ export function LearningEfficiencyDashboard() {
           </div>
 
           {/* 分野別効率 */}
-          <div className="bg-gray-50 rounded-lg p-6">
-            <h3 className="text-xl font-semibold text-gray-800 mb-4">📚 分野別学習効率</h3>
+          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
+            <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">📚 分野別学習効率</h3>
             <div className="h-80">
-              <Suspense fallback={<div className="h-full flex items-center justify-center">グラフを読み込み中...</div>}>
+              <Suspense fallback={<div className="h-full flex items-center justify-center text-gray-500">グラフを読み込み中...</div>}>
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={subjectChartData} layout="horizontal">
                     <CartesianGrid strokeDasharray="3 3" />
@@ -278,13 +278,13 @@ export function LearningEfficiencyDashboard() {
           {/* 詳細数値 */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* 分野別詳細 */}
-            <div className="bg-gray-50 rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">分野別詳細</h3>
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">分野別詳細</h3>
               <div className="space-y-3">
                 {analysis.subjectEfficiency.map((subject, index) => (
-                  <div key={index} className="bg-white rounded p-3">
-                    <div className="font-medium text-gray-800 mb-2">{subject.subject}</div>
-                    <div className="grid grid-cols-2 gap-2 text-sm">
+                  <div key={index} className="bg-white dark:bg-gray-800 rounded p-3">
+                    <div className="font-medium text-gray-800 dark:text-gray-200 mb-2">{subject.subject}</div>
+                    <div className="grid grid-cols-2 gap-2 text-sm text-gray-600 dark:text-gray-300">
                       <span>学習時間: {Math.round(subject.totalStudyTime)}分</span>
                       <span>理解度: {subject.avgUnderstanding.toFixed(1)}/5</span>
                       <span>完了率: {Math.round(subject.completionRate * 100)}%</span>
@@ -296,22 +296,22 @@ export function LearningEfficiencyDashboard() {
             </div>
 
             {/* 最適時間帯 */}
-            <div className="bg-gray-50 rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">最適時間帯TOP5</h3>
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">最適時間帯TOP5</h3>
               <div className="space-y-3">
                 {analysis.hourlyEfficiency
                   .filter(h => h.efficiencyScore > 0)
                   .sort((a, b) => b.efficiencyScore - a.efficiencyScore)
                   .slice(0, 5)
                   .map((hour, index) => (
-                    <div key={index} className="bg-white rounded p-3">
+                    <div key={index} className="bg-white dark:bg-gray-800 rounded p-3">
                       <div className="flex items-center justify-between">
-                        <span className="font-medium">{hour.hour}:00 - {hour.hour + 1}:00</span>
-                        <span className="text-blue-600 font-semibold">
+                        <span className="font-medium text-gray-800 dark:text-gray-200">{hour.hour}:00 - {hour.hour + 1}:00</span>
+                        <span className="text-blue-600 dark:text-blue-400 font-semibold">
                           {hour.efficiencyScore.toFixed(2)}
                         </span>
                       </div>
-                      <div className="text-sm text-gray-600 mt-1">
+                      <div className="text-sm text-gray-600 dark:text-gray-300 mt-1">
                         理解度: {hour.avgUnderstanding.toFixed(1)} | 完了率: {Math.round(hour.completionRate * 100)}%
                       </div>
                     </div>
