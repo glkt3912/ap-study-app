@@ -86,7 +86,7 @@ class MonitoringService {
    */
   private async initWebVitals() {
     try {
-      const { getCLS, getFID, getFCP, getLCP, getTTFB } = await import('web-vitals');
+      const { onCLS, onFID, onFCP, onLCP, onTTFB } = await import('web-vitals');
       
       const handleMetric = (metric: WebVitalsMetric) => {
         this.trackPerformance({
@@ -103,11 +103,11 @@ class MonitoringService {
         });
       };
 
-      getCLS(handleMetric);
-      getFID(handleMetric);
-      getFCP(handleMetric);
-      getLCP(handleMetric);
-      getTTFB(handleMetric);
+      onCLS(handleMetric);
+      onFID(handleMetric);
+      onFCP(handleMetric);
+      onLCP(handleMetric);
+      onTTFB(handleMetric);
     } catch (error) {
       // console.warn('Web Vitals monitoring failed to initialize:', error);
     }
@@ -175,11 +175,11 @@ class MonitoringService {
         this.trackPerformance({
           type: 'navigation',
           name: 'page-load',
-          duration: navigation.loadEventEnd - navigation.navigationStart,
+          duration: navigation.loadEventEnd - (navigation.requestStart || 0),
           timestamp: new Date().toISOString(),
           url: window.location.href,
           metadata: {
-            domContentLoaded: navigation.domContentLoadedEventEnd - navigation.navigationStart,
+            domContentLoaded: navigation.domContentLoadedEventEnd - (navigation.requestStart || 0),
             firstPaint: performance.getEntriesByName('first-paint')[0]?.startTime || 0,
             firstContentfulPaint: performance.getEntriesByName('first-contentful-paint')[0]?.startTime || 0
           }
@@ -258,7 +258,7 @@ class MonitoringService {
         timestamp: new Date().toISOString(),
         url: window.location.href,
         metadata: {
-          sessionDuration: Date.now() - (performance.timing?.navigationStart || 0)
+          sessionDuration: Date.now() - (performance.timeOrigin || Date.now())
         }
       });
       
@@ -336,7 +336,7 @@ class MonitoringService {
       duration: value,
       timestamp: new Date().toISOString(),
       url: window.location.href,
-      metadata
+      ...(metadata && { metadata })
     });
   }
 

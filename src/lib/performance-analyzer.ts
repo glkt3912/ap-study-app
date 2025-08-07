@@ -182,19 +182,19 @@ class PerformanceAnalyzer {
 
       // Web Vitalsを非同期で取得
       Promise.all([
-        import('web-vitals').then(({ getCLS }) => 
-          new Promise<number>(resolve => getCLS((metric) => resolve(metric.value)))
+        import('web-vitals').then(({ onCLS }) => 
+          new Promise<number>(resolve => onCLS((metric: any) => resolve(metric.value)))
         ).catch(() => 0),
-        import('web-vitals').then(({ getFID }) => 
-          new Promise<number>(resolve => getFID((metric) => resolve(metric.value)))
+        import('web-vitals').then(({ onFID }) => 
+          new Promise<number>(resolve => onFID((metric: any) => resolve(metric.value)))
         ).catch(() => 0),
-        import('web-vitals').then(({ getLCP }) => 
-          new Promise<number>(resolve => getLCP((metric) => resolve(metric.value)))
+        import('web-vitals').then(({ onLCP }) => 
+          new Promise<number>(resolve => onLCP((metric: any) => resolve(metric.value)))
         ).catch(() => 0),
       ]).then(([cls, fid, lcp]) => {
         resolve({
-          domContentLoaded: navigation.domContentLoadedEventEnd - navigation.navigationStart,
-          loadComplete: navigation.loadEventEnd - navigation.navigationStart,
+          domContentLoaded: navigation.domContentLoadedEventEnd - (navigation.requestStart || 0),
+          loadComplete: navigation.loadEventEnd - (navigation.requestStart || 0),
           firstPaint: paintEntries.find(entry => entry.name === 'first-paint')?.startTime || 0,
           firstContentfulPaint: paintEntries.find(entry => entry.name === 'first-contentful-paint')?.startTime || 0,
           largestContentfulPaint: lcp,
@@ -566,7 +566,7 @@ class PerformanceAnalyzer {
 
   private estimateTimeToInteractive(navigation: PerformanceNavigationTiming): number {
     // 簡略化された TTI 推定
-    return navigation.domContentLoadedEventEnd - navigation.navigationStart + 1000;
+    return navigation.domContentLoadedEventEnd - (navigation.requestStart || 0) + 1000;
   }
 
   private calculateLoadingScore(navigation: PerformanceMetrics['navigation']): number {
