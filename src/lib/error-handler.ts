@@ -127,12 +127,14 @@ class ErrorHandler {
       },
       timestamp,
       context: {
-        url: context?.url || (typeof window !== 'undefined' ? window.location.href : undefined),
-        method: context?.method,
-        userId: context?.userId,
-        requestId: context?.requestId,
-        userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : undefined,
-        stackTrace: error?.stack,
+        ...((context?.url || (typeof window !== 'undefined' && window.location.href)) && { 
+          url: context?.url || window.location.href 
+        }),
+        ...(context?.method && { method: context.method }),
+        ...(context?.userId && { userId: context.userId }),
+        ...(context?.requestId && { requestId: context.requestId }),
+        ...((typeof navigator !== 'undefined' && navigator.userAgent) && { userAgent: navigator.userAgent }),
+        ...(error?.stack && { stackTrace: error.stack }),
       },
       retryable: this.isRetryable(category, error),
       recoveryActions: this.generateRecoveryActions(category, error),
@@ -201,8 +203,8 @@ class ErrorHandler {
       category: ErrorCategory.API,
       url: endpoint,
       method,
-      userId: context?.userId,
-      requestId: context?.requestId,
+      ...(context?.userId && { userId: context.userId }),
+      ...(context?.requestId && { requestId: context.requestId }),
       code: error?.status?.toString() || 'API_ERROR',
     };
 
@@ -223,8 +225,8 @@ class ErrorHandler {
     const networkContext = {
       category: ErrorCategory.NETWORK,
       severity: ErrorSeverity.HIGH,
-      url: context?.url,
-      method: context?.method,
+      ...(context?.url && { url: context.url }),
+      ...(context?.method && { method: context.method }),
       code: context?.timeout ? 'NETWORK_TIMEOUT' : 'NETWORK_ERROR',
       userMessage: context?.timeout 
         ? 'リクエストがタイムアウトしました。しばらく待ってから再度お試しください。'
@@ -429,7 +431,7 @@ class ErrorHandler {
         actions.push({
           type: 'redirect',
           label: 'ホームに戻る',
-          action: () => window.location.href = '/',
+          action: () => { window.location.href = '/'; },
         });
         break;
     }
@@ -456,11 +458,11 @@ class ErrorHandler {
         lineno: 0,
         colno: 0,
         error: new Error(error.message),
-        stack: error.context?.stackTrace,
+        ...(error.context?.stackTrace && { stack: error.context.stackTrace }),
         timestamp: error.timestamp,
         userAgent: error.context?.userAgent || 'unknown',
         url: error.context?.url || 'unknown',
-        userId: error.context?.userId,
+        ...(error.context?.userId && { userId: error.context.userId }),
       });
     } catch (reportingError) {
       // console.error('Failed to report error:', reportingError);
