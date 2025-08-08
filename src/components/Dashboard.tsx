@@ -19,12 +19,11 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
   const [personalizedRecommendations, setPersonalizedRecommendations] = useState<PersonalizedRecommendations | null>(null)
   const [isLoadingAI, setIsLoadingAI] = useState(false)
 
-  // AI分析データ取得
-  const fetchAIData = useCallback(async () => {
+  // フォールバック: 個別AI分析データ取得 (バックエンド未対応時)
+  const fetchAIDataFallback = useCallback(async () => {
     if (!user?.id) return
     
     try {
-      setIsLoadingAI(true)
       const [predictions, recommendations] = await Promise.all([
         apiClient.getPredictiveAnalysis(user.id).catch(() => null),
         apiClient.getPersonalizedRecommendations(user.id).catch(() => null)
@@ -38,16 +37,38 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
         // eslint-disable-next-line no-console
         console.error('AI データ取得エラー:', error)
       }
-    } finally {
-      setIsLoadingAI(false)
     }
   }, [user?.id])
 
+  // バッチ処理: ダッシュボードML分析データ一括取得 (2個API → 1個API)
+  const fetchBatchDashboardMLData = useCallback(async () => {
+    if (!user?.id) return
+    
+    try {
+      setIsLoadingAI(true)
+      const batchData = await apiClient.getBatchDashboardMLData(user.id)
+      
+      setPredictiveAnalysis(batchData.predictiveAnalysis)
+      setPersonalizedRecommendations(batchData.personalizedRecommendations)
+    } catch (error) {
+      // バッチAPI失敗時はフォールバックを使用
+      await fetchAIDataFallback()
+      
+      // エラーログは開発環境でのみ出力
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error('バッチML データ取得エラー、フォールバックを使用:', error)
+      }
+    } finally {
+      setIsLoadingAI(false)
+    }
+  }, [user?.id, fetchAIDataFallback])
+
   useEffect(() => {
     if (user?.id && !isLoading) {
-      fetchAIData()
+      fetchBatchDashboardMLData()
     }
-  }, [user?.id, isLoading, fetchAIData])
+  }, [user?.id, isLoading, fetchBatchDashboardMLData])
 
   if (isLoading) {
     return (
