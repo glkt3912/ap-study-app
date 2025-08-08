@@ -5,17 +5,17 @@ import dynamic from 'next/dynamic'
 
 // 動的インポートでコード分割
 const StudyTimeChart = dynamic(() => import('./charts/AnalysisCharts').then(mod => ({ default: mod.StudyTimeChart })), {
-  loading: () => <div className="h-[300px] bg-gray-100 rounded animate-pulse" />,
+  loading: () => <div className="h-[300px] bg-gray-100 dark:bg-gray-700 rounded animate-pulse" />,
   ssr: false
 })
 
 const ProgressChart = dynamic(() => import('./charts/AnalysisCharts').then(mod => ({ default: mod.ProgressChart })), {
-  loading: () => <div className="h-[300px] bg-gray-100 rounded animate-pulse" />,
+  loading: () => <div className="h-[300px] bg-gray-100 dark:bg-gray-700 rounded animate-pulse" />,
   ssr: false
 })
 
 const UnderstandingRadarChart = dynamic(() => import('./charts/AnalysisCharts').then(mod => ({ default: mod.UnderstandingRadarChart })), {
-  loading: () => <div className="h-[300px] bg-gray-100 rounded animate-pulse" />,
+  loading: () => <div className="h-[300px] bg-gray-100 dark:bg-gray-700 rounded animate-pulse" />,
   ssr: false
 })
 import { apiClient, StudyLog, MorningTest, AfternoonTest } from '../lib/api'
@@ -79,19 +79,22 @@ export default function Analysis() {
   // const [examDate, setExamDate] = useState('')
   const [isLoading, setIsLoading] = useState(true)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [studyStats, setStudyStats] = useState<any>(null)
   // const [isPredicting, setIsPredicting] = useState(false)
 
   const fetchAnalysisData = useCallback(async () => {
     try {
       setIsLoading(true)
-      const [logs, morningData, afternoonData] = await Promise.all([
+      const [logs, morningData, afternoonData, stats] = await Promise.all([
         apiClient.getStudyLogs(),
         apiClient.getMorningTests(),
-        apiClient.getAfternoonTests()
+        apiClient.getAfternoonTests(),
+        apiClient.getStudyLogStats().catch(() => null) // エラー時はnullを返す
       ])
       setStudyLogs(logs)
       setMorningTests(morningData)
       setAfternoonTests(afternoonData)
+      setStudyStats(stats)
       
       // 最新の分析結果を取得
       await fetchLatestAnalysis()
@@ -209,16 +212,16 @@ export default function Analysis() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <div className="bg-white rounded-lg shadow">
-          <div className="p-6 border-b border-gray-200">
-            <h2 className="text-xl font-semibold text-gray-900">学習分析</h2>
-            <p className="text-gray-600 mt-1">学習データを分析して効率的な学習方法を見つけましょう</p>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
+          <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">学習分析</h2>
+            <p className="text-gray-600 dark:text-gray-300 mt-1">学習データを分析して効率的な学習方法を見つけましょう</p>
           </div>
           <div className="p-6">
             <div className="animate-pulse">
-              <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
-              <div className="h-64 bg-gray-200 rounded mb-6"></div>
-              <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-4"></div>
+              <div className="h-64 bg-gray-200 dark:bg-gray-700 rounded mb-6"></div>
+              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
             </div>
           </div>
         </div>
@@ -235,23 +238,70 @@ export default function Analysis() {
 
   return (
     <div className="space-y-6">
-      <div className="bg-white rounded-lg shadow">
-        <div className="p-6 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900">学習分析</h2>
-          <p className="text-gray-600 mt-1">学習データを分析して効率的な学習方法を見つけましょう</p>
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
+        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">学習分析</h2>
+          <p className="text-gray-600 dark:text-gray-300 mt-1">学習データを分析して効率的な学習方法を見つけましょう</p>
         </div>
 
         <div className="p-6">
+          {/* 学習統計サマリー */}
+          {studyStats && (
+            <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+              <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-300 mb-3">📊 学習統計サマリー</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{Math.round(studyStats.totalTime)}h</div>
+                  <div className="text-sm text-blue-800 dark:text-blue-300">総学習時間</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-green-600 dark:text-green-400">{studyStats.totalSessions}</div>
+                  <div className="text-sm text-green-800 dark:text-green-300">学習回数</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">{studyStats.averageUnderstanding.toFixed(1)}</div>
+                  <div className="text-sm text-purple-800 dark:text-purple-300">平均理解度</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">{studyStats.subjectStats?.length || 0}</div>
+                  <div className="text-sm text-orange-800 dark:text-orange-300">学習分野数</div>
+                </div>
+              </div>
+              
+              {studyStats.subjectStats && studyStats.subjectStats.length > 0 && (
+                <div className="mt-4">
+                  <h4 className="font-medium text-blue-900 dark:text-blue-300 mb-2">分野別統計</h4>
+                  <div className="space-y-2">
+                    {studyStats.subjectStats.slice(0, 3).map((subject: any, index: number) => (
+                      <div key={index} className="flex justify-between items-center text-sm">
+                        <span className="font-medium">{subject.subject}</span>
+                        <div className="text-right">
+                          <div>{Math.round(subject.totalTime)}h ({subject.sessionCount}回)</div>
+                          <div className="text-xs text-gray-600 dark:text-gray-400">理解度: {subject.averageUnderstanding.toFixed(1)}</div>
+                        </div>
+                      </div>
+                    ))}
+                    {studyStats.subjectStats.length > 3 && (
+                      <div className="text-xs text-gray-500 dark:text-gray-400 text-center">
+                        他 {studyStats.subjectStats.length - 3} 分野
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* 分析実行ボタン */}
           <div className="mb-6 flex justify-between items-center">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900">AI学習分析</h3>
-              <p className="text-sm text-gray-600">学習データを分析して個別の改善提案を生成します</p>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">AI学習分析</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-300">学習データを分析して個別の改善提案を生成します</p>
             </div>
             <button
               onClick={runAnalysis}
               disabled={isAnalyzing || studyLogs.length === 0}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center space-x-2"
+              className="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 disabled:bg-gray-400 dark:disabled:bg-gray-600 disabled:cursor-not-allowed flex items-center space-x-2"
             >
               {isAnalyzing ? (
                 <>
@@ -269,19 +319,19 @@ export default function Analysis() {
 
           {/* AI分析結果 */}
           {analysisResult && (
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-6 mb-8">
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg p-6 mb-8">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xl font-semibold text-gray-900">AI学習分析結果</h3>
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white">AI学習分析結果</h3>
                 <div className="flex items-center space-x-2">
-                  <span className="text-2xl font-bold text-indigo-600">{analysisResult.overallScore}</span>
-                  <span className="text-sm text-indigo-800">総合スコア</span>
+                  <span className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">{analysisResult.overallScore}</span>
+                  <span className="text-sm text-indigo-800 dark:text-indigo-300">総合スコア</span>
                 </div>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* 学習パターン */}
-                <div className="bg-white rounded-lg p-4">
-                  <h4 className="font-semibold text-gray-900 mb-3">学習パターン</h4>
+                <div className="bg-white dark:bg-gray-700 rounded-lg p-4">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-3">学習パターン</h4>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span className="text-gray-600">総学習時間:</span>
@@ -364,35 +414,35 @@ export default function Analysis() {
 
           {/* 統計サマリー */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-            <div className="bg-blue-50 rounded-lg p-4">
-              <div className="text-2xl font-bold text-blue-600">{Math.floor(totalStudyTime / 60)}h {totalStudyTime % 60}m</div>
-              <div className="text-sm text-blue-800">総学習時間</div>
+            <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
+              <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{Math.floor(totalStudyTime / 60)}h {totalStudyTime % 60}m</div>
+              <div className="text-sm text-blue-800 dark:text-blue-300">総学習時間</div>
             </div>
-            <div className="bg-green-50 rounded-lg p-4">
-              <div className="text-2xl font-bold text-green-600">{averageUnderstanding.toFixed(1)}</div>
-              <div className="text-sm text-green-800">平均理解度</div>
+            <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4">
+              <div className="text-2xl font-bold text-green-600 dark:text-green-400">{averageUnderstanding.toFixed(1)}</div>
+              <div className="text-sm text-green-800 dark:text-green-300">平均理解度</div>
             </div>
-            <div className="bg-orange-50 rounded-lg p-4">
-              <div className="text-2xl font-bold text-orange-600">{morningTestAverage.toFixed(1)}%</div>
-              <div className="text-sm text-orange-800">午前正答率</div>
+            <div className="bg-orange-50 dark:bg-orange-900/20 rounded-lg p-4">
+              <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">{morningTestAverage.toFixed(1)}%</div>
+              <div className="text-sm text-orange-800 dark:text-orange-300">午前正答率</div>
             </div>
-            <div className="bg-purple-50 rounded-lg p-4">
-              <div className="text-2xl font-bold text-purple-600">{afternoonTestAverage.toFixed(1)}</div>
-              <div className="text-sm text-purple-800">午後平均点</div>
+            <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4">
+              <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">{afternoonTestAverage.toFixed(1)}</div>
+              <div className="text-sm text-purple-800 dark:text-purple-300">午後平均点</div>
             </div>
           </div>
 
           {/* チャートエリア */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
             {/* 週別学習時間 */}
-            <div className="bg-white border rounded-lg p-4">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">週別学習時間推移</h3>
+            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">週別学習時間推移</h3>
               <ProgressChart data={weeklyData} />
             </div>
 
             {/* 科目別学習時間 */}
-            <div className="bg-white border rounded-lg p-4">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">科目別学習時間</h3>
+            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">科目別学習時間</h3>
               <StudyTimeChart data={subjectData} />
             </div>
           </div>
@@ -400,20 +450,20 @@ export default function Analysis() {
           {/* 理解度分析 */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* 理解度レーダーチャート */}
-            <div className="bg-white border rounded-lg p-4">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">分野別理解度</h3>
+            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">分野別理解度</h3>
               {understandingData.length > 0 ? (
                 <UnderstandingRadarChart data={understandingData} />
               ) : (
-                <div className="h-[250px] flex items-center justify-center text-gray-500">
+                <div className="h-[250px] flex items-center justify-center text-gray-500 dark:text-gray-400">
                   学習記録がありません
                 </div>
               )}
             </div>
 
             {/* 改善提案 */}
-            <div className="bg-white border rounded-lg p-4">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">学習改善提案</h3>
+            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">学習改善提案</h3>
               <div className="space-y-4">
                 {understandingData.length > 0 && (
                   <>
@@ -421,10 +471,10 @@ export default function Analysis() {
                       .filter(item => item.understanding < 3)
                       .slice(0, 2)
                       .map((item, index) => (
-                        <div key={index} className="border-l-4 border-red-400 bg-red-50 p-3">
-                          <h4 className="font-medium text-red-800">要注意分野</h4>
-                          <p className="text-red-700 text-sm">{item.fullSubject}の理解度が{item.understanding}と低めです。</p>
-                          <p className="text-xs text-red-600 mt-1">重点的な復習をお勧めします</p>
+                        <div key={index} className="border-l-4 border-red-400 bg-red-50 dark:bg-red-900/20 p-3">
+                          <h4 className="font-medium text-red-800 dark:text-red-300">要注意分野</h4>
+                          <p className="text-red-700 dark:text-red-400 text-sm">{item.fullSubject}の理解度が{item.understanding}と低めです。</p>
+                          <p className="text-xs text-red-600 dark:text-red-400 mt-1">重点的な復習をお勧めします</p>
                         </div>
                       ))}
                     
@@ -432,10 +482,10 @@ export default function Analysis() {
                       .filter(item => item.understanding >= 4)
                       .slice(0, 1)
                       .map((item, index) => (
-                        <div key={index} className="border-l-4 border-green-400 bg-green-50 p-3">
-                          <h4 className="font-medium text-green-800">得意分野</h4>
-                          <p className="text-green-700 text-sm">{item.fullSubject}は理解度{item.understanding}と良好です。</p>
-                          <p className="text-xs text-green-600 mt-1">このペースを維持しましょう</p>
+                        <div key={index} className="border-l-4 border-green-400 bg-green-50 dark:bg-green-900/20 p-3">
+                          <h4 className="font-medium text-green-800 dark:text-green-300">得意分野</h4>
+                          <p className="text-green-700 dark:text-green-400 text-sm">{item.fullSubject}は理解度{item.understanding}と良好です。</p>
+                          <p className="text-xs text-green-600 dark:text-green-400 mt-1">このペースを維持しましょう</p>
                         </div>
                       ))}
                   </>
@@ -443,7 +493,7 @@ export default function Analysis() {
                 
                 {studyLogs.length === 0 && (
                   <div className="text-center py-8">
-                    <p className="text-gray-500">学習記録を追加すると、個別の改善提案が表示されます</p>
+                    <p className="text-gray-500 dark:text-gray-400">学習記録を追加すると、個別の改善提案が表示されます</p>
                   </div>
                 )}
               </div>
@@ -451,7 +501,7 @@ export default function Analysis() {
           </div>
 
           <div className="mt-8 text-center">
-            <p className="text-gray-500 text-sm">
+            <p className="text-gray-500 dark:text-gray-400 text-sm">
               ※ このページの分析結果は学習記録データに基づいて表示されます。<br/>
               より正確な分析のために、日々の学習記録を継続してください。
             </p>
