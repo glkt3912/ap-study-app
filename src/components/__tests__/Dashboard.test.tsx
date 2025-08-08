@@ -3,10 +3,29 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import Dashboard from '../Dashboard'
 import { ThemeProvider } from '../../contexts/ThemeContext'
 
+// Mock useAuth hook to avoid AuthProvider dependency
+vi.mock('../../contexts/AuthContext', () => ({
+  useAuth: () => ({
+    user: { id: 1, name: 'Test User', email: 'test@example.com' },
+    userId: 1,
+    token: 'mock-token',
+    isAuthenticated: true,
+    login: vi.fn(),
+    signup: vi.fn(),
+    logout: vi.fn(),
+    updateUser: vi.fn(),
+    isLoading: false,
+    error: null,
+  }),
+  AuthProvider: ({ children }: { children: React.ReactNode }) => children,
+}))
+
 // Mock API client
 vi.mock('../../lib/api', () => ({
   apiClient: {
     getStudyPlan: vi.fn(),
+    getPredictiveAnalysis: vi.fn().mockResolvedValue(null),
+    getPersonalizedRecommendations: vi.fn().mockResolvedValue(null),
   },
 }))
 
@@ -32,7 +51,7 @@ describe('Dashboard', () => {
   })
 
   it('renders dashboard title', () => {
-    mockApiClient.getStudyPlan.mockResolvedValue([])
+    vi.mocked(mockApiClient.getStudyPlan).mockResolvedValue([])
 
     render(<MockedDashboard studyData={[]} />)
     
@@ -40,7 +59,7 @@ describe('Dashboard', () => {
   })
 
   it('displays loading state initially', () => {
-    mockApiClient.getStudyPlan.mockImplementation(() => new Promise(() => {})) // Never resolves
+    vi.mocked(mockApiClient.getStudyPlan).mockImplementation(() => new Promise(() => {})) // Never resolves
 
     render(<MockedDashboard isLoading={true} />)
     
@@ -65,7 +84,7 @@ describe('Dashboard', () => {
       },
     ]
 
-    mockApiClient.getStudyPlan.mockResolvedValue(mockData)
+    vi.mocked(mockApiClient.getStudyPlan).mockResolvedValue(mockData)
 
     render(<MockedDashboard studyData={mockData} />)
     
@@ -77,7 +96,7 @@ describe('Dashboard', () => {
   })
 
   it('displays error message when API call fails', async () => {
-    mockApiClient.getStudyPlan.mockRejectedValue(new Error('API Error'))
+    vi.mocked(mockApiClient.getStudyPlan).mockRejectedValue(new Error('API Error'))
 
     render(<MockedDashboard studyData={[]} />)
     
@@ -85,7 +104,7 @@ describe('Dashboard', () => {
   })
 
   it('displays empty state when no weeks available', async () => {
-    mockApiClient.getStudyPlan.mockResolvedValue([])
+    vi.mocked(mockApiClient.getStudyPlan).mockResolvedValue([])
 
     render(<MockedDashboard studyData={[]} />)
     
