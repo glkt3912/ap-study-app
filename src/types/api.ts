@@ -86,13 +86,15 @@ export interface AfternoonTest {
 }
 
 // Additional utility types
-export type ApiResponse<T> = {
-  success: true;
-  data: T;
-} | {
-  success: false;
-  error: string;
-};
+export type ApiResponse<T> =
+  | {
+      success: true;
+      data: T;
+    }
+  | {
+      success: false;
+      error: string;
+    };
 
 // Request types
 export type CreateStudyLogRequest = Omit<StudyLog, 'id' | 'efficiency'>;
