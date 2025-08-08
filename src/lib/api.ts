@@ -293,6 +293,21 @@ class ApiClient {
     );
   }
 
+  async getStudyLogStats(): Promise<{
+    totalTime: number;
+    averageUnderstanding: number;
+    totalSessions: number;
+    subjectStats: Array<{
+      subject: string;
+      totalTime: number;
+      sessionCount: number;
+      averageUnderstanding: number;
+      latestActivity: string;
+    }>;
+  }> {
+    return this.request("/api/studylog/stats");
+  }
+
   // 午前問題記録API
   async getMorningTests(): Promise<MorningTest[]> {
     return this.request<MorningTest[]>("/api/test/morning");
@@ -488,6 +503,14 @@ class ApiClient {
   }> {
     const params = limit ? `?limit=${limit}` : "";
     return this.request(`/api/quiz/recommendations${params}`);
+  }
+
+  async getQuestionById(id: string): Promise<Question & {
+    answerHistory?: UserAnswer[];
+    relatedQuestions?: Question[];
+    difficultyAnalysis?: any;
+  }> {
+    return this.request(`/api/quiz/questions/${id}`);
   }
 
   async getQuizProgress(): Promise<{

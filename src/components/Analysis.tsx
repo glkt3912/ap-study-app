@@ -79,19 +79,22 @@ export default function Analysis() {
   // const [examDate, setExamDate] = useState('')
   const [isLoading, setIsLoading] = useState(true)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [studyStats, setStudyStats] = useState<any>(null)
   // const [isPredicting, setIsPredicting] = useState(false)
 
   const fetchAnalysisData = useCallback(async () => {
     try {
       setIsLoading(true)
-      const [logs, morningData, afternoonData] = await Promise.all([
+      const [logs, morningData, afternoonData, stats] = await Promise.all([
         apiClient.getStudyLogs(),
         apiClient.getMorningTests(),
-        apiClient.getAfternoonTests()
+        apiClient.getAfternoonTests(),
+        apiClient.getStudyLogStats().catch(() => null) // エラー時はnullを返す
       ])
       setStudyLogs(logs)
       setMorningTests(morningData)
       setAfternoonTests(afternoonData)
+      setStudyStats(stats)
       
       // 最新の分析結果を取得
       await fetchLatestAnalysis()
@@ -242,6 +245,53 @@ export default function Analysis() {
         </div>
 
         <div className="p-6">
+          {/* 学習統計サマリー */}
+          {studyStats && (
+            <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <h3 className="text-lg font-semibold text-blue-900 mb-3">📊 学習統計サマリー</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-blue-600">{Math.round(studyStats.totalTime)}h</div>
+                  <div className="text-sm text-blue-800">総学習時間</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-green-600">{studyStats.totalSessions}</div>
+                  <div className="text-sm text-green-800">学習回数</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-purple-600">{studyStats.averageUnderstanding.toFixed(1)}</div>
+                  <div className="text-sm text-purple-800">平均理解度</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-orange-600">{studyStats.subjectStats?.length || 0}</div>
+                  <div className="text-sm text-orange-800">学習分野数</div>
+                </div>
+              </div>
+              
+              {studyStats.subjectStats && studyStats.subjectStats.length > 0 && (
+                <div className="mt-4">
+                  <h4 className="font-medium text-blue-900 mb-2">分野別統計</h4>
+                  <div className="space-y-2">
+                    {studyStats.subjectStats.slice(0, 3).map((subject: any, index: number) => (
+                      <div key={index} className="flex justify-between items-center text-sm">
+                        <span className="font-medium">{subject.subject}</span>
+                        <div className="text-right">
+                          <div>{Math.round(subject.totalTime)}h ({subject.sessionCount}回)</div>
+                          <div className="text-xs text-gray-600">理解度: {subject.averageUnderstanding.toFixed(1)}</div>
+                        </div>
+                      </div>
+                    ))}
+                    {studyStats.subjectStats.length > 3 && (
+                      <div className="text-xs text-gray-500 text-center">
+                        他 {studyStats.subjectStats.length - 3} 分野
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* 分析実行ボタン */}
           <div className="mb-6 flex justify-between items-center">
             <div>

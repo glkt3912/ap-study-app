@@ -1,8 +1,33 @@
 'use client'
 
 import Link from 'next/link'
+import { useState } from 'react'
+import { performanceAnalyzer } from '@/lib/performance-analyzer'
+import { errorHandler } from '@/lib/error-handler'
 
 export default function DiagnosticHub() {
+  const [performanceResults, setPerformanceResults] = useState<any>(null)
+  const [errorStats, setErrorStats] = useState<any>(null)
+  const [isAnalyzing, setIsAnalyzing] = useState(false)
+
+  const runPerformanceAnalysis = async () => {
+    setIsAnalyzing(true)
+    try {
+      const results = await performanceAnalyzer.analyzePerformance()
+      setPerformanceResults(results)
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('パフォーマンス分析エラー:', error)
+    } finally {
+      setIsAnalyzing(false)
+    }
+  }
+
+  const getErrorStatistics = () => {
+    const stats = errorHandler.getErrorStatistics()
+    setErrorStats(stats)
+  }
+
   const diagnosticPages = [
     {
       title: '🧪 総合診断',
@@ -51,6 +76,95 @@ export default function DiagnosticHub() {
             </p>
           </Link>
         ))}
+      </div>
+
+      {/* 監視・パフォーマンスダッシュボード */}
+      <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* パフォーマンス分析 */}
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+              📊 パフォーマンス分析
+            </h3>
+            <button
+              onClick={runPerformanceAnalysis}
+              disabled={isAnalyzing}
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400 transition-colors"
+            >
+              {isAnalyzing ? '分析中...' : '分析開始'}
+            </button>
+          </div>
+          
+          {performanceResults ? (
+            <div className="space-y-3">
+              <div className="flex justify-between">
+                <span>総合スコア:</span>
+                <span className={`font-bold ${
+                  performanceResults.score.overall >= 90 ? 'text-green-600' :
+                  performanceResults.score.overall >= 70 ? 'text-yellow-600' :
+                  'text-red-600'
+                }`}>
+                  {performanceResults.score.overall}/100
+                </span>
+              </div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">
+                {performanceResults.summary}
+              </div>
+              <div className="text-xs">
+                ボトルネック: {performanceResults.bottlenecks.length}件 | 
+                提案: {performanceResults.suggestions.length}件
+              </div>
+            </div>
+          ) : (
+            <div className="text-sm text-gray-500 dark:text-gray-400">
+              パフォーマンス分析を実行してください
+            </div>
+          )}
+        </div>
+
+        {/* エラー統計 */}
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+              🚨 エラー統計
+            </h3>
+            <button
+              onClick={getErrorStatistics}
+              className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+            >
+              統計取得
+            </button>
+          </div>
+          
+          {errorStats ? (
+            <div className="space-y-3">
+              <div className="flex justify-between">
+                <span>総エラー数:</span>
+                <span className={`font-bold ${errorStats.total === 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  {errorStats.total}件
+                </span>
+              </div>
+              <div className="text-sm">
+                <div>再試行可能: {errorStats.retryableCount}件</div>
+                <div>最近のエラー: {errorStats.recentErrors.length}件</div>
+              </div>
+              {Object.entries(errorStats.byCategory).length > 0 && (
+                <div className="text-xs space-y-1">
+                  <div className="font-medium">カテゴリ別:</div>
+                  {Object.entries(errorStats.byCategory).map(([category, count]) => (
+                    <div key={category} className="ml-2">
+                      {category}: {count as number}件
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="text-sm text-gray-500 dark:text-gray-400">
+              エラー統計を取得してください
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="mt-8 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">

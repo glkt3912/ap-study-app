@@ -12,9 +12,11 @@ import DiagnosticHub from '@/components/DiagnosticHub'
 import { AdvancedAnalysis } from '@/components/AdvancedAnalysis'
 import { ReviewSystem } from '@/components/ReviewSystem'
 import { AuthModal } from '@/components/auth'
+import { ErrorToastManager } from '@/components/ErrorToast'
 import { useAuth } from '@/contexts/AuthContext'
 import { studyPlanData } from '@/data/studyPlan'
 import { apiClient } from '@/lib/api'
+import { errorHandler } from '@/lib/error-handler'
 
 export default function ClientHome() {
   const { isAuthenticated, user, isLoading: authLoading, logout } = useAuth()
@@ -67,10 +69,21 @@ export default function ClientHome() {
         
         setStudyData(convertedData)
       } catch (err) {
+        // 高度なエラーハンドリング
+        const standardError = await errorHandler.handleApiError(
+          err,
+          '/api/study/plan',
+          'GET',
+          user?.id ? {
+            userId: user.id.toString(),
+          } : undefined
+        )
+
         if (process.env.NODE_ENV === 'development') {
           // eslint-disable-next-line no-console
-          console.error('学習データの取得に失敗しました:', err)
+          console.error('学習データの取得に失敗しました:', standardError)
         }
+
         setError('データの読み込みに失敗しました。モックデータを使用します。')
         // エラー時はモックデータを使用
         setStudyData(studyPlanData)
@@ -80,7 +93,7 @@ export default function ClientHome() {
     }
 
     fetchStudyData()
-  }, [])
+  }, [user?.id])
 
   const tabs = [
     { id: 'dashboard', name: 'ダッシュボード', icon: '📊' },
@@ -230,6 +243,9 @@ export default function ClientHome() {
         isOpen={showAuthModal} 
         onClose={() => setShowAuthModal(false)} 
       />
+      
+      {/* エラートースト管理 */}
+      <ErrorToastManager />
     </div>
   )
 }
