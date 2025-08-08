@@ -700,6 +700,319 @@ class ApiClient {
   async getUserLearningEfficiencyAnalyses(userId: string): Promise<any[]> {
     return this.request(`/api/learning-efficiency-analysis/user/${userId}`);
   }
+
+  // ========================================
+  // ML学習効率分析API (高度機能統合)
+  // ========================================
+
+  /**
+   * 予測分析を実行 (合格確率、推奨学習時間等)
+   */
+  async getPredictiveAnalysis(userId: number): Promise<PredictiveAnalysis> {
+    return this.request<PredictiveAnalysis>(`/api/learning-efficiency-analysis/predict/${userId}`);
+  }
+
+  /**
+   * パーソナライズド学習推奨を取得
+   */
+  async getPersonalizedRecommendations(userId: number): Promise<PersonalizedRecommendations> {
+    return this.request<PersonalizedRecommendations>(`/api/learning-efficiency-analysis/recommendations/${userId}`);
+  }
+
+  /**
+   * 最新のML分析結果を取得
+   */
+  async getLatestMLAnalysis(userId: number): Promise<MLAnalysisResult> {
+    return this.request<MLAnalysisResult>(`/api/learning-efficiency-analysis/latest/${userId}`);
+  }
+
+  /**
+   * ML分析を実行生成
+   */
+  async generateMLAnalysis(userId: number): Promise<MLAnalysisResult> {
+    return this.request<MLAnalysisResult>(`/api/learning-efficiency-analysis/generate`, {
+      method: 'POST',
+      body: JSON.stringify({ userId })
+    });
+  }
+
+  /**
+   * 高度なQuiz苦手分野分析 (AI搭載)
+   */
+  async getAdvancedWeakPoints(userId?: number): Promise<AdvancedWeakPointsAnalysis> {
+    const params = userId ? `?userId=${userId}` : '';
+    return this.request<AdvancedWeakPointsAnalysis>(`/api/quiz/weak-points${params}`);
+  }
+
+  /**
+   * AI推奨問題取得 (パーソナライズド)
+   */
+  async getAIRecommendedQuestions(userId?: number, limit?: number): Promise<RecommendedQuestionsResponse> {
+    const params = new URLSearchParams();
+    if (userId) params.append('userId', userId.toString());
+    if (limit) params.append('limit', limit.toString());
+    const query = params.toString();
+    return this.request<RecommendedQuestionsResponse>(`/api/quiz/recommendations${query ? `?${query}` : ''}`);
+  }
+
+  /**
+   * バッチ処理: 包括的学習データ取得 (パフォーマンス最適化)
+   */
+  async getBatchStudyData(userId?: number): Promise<BatchStudyDataResponse> {
+    const params = userId ? `?userId=${userId}` : '';
+    return this.request<BatchStudyDataResponse>(`/api/batch/study-data${params}`);
+  }
+
+  /**
+   * 高度監視メトリクス取得
+   */
+  async getSystemMetrics(): Promise<SystemMetrics> {
+    return this.request<SystemMetrics>(`/api/monitoring/metrics`);
+  }
+
+  /**
+   * システム情報取得
+   */
+  async getSystemInfo(): Promise<SystemInfo> {
+    return this.request<SystemInfo>(`/api/monitoring/system`);
+  }
+}
+
+// ========================================
+// ML分析関連の型定義
+// ========================================
+
+export interface MLAnalysisResult {
+  id: number;
+  userId: number;
+  analysisDate: string;
+  overallScore: number;
+  studyPattern: StudyPatternML;
+  weaknessAnalysis: WeaknessAnalysisML;
+  studyRecommendation: StudyRecommendationML;
+  learningEfficiencyScore: number;
+  predictions: PredictiveInsights;
+  personalizedRecommendations: PersonalizedRecommendation[];
+}
+
+export interface PredictiveAnalysis {
+  examPassProbability: number;
+  recommendedStudyHours: number;
+  weakAreaPredictions: WeakAreaPrediction[];
+  timeToReadiness: number; // days
+  confidenceInterval: {
+    lower: number;
+    upper: number;
+  };
+  riskFactors: string[];
+  successFactors: string[];
+}
+
+export interface PersonalizedRecommendations {
+  dailyStudyPlan: DailyStudyRecommendation[];
+  prioritySubjects: PrioritySubject[];
+  reviewSchedule: ReviewScheduleItemML[];
+  motivationalInsights: string[];
+  learningPathOptimization: {
+    currentPath: string;
+    optimizedPath: string;
+    expectedImprovement: number;
+  };
+}
+
+export interface AdvancedWeakPointsAnalysis {
+  criticalWeakPoints: WeakPointDetail[];
+  improvementPotential: ImprovementPotential[];
+  learningPath: LearningPathPhase[];
+  aiRecommendations: string[];
+}
+
+export interface RecommendedQuestionsResponse {
+  reason: string;
+  algorithmVersion: string;
+  personalizedScore: number;
+  questions: Question[];
+  learningObjectives: string[];
+  difficultyProgression: 'adaptive' | 'progressive' | 'remedial';
+}
+
+export interface BatchStudyDataResponse {
+  studyLogs: StudyLog[];
+  testResults: {
+    morningTests: MorningTest[];
+    afternoonTests: AfternoonTest[];
+  };
+  analysisResults: MLAnalysisResult[];
+  recommendations: PersonalizedRecommendations;
+  systemMetrics: SystemMetrics;
+  lastUpdated: string;
+  cacheStatus: 'fresh' | 'stale' | 'expired';
+}
+
+export interface SystemMetrics {
+  performance: {
+    averageResponseTime: number;
+    requestCount: number;
+    errorRate: number;
+    successRate: number;
+  };
+  usage: {
+    activeUsers: number;
+    totalSessions: number;
+    avgSessionDuration: number;
+    peakConcurrentUsers: number;
+  };
+  ml: {
+    modelVersion: string;
+    predictionAccuracy: number;
+    recommendationClickRate: number;
+    analysisGenerationTime: number;
+  };
+}
+
+export interface SystemInfo {
+  version: string;
+  environment: string;
+  uptime: number;
+  memoryUsage: number;
+  cpuUsage: number;
+  databaseConnections: number;
+}
+
+// 補助的な型定義
+export interface StudyPatternML {
+  totalStudyTime: number;
+  averageStudyTime: number;
+  studyFrequency: number;
+  bestStudyTime: string;
+  consistencyScore: number;
+  preferredSubjects: string[];
+  learningVelocity: number;
+  concentrationSpan: number;
+}
+
+export interface WeaknessAnalysisML {
+  weakSubjects: WeakSubjectML[];
+  weakTopics: WeakTopicML[];
+  improvementAreas: string[];
+  rootCauses: string[];
+}
+
+export interface StudyRecommendationML {
+  dailyStudyTime: number;
+  weeklyGoal: number;
+  focusSubjects: string[];
+  reviewSchedule: ReviewScheduleItemML[];
+  adaptivePacing: {
+    currentPace: 'slow' | 'normal' | 'fast';
+    recommendedPace: 'slow' | 'normal' | 'fast';
+    reason: string;
+  };
+}
+
+export interface PredictiveInsights {
+  examPassProbability: number;
+  recommendedStudyHours: number;
+  riskFactors: string[];
+  successFactors: string[];
+  milestonesPrediction: {
+    milestone: string;
+    predictedDate: string;
+    confidence: number;
+  }[];
+}
+
+export interface PersonalizedRecommendation {
+  type: 'study_focus' | 'time_management' | 'weak_area' | 'motivation' | 'exam_strategy';
+  priority: 'high' | 'medium' | 'low';
+  title: string;
+  description: string;
+  actionItems: string[];
+  expectedImpact: number;
+  timeframe: 'immediate' | 'short_term' | 'long_term';
+}
+
+export interface WeakPointDetail {
+  subject: string;
+  category: string;
+  subcategory?: string;
+  severity: 'critical' | 'moderate' | 'minor';
+  accuracy: number;
+  timeSpent: number;
+  improvementSuggestions: string[];
+  priorityScore: number;
+}
+
+export interface WeakSubjectML {
+  subject: string;
+  understanding: number;
+  studyTime: number;
+  testScore: number;
+  improvement: number;
+  masteryLevel: 'beginner' | 'intermediate' | 'advanced';
+}
+
+export interface WeakTopicML {
+  topic: string;
+  subject: string;
+  understanding: number;
+  testAccuracy: number;
+  priority: number;
+  conceptDependencies: string[];
+}
+
+export interface DailyStudyRecommendation {
+  date: string;
+  subjects: string[];
+  estimatedTime: number;
+  priority: 'high' | 'medium' | 'low';
+  objectives: string[];
+  adaptiveAdjustments: {
+    basedOnPerformance: boolean;
+    basedOnTimeConstraints: boolean;
+    basedOnMotivation: boolean;
+  };
+}
+
+export interface PrioritySubject {
+  subject: string;
+  priority: number;
+  reason: string;
+  recommendedTime: number;
+  urgency: 'immediate' | 'soon' | 'moderate' | 'low';
+}
+
+export interface ReviewScheduleItemML {
+  subject: string;
+  nextReviewDate: string;
+  priority: number;
+  reviewType: 'light' | 'medium' | 'intensive';
+  spacedRepetitionInterval: number;
+}
+
+export interface WeakAreaPrediction {
+  area: string;
+  currentPerformance: number;
+  predictedPerformance: number;
+  interventionSuggestions: string[];
+  timeToImprovement: number;
+}
+
+export interface ImprovementPotential {
+  subject: string;
+  currentScore: number;
+  potentialScore: number;
+  effortRequired: 'low' | 'medium' | 'high';
+  timeEstimate: number;
+  prerequisites: string[];
+}
+
+export interface LearningPathPhase {
+  phase: string;
+  subjects: string[];
+  estimatedDuration: number;
+  objectives: string[];
+  successCriteria: string[];
 }
 
 export const apiClient = new ApiClient();

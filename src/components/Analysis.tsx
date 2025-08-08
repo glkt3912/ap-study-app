@@ -18,7 +18,8 @@ const UnderstandingRadarChart = dynamic(() => import('./charts/AnalysisCharts').
   loading: () => <div className="h-[300px] bg-gray-100 dark:bg-gray-700 rounded animate-pulse" />,
   ssr: false
 })
-import { apiClient, StudyLog, MorningTest, AfternoonTest } from '../lib/api'
+import { apiClient, StudyLog, MorningTest, AfternoonTest, PredictiveAnalysis, PersonalizedRecommendations, AdvancedWeakPointsAnalysis } from '../lib/api'
+import { useAuth } from '../contexts/AuthContext'
 // import { ChartSkeleton, CardSkeleton } from './ui/Skeleton'
 
 // 分析結果の型定義
@@ -71,16 +72,50 @@ interface AnalysisResult {
 
 
 export default function Analysis() {
+  const { user } = useAuth()
   const [studyLogs, setStudyLogs] = useState<StudyLog[]>([])
   const [morningTests, setMorningTests] = useState<MorningTest[]>([])
   const [afternoonTests, setAfternoonTests] = useState<AfternoonTest[]>([])
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null)
-  // const [predictionResult, setPredictionResult] = useState<PredictionResult | null>(null)
-  // const [examDate, setExamDate] = useState('')
   const [isLoading, setIsLoading] = useState(true)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [studyStats, setStudyStats] = useState<any>(null)
-  // const [isPredicting, setIsPredicting] = useState(false)
+  
+  // ========================================
+  // ML分析関連ステート
+  // ========================================
+  const [predictiveAnalysis, setPredictiveAnalysis] = useState<PredictiveAnalysis | null>(null)
+  const [personalizedRecommendations, setPersonalizedRecommendations] = useState<PersonalizedRecommendations | null>(null)
+  const [advancedWeakPoints, setAdvancedWeakPoints] = useState<AdvancedWeakPointsAnalysis | null>(null)
+  const [isGeneratingML, setIsGeneratingML] = useState(false)
+  const [mlError, setMlError] = useState<string | null>(null)
+
+  // ML分析データ取得関数
+  const fetchMLAnalysisData = useCallback(async () => {
+    if (!user?.id) return
+    
+    try {
+      setMlError(null)
+      
+      const [predictions, recommendations, weakPoints] = await Promise.all([
+        apiClient.getPredictiveAnalysis(user.id).catch(() => null),
+        apiClient.getPersonalizedRecommendations(user.id).catch(() => null),
+        apiClient.getAdvancedWeakPoints(user.id).catch(() => null)
+      ])
+      
+      setPredictiveAnalysis(predictions)
+      setPersonalizedRecommendations(recommendations)
+      setAdvancedWeakPoints(weakPoints)
+      
+    } catch (error) {
+      setMlError('ML分析データの取得に失敗しました')
+      // エラーログは開発環境でのみ出力
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error('ML分析データ取得エラー:', error)
+      }
+    }
+  }, [user?.id])
 
   const fetchAnalysisData = useCallback(async () => {
     try {
@@ -96,14 +131,19 @@ export default function Analysis() {
       setAfternoonTests(afternoonData)
       setStudyStats(stats)
       
-      // 最新の分析結果を取得
+      // 従来の分析結果を取得
       await fetchLatestAnalysis()
+      
+      // ML分析データを取得（ユーザー認証時のみ）
+      if (user?.id) {
+        await fetchMLAnalysisData()
+      }
     } catch (error) {
       // 分析データの取得に失敗
     } finally {
       setIsLoading(false)
     }
-  }, [])
+  }, [user?.id, fetchMLAnalysisData])
 
   useEffect(() => {
     fetchAnalysisData()
@@ -128,6 +168,30 @@ export default function Analysis() {
       // 分析実行に失敗
     } finally {
       setIsAnalyzing(false)
+    }
+  }
+
+  // ML分析生成関数
+  const generateMLAnalysis = async () => {
+    if (!user?.id) return
+    
+    try {
+      setIsGeneratingML(true)
+      setMlError(null)
+      
+      await apiClient.generateMLAnalysis(user.id)
+      
+      // 生成後に関連データも再取得
+      await fetchMLAnalysisData()
+    } catch (error) {
+      setMlError('ML分析の生成に失敗しました')
+      // エラーログは開発環境でのみ出力
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error('ML分析生成エラー:', error)
+      }
+    } finally {
+      setIsGeneratingML(false)
     }
   }
 
@@ -408,6 +472,194 @@ export default function Analysis() {
               
               <div className="mt-4 text-xs text-gray-500">
                 分析日時: {new Date(analysisResult.analysisDate).toLocaleString('ja-JP')}
+              </div>
+            </div>
+          )}
+
+          {/* ========================================
+              🤖 ML学習効率分析セクション (新機能)
+              ======================================== */}
+          
+          {/* ML分析実行ボタン */}
+          {user?.id && (
+            <div className="mb-6 flex justify-between items-center">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">🤖 ML学習効率分析</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-300">機械学習による高度な学習効率分析と予測</p>
+              </div>
+              <button
+                onClick={generateMLAnalysis}
+                disabled={isGeneratingML}
+                className="px-4 py-2 bg-purple-600 dark:bg-purple-700 text-white rounded-lg hover:bg-purple-700 dark:hover:bg-purple-600 disabled:bg-gray-400 dark:disabled:bg-gray-600 disabled:cursor-not-allowed flex items-center space-x-2"
+              >
+                {isGeneratingML ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    <span>分析中...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>🧠</span>
+                    <span>ML分析実行</span>
+                  </>
+                )}
+              </button>
+            </div>
+          )}
+
+          {/* ML分析エラー表示 */}
+          {mlError && (
+            <div className="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+              <p className="text-sm text-red-600 dark:text-red-400">{mlError}</p>
+            </div>
+          )}
+
+          {/* 予測分析結果 */}
+          {predictiveAnalysis && (
+            <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-lg p-6 mb-8">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white">🔮 予測分析結果</h3>
+                <div className="flex items-center space-x-2">
+                  <span className="text-3xl font-bold text-purple-600 dark:text-purple-400">
+                    {predictiveAnalysis.examPassProbability}%
+                  </span>
+                  <span className="text-sm text-purple-800 dark:text-purple-300">合格予測確率</span>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="bg-white dark:bg-gray-700 rounded-lg p-4">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-3">📈 学習予測</h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600 dark:text-gray-300">推奨学習時間:</span>
+                      <span className="font-medium">{predictiveAnalysis.recommendedStudyHours}時間</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600 dark:text-gray-300">合格まで:</span>
+                      <span className="font-medium">{predictiveAnalysis.timeToReadiness}日</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600 dark:text-gray-300">信頼区間:</span>
+                      <span className="font-medium">
+                        {predictiveAnalysis.confidenceInterval.lower}% - {predictiveAnalysis.confidenceInterval.upper}%
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white dark:bg-gray-700 rounded-lg p-4">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-3">⚠️ リスク要因</h4>
+                  <div className="space-y-1">
+                    {predictiveAnalysis.riskFactors.slice(0, 3).map((factor, index) => (
+                      <div key={index} className="text-xs text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 px-2 py-1 rounded">
+                        {factor}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="bg-white dark:bg-gray-700 rounded-lg p-4">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-3">✨ 成功要因</h4>
+                  <div className="space-y-1">
+                    {predictiveAnalysis.successFactors.slice(0, 3).map((factor, index) => (
+                      <div key={index} className="text-xs text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 px-2 py-1 rounded">
+                        {factor}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* パーソナライズド推奨 */}
+          {personalizedRecommendations && (
+            <div className="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-lg p-6 mb-8">
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">🎯 パーソナライズド推奨</h3>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div>
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-3">📅 今週の学習計画</h4>
+                  <div className="space-y-2">
+                    {personalizedRecommendations.dailyStudyPlan.slice(0, 3).map((day, index) => (
+                      <div key={index} className="bg-white dark:bg-gray-700 rounded-lg p-3">
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-sm font-medium text-gray-900 dark:text-white">
+                            {new Date(day.date).toLocaleDateString('ja-JP', { weekday: 'short', month: 'short', day: 'numeric' })}
+                          </span>
+                          <span className={`text-xs px-2 py-1 rounded-full ${
+                            day.priority === 'high' ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400' :
+                            day.priority === 'medium' ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400' :
+                            'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400'
+                          }`}>
+                            {day.priority}
+                          </span>
+                        </div>
+                        <div className="text-xs text-gray-600 dark:text-gray-300">
+                          {day.subjects.join(', ')} ({day.estimatedTime}分)
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-3">🏆 優先科目</h4>
+                  <div className="space-y-2">
+                    {personalizedRecommendations.prioritySubjects.slice(0, 4).map((subject, index) => (
+                      <div key={index} className="bg-white dark:bg-gray-700 rounded-lg p-3">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm font-medium text-gray-900 dark:text-white">{subject.subject}</span>
+                          <span className="text-xs text-gray-500 dark:text-gray-400">{subject.recommendedTime}分</span>
+                        </div>
+                        <div className="text-xs text-gray-600 dark:text-gray-300 mt-1">{subject.reason}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* 学習パス最適化 */}
+              {personalizedRecommendations.learningPathOptimization && (
+                <div className="mt-4 bg-white dark:bg-gray-700 rounded-lg p-4">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">🛤️ 学習パス最適化</h4>
+                  <div className="text-sm text-gray-600 dark:text-gray-300">
+                    <p><strong>現在のパス:</strong> {personalizedRecommendations.learningPathOptimization.currentPath}</p>
+                    <p><strong>最適化パス:</strong> {personalizedRecommendations.learningPathOptimization.optimizedPath}</p>
+                    <p><strong>期待改善:</strong> {personalizedRecommendations.learningPathOptimization.expectedImprovement}%</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* 高度な弱点分析 */}
+          {advancedWeakPoints && (
+            <div className="bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20 rounded-lg p-6 mb-8">
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">🎯 AI弱点分析</h3>
+              
+              <div className="space-y-4">
+                {advancedWeakPoints.criticalWeakPoints.slice(0, 3).map((weakness, index) => (
+                  <div key={index} className="bg-white dark:bg-gray-700 rounded-lg p-4">
+                    <div className="flex justify-between items-start mb-2">
+                      <h4 className="font-semibold text-gray-900 dark:text-white">{weakness.subject}</h4>
+                      <span className={`text-xs px-2 py-1 rounded-full ${
+                        weakness.severity === 'critical' ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400' :
+                        weakness.severity === 'moderate' ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400' :
+                        'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400'
+                      }`}>
+                        {weakness.severity}
+                      </span>
+                    </div>
+                    <div className="text-sm text-gray-600 dark:text-gray-300 mb-2">
+                      正答率: {(weakness.accuracy * 100).toFixed(1)}% | 学習時間: {weakness.timeSpent}分
+                    </div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                      <strong>改善提案:</strong> {weakness.improvementSuggestions.slice(0, 2).join(', ')}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           )}
