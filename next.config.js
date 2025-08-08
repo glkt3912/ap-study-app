@@ -8,9 +8,9 @@ const nextConfig = {
   // 本番環境でのデバッグページ除外
   async rewrites() {
     if (process.env.NODE_ENV === 'production') {
-      return []
+      return [];
     }
-    return []
+    return [];
   },
   async redirects() {
     if (process.env.NODE_ENV === 'production') {
@@ -45,9 +45,9 @@ const nextConfig = {
           destination: '/404',
           permanent: false,
         },
-      ]
+      ];
     }
-    return []
+    return [];
   },
   // Bundle Analyzer用
   webpack: (config, { isServer }) => {
@@ -55,10 +55,10 @@ const nextConfig = {
       config.resolve.fallback = {
         ...config.resolve.fallback,
         fs: false,
-      }
+      };
     }
-    return config
-  }
-}
+    return config;
+  },
+};
 
-export default nextConfig
+export default nextConfig;

@@ -61,7 +61,7 @@ jobs:
   security-scan:
     name: Security Scan
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -81,7 +81,7 @@ jobs:
   #   runs-on: ubuntu-latest
   #   needs: [test-and-build, security-scan]
   #   if: false  # Disabled until production environment is ready
-  
+
   # deploy-preview:
   #   name: Deploy Preview (DISABLED - Production not ready)
   #   runs-on: ubuntu-latest

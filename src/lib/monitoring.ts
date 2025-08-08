@@ -58,7 +58,7 @@ class MonitoringService {
   constructor() {
     this.isEnabled = process.env.NODE_ENV === 'production' || process.env.NEXT_PUBLIC_ENABLE_MONITORING === 'true';
     this.apiEndpoint = process.env.NEXT_PUBLIC_MONITORING_ENDPOINT || '/api/monitoring';
-    
+
     if (this.isEnabled && typeof window !== 'undefined') {
       this.initializeMonitoring();
     }
@@ -67,13 +67,13 @@ class MonitoringService {
   private initializeMonitoring() {
     // Web Vitals 監視
     this.initWebVitals();
-    
+
     // エラー監視
     this.initErrorTracking();
-    
+
     // パフォーマンス監視
     this.initPerformanceTracking();
-    
+
     // ユーザー行動監視
     this.initUserTracking();
 
@@ -87,7 +87,7 @@ class MonitoringService {
   private async initWebVitals() {
     try {
       const { onCLS, onINP, onFCP, onLCP, onTTFB } = await import('web-vitals');
-      
+
       const handleMetric = (metric: WebVitalsMetric) => {
         this.trackPerformance({
           type: 'navigation',
@@ -98,8 +98,8 @@ class MonitoringService {
           metadata: {
             rating: metric.rating,
             delta: metric.delta,
-            id: metric.id
-          }
+            id: metric.id,
+          },
         });
       };
 
@@ -118,7 +118,7 @@ class MonitoringService {
    */
   private initErrorTracking() {
     // JavaScript エラー
-    window.addEventListener('error', (event) => {
+    window.addEventListener('error', event => {
       this.trackError({
         message: event.message,
         filename: event.filename,
@@ -128,12 +128,12 @@ class MonitoringService {
         stack: event.error?.stack,
         timestamp: new Date().toISOString(),
         userAgent: navigator.userAgent,
-        url: window.location.href
+        url: window.location.href,
       });
     });
 
     // Promise rejection エラー
-    window.addEventListener('unhandledrejection', (event) => {
+    window.addEventListener('unhandledrejection', event => {
       this.trackError({
         message: `Unhandled Promise Rejection: ${event.reason}`,
         filename: 'unknown',
@@ -143,7 +143,7 @@ class MonitoringService {
         stack: event.reason?.stack,
         timestamp: new Date().toISOString(),
         userAgent: navigator.userAgent,
-        url: window.location.href
+        url: window.location.href,
       });
     });
 
@@ -158,7 +158,7 @@ class MonitoringService {
         stack: event.detail.error?.stack || event.detail.componentStack,
         timestamp: new Date().toISOString(),
         userAgent: navigator.userAgent,
-        url: window.location.href
+        url: window.location.href,
       });
     });
   }
@@ -171,7 +171,7 @@ class MonitoringService {
     window.addEventListener('load', () => {
       setTimeout(() => {
         const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
-        
+
         this.trackPerformance({
           type: 'navigation',
           name: 'page-load',
@@ -181,15 +181,15 @@ class MonitoringService {
           metadata: {
             domContentLoaded: navigation.domContentLoadedEventEnd - (navigation.requestStart || 0),
             firstPaint: performance.getEntriesByName('first-paint')[0]?.startTime || 0,
-            firstContentfulPaint: performance.getEntriesByName('first-contentful-paint')[0]?.startTime || 0
-          }
+            firstContentfulPaint: performance.getEntriesByName('first-contentful-paint')[0]?.startTime || 0,
+          },
         });
       }, 0);
     });
 
     // リソース読み込み監視
-    new PerformanceObserver((list) => {
-      list.getEntries().forEach((entry) => {
+    new PerformanceObserver(list => {
+      list.getEntries().forEach(entry => {
         if (entry.entryType === 'resource') {
           const resourceEntry = entry as PerformanceResourceTiming;
           this.trackPerformance({
@@ -202,8 +202,8 @@ class MonitoringService {
               initiatorType: resourceEntry.initiatorType,
               transferSize: resourceEntry.transferSize,
               encodedBodySize: resourceEntry.encodedBodySize,
-              decodedBodySize: resourceEntry.decodedBodySize
-            }
+              decodedBodySize: resourceEntry.decodedBodySize,
+            },
           });
         }
       });
@@ -215,7 +215,7 @@ class MonitoringService {
    */
   private initUserTracking() {
     // クリック追跡
-    document.addEventListener('click', (event) => {
+    document.addEventListener('click', event => {
       const target = event.target as HTMLElement;
       this.trackUserEvent({
         type: 'click',
@@ -225,8 +225,8 @@ class MonitoringService {
         metadata: {
           x: event.clientX,
           y: event.clientY,
-          button: event.button
-        }
+          button: event.button,
+        },
       });
     });
 
@@ -244,8 +244,8 @@ class MonitoringService {
             scrollY: window.scrollY,
             scrollX: window.scrollX,
             innerHeight: window.innerHeight,
-            scrollHeight: document.documentElement.scrollHeight
-          }
+            scrollHeight: document.documentElement.scrollHeight,
+          },
         });
       }, 100);
     });
@@ -258,10 +258,10 @@ class MonitoringService {
         timestamp: new Date().toISOString(),
         url: window.location.href,
         metadata: {
-          sessionDuration: Date.now() - (performance.timeOrigin || Date.now())
-        }
+          sessionDuration: Date.now() - (performance.timeOrigin || Date.now()),
+        },
       });
-      
+
       // 残りのイベントを即座に送信
       this.flushEvents();
     });
@@ -319,8 +319,8 @@ class MonitoringService {
       metadata: {
         method,
         status,
-        error: error?.message
-      }
+        error: error?.message,
+      },
     });
   }
 
@@ -336,7 +336,7 @@ class MonitoringService {
       duration: value,
       timestamp: new Date().toISOString(),
       url: window.location.href,
-      ...(metadata && { metadata })
+      ...(metadata && { metadata }),
     });
   }
 
@@ -347,7 +347,7 @@ class MonitoringService {
     this.eventQueue.push({
       type,
       data,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
 
     if (this.eventQueue.length >= this.batchSize) {
@@ -372,16 +372,16 @@ class MonitoringService {
       await fetch(this.apiEndpoint, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           events,
           metadata: {
             userAgent: navigator.userAgent,
             timestamp: new Date().toISOString(),
-            url: window.location.href
-          }
-        })
+            url: window.location.href,
+          },
+        }),
       });
     } catch (error) {
       // console.error('Failed to send monitoring events:', error);
@@ -409,8 +409,8 @@ class MonitoringService {
           metadata: {
             userAgent: navigator.userAgent,
             timestamp: new Date().toISOString(),
-            url: window.location.href
-          }
+            url: window.location.href,
+          },
         })
       );
     }
@@ -423,11 +423,11 @@ class MonitoringService {
     if (element.id) {
       return `#${element.id}`;
     }
-    
+
     if (element.className) {
       return `.${element.className.split(' ').join('.')}`;
     }
-    
+
     return element.tagName.toLowerCase();
   }
 }
@@ -442,8 +442,8 @@ export const reportError = (error: Error, errorInfo: any) => {
       detail: {
         message: error.message,
         error,
-        componentStack: errorInfo.componentStack
-      }
+        componentStack: errorInfo.componentStack,
+      },
     });
     window.dispatchEvent(event);
   }

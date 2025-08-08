@@ -3,13 +3,13 @@
 @tailwind utilities;
 
 /* Test CSS to verify styles are loading */
-.test-red { 
-  background-color: red !important; 
+.test-red {
+  background-color: red !important;
   color: white !important;
   padding: 1rem !important;
 }
-.test-blue { 
-  background-color: blue !important; 
+.test-blue {
+  background-color: blue !important;
   color: white !important;
   padding: 1rem !important;
 }

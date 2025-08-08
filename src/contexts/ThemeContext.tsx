@@ -1,79 +1,71 @@
-'use client'
+'use client';
 
-import React, { createContext, useContext, useEffect, useState } from 'react'
+import React, { createContext, useContext, useEffect, useState } from 'react';
 
-type Theme = 'light' | 'dark'
+type Theme = 'light' | 'dark';
 
 interface ThemeContextType {
-  theme: Theme
-  toggleTheme: () => void
+  theme: Theme;
+  toggleTheme: () => void;
 }
 
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>('light')
-  const [mounted, setMounted] = useState(false)
+  const [theme, setTheme] = useState<Theme>('light');
+  const [mounted, setMounted] = useState(false);
 
   // ローカルストレージからテーマを復元
   useEffect(() => {
-    const savedTheme = localStorage.getItem('ap-study-theme') as Theme
-    let initialTheme: Theme
-    
+    const savedTheme = localStorage.getItem('ap-study-theme') as Theme;
+    let initialTheme: Theme;
+
     if (savedTheme) {
-      initialTheme = savedTheme
+      initialTheme = savedTheme;
     } else {
       // システムの設定を確認
-      initialTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+      initialTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     }
-    
-    setTheme(initialTheme)
-    
+
+    setTheme(initialTheme);
+
     // 初期テーマを即座に適用
     if (initialTheme === 'dark') {
-      document.documentElement.classList.add('dark')
+      document.documentElement.classList.add('dark');
     } else {
-      document.documentElement.classList.remove('dark')
+      document.documentElement.classList.remove('dark');
     }
-    
-    setMounted(true)
-  }, [])
+
+    setMounted(true);
+  }, []);
 
   // テーマが変更されたときの処理
   useEffect(() => {
     // DOM操作は常に実行（mountedに関係なく）
-    localStorage.setItem('ap-study-theme', theme)
+    localStorage.setItem('ap-study-theme', theme);
     if (theme === 'dark') {
-      document.documentElement.classList.add('dark')
+      document.documentElement.classList.add('dark');
     } else {
-      document.documentElement.classList.remove('dark')
+      document.documentElement.classList.remove('dark');
     }
-  }, [theme, mounted])
+  }, [theme, mounted]);
 
   const toggleTheme = () => {
-    setTheme(prev => prev === 'light' ? 'dark' : 'light')
-  }
+    setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
+  };
 
   // Hydration mismatchを防ぐため、mounted前はデフォルト値でコンテキストを提供
   if (!mounted) {
-    return (
-      <ThemeContext.Provider value={{ theme: 'light', toggleTheme }}>
-        {children}
-      </ThemeContext.Provider>
-    )
+    return <ThemeContext.Provider value={{ theme: 'light', toggleTheme }}>{children}</ThemeContext.Provider>;
   }
 
-  return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
-      {children}
-    </ThemeContext.Provider>
-  )
+  return <ThemeContext.Provider value={{ theme, toggleTheme }}>{children}</ThemeContext.Provider>;
 }
 
 export function useTheme() {
-  const context = useContext(ThemeContext)
+  const context = useContext(ThemeContext);
   if (context === undefined) {
-    throw new Error('useTheme must be used within a ThemeProvider')
+    throw new Error('useTheme must be used within a ThemeProvider');
   }
-  return context
+  return context;
 }

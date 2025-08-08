@@ -130,7 +130,6 @@ class PerformanceAnalyzer {
       });
 
       return analysis;
-
     } finally {
       this.isAnalyzing = false;
     }
@@ -140,14 +139,13 @@ class PerformanceAnalyzer {
    * メトリクス収集
    */
   private async collectMetrics(): Promise<PerformanceMetrics> {
-    const [navigationMetrics, resourceMetrics, runtimeMetrics, interactionMetrics, apiMetrics] = 
-      await Promise.all([
-        this.collectNavigationMetrics(),
-        this.collectResourceMetrics(),
-        this.collectRuntimeMetrics(),
-        this.collectInteractionMetrics(),
-        this.collectApiMetrics(),
-      ]);
+    const [navigationMetrics, resourceMetrics, runtimeMetrics, interactionMetrics, apiMetrics] = await Promise.all([
+      this.collectNavigationMetrics(),
+      this.collectResourceMetrics(),
+      this.collectRuntimeMetrics(),
+      this.collectInteractionMetrics(),
+      this.collectApiMetrics(),
+    ]);
 
     return {
       navigation: navigationMetrics,
@@ -162,7 +160,7 @@ class PerformanceAnalyzer {
    * ナビゲーションメトリクス収集
    */
   private async collectNavigationMetrics(): Promise<PerformanceMetrics['navigation']> {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       if (typeof window === 'undefined') {
         resolve({
           domContentLoaded: 0,
@@ -182,15 +180,15 @@ class PerformanceAnalyzer {
 
       // Web Vitalsを非同期で取得
       Promise.all([
-        import('web-vitals').then(({ onCLS }) => 
-          new Promise<number>(resolve => onCLS((metric: any) => resolve(metric.value)))
-        ).catch(() => 0),
-        import('web-vitals').then(({ onINP }) => 
-          new Promise<number>(resolve => onINP((metric: any) => resolve(metric.value)))
-        ).catch(() => 0),
-        import('web-vitals').then(({ onLCP }) => 
-          new Promise<number>(resolve => onLCP((metric: any) => resolve(metric.value)))
-        ).catch(() => 0),
+        import('web-vitals')
+          .then(({ onCLS }) => new Promise<number>(resolve => onCLS((metric: any) => resolve(metric.value))))
+          .catch(() => 0),
+        import('web-vitals')
+          .then(({ onINP }) => new Promise<number>(resolve => onINP((metric: any) => resolve(metric.value))))
+          .catch(() => 0),
+        import('web-vitals')
+          .then(({ onLCP }) => new Promise<number>(resolve => onLCP((metric: any) => resolve(metric.value))))
+          .catch(() => 0),
       ]).then(([cls, inp, lcp]) => {
         resolve({
           domContentLoaded: navigation.domContentLoadedEventEnd - (navigation.requestStart || 0),
@@ -199,7 +197,7 @@ class PerformanceAnalyzer {
           firstContentfulPaint: paintEntries.find(entry => entry.name === 'first-contentful-paint')?.startTime || 0,
           largestContentfulPaint: lcp,
           firstInputDelay: inp,
-          cumulativeLayoutShift: cls,  
+          cumulativeLayoutShift: cls,
           timeToInteractive: this.estimateTimeToInteractive(navigation),
         });
       });
@@ -212,13 +210,21 @@ class PerformanceAnalyzer {
   private async collectResourceMetrics(): Promise<PerformanceMetrics['resources']> {
     if (typeof window === 'undefined') {
       return {
-        jsSize: 0, cssSize: 0, imageSize: 0, totalSize: 0, resourceCount: 0, cacheHitRate: 0
+        jsSize: 0,
+        cssSize: 0,
+        imageSize: 0,
+        totalSize: 0,
+        resourceCount: 0,
+        cacheHitRate: 0,
       };
     }
 
     const resources = performance.getEntriesByType('resource') as PerformanceResourceTiming[];
-    
-    let jsSize = 0, cssSize = 0, imageSize = 0, totalSize = 0;
+
+    let jsSize = 0,
+      cssSize = 0,
+      imageSize = 0,
+      totalSize = 0;
     let cacheHits = 0;
 
     resources.forEach(resource => {
@@ -259,7 +265,11 @@ class PerformanceAnalyzer {
   private async collectRuntimeMetrics(): Promise<PerformanceMetrics['runtime']> {
     if (typeof window === 'undefined' || !('memory' in performance)) {
       return {
-        heapUsed: 0, heapTotal: 0, jsHeapSizeLimit: 0, usedJSHeapSize: 0, totalJSHeapSize: 0
+        heapUsed: 0,
+        heapTotal: 0,
+        jsHeapSizeLimit: 0,
+        usedJSHeapSize: 0,
+        totalJSHeapSize: 0,
       };
     }
 
@@ -362,7 +372,8 @@ class PerformanceAnalyzer {
     }
 
     // バンドルサイズチェック
-    if (metrics.resources.jsSize > 1024 * 1024) { // 1MB
+    if (metrics.resources.jsSize > 1024 * 1024) {
+      // 1MB
       bottlenecks.push({
         type: 'network',
         severity: metrics.resources.jsSize > 2 * 1024 * 1024 ? 'high' : 'medium',
@@ -405,7 +416,7 @@ class PerformanceAnalyzer {
    * 最適化提案生成
    */
   private generateOptimizationSuggestions(
-    metrics: PerformanceMetrics, 
+    metrics: PerformanceMetrics,
     bottlenecks: PerformanceBottleneck[]
   ): OptimizationSuggestion[] {
     const suggestions: OptimizationSuggestion[] = [];
@@ -527,8 +538,8 @@ class PerformanceAnalyzer {
    * 分析結果サマリー生成
    */
   private generateSummary(
-    metrics: PerformanceMetrics, 
-    bottlenecks: PerformanceBottleneck[], 
+    metrics: PerformanceMetrics,
+    bottlenecks: PerformanceBottleneck[],
     score: ReturnType<typeof this.calculatePerformanceScore>
   ): string {
     const criticalIssues = bottlenecks.filter(b => b.severity === 'critical').length;
@@ -572,13 +583,13 @@ class PerformanceAnalyzer {
   private calculateLoadingScore(navigation: PerformanceMetrics['navigation']): number {
     const fcp = navigation.firstContentfulPaint;
     const lcp = navigation.largestContentfulPaint;
-    
+
     // FCP スコア (0-100)
     const fcpScore = Math.max(0, 100 - (fcp - 1000) / 40);
-    
-    // LCP スコア (0-100)  
+
+    // LCP スコア (0-100)
     const lcpScore = Math.max(0, 100 - (lcp - 2500) / 50);
-    
+
     return (fcpScore + lcpScore) / 2;
   }
 
@@ -588,19 +599,19 @@ class PerformanceAnalyzer {
   ): number {
     const fid = navigation.firstInputDelay;
     const tti = navigation.timeToInteractive;
-    
+
     // FID スコア (0-100)
     const fidScore = Math.max(0, 100 - (fid - 100) / 5);
-    
+
     // TTI スコア (0-100)
     const ttiScore = Math.max(0, 100 - (tti - 3800) / 50);
-    
+
     return (fidScore + ttiScore) / 2;
   }
 
   private calculateVisualStabilityScore(navigation: PerformanceMetrics['navigation']): number {
     const cls = navigation.cumulativeLayoutShift;
-    
+
     // CLS スコア (0-100)
     return Math.max(0, 100 - (cls - 0.1) * 400);
   }

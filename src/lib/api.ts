@@ -1,6 +1,6 @@
 // API Client for backend communication
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 export interface StudyDay {
   id: number;
@@ -96,7 +96,7 @@ export interface Question {
 export interface QuizSession {
   id: number;
   userId?: number;
-  sessionType: "category" | "random" | "review" | "weak_points";
+  sessionType: 'category' | 'random' | 'review' | 'weak_points';
   category?: string;
   totalQuestions: number;
   correctAnswers: number;
@@ -137,7 +137,7 @@ export interface QuizStats {
 class ApiClient {
   private getAuthHeaders(): Record<string, string> {
     const headers: Record<string, string> = {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
     };
 
     // ブラウザ環境でのみLocalStorageにアクセス
@@ -151,10 +151,7 @@ class ApiClient {
     return headers;
   }
 
-  private async request<T>(
-    endpoint: string,
-    options?: RequestInit
-  ): Promise<T> {
+  private async request<T>(endpoint: string, options?: RequestInit): Promise<T> {
     const startTime = performance.now();
     const method = options?.method || 'GET';
     const url = `${API_BASE_URL}${endpoint}`;
@@ -172,27 +169,27 @@ class ApiClient {
 
       if (!response.ok) {
         const error = new Error(`HTTP error! status: ${response.status}`);
-        
+
         // 監視システムにAPI エラーを記録
         if (typeof window !== 'undefined') {
           const { monitoring } = await import('./monitoring');
           monitoring.trackApiCall(endpoint, method, duration, response.status, error);
         }
-        
+
         throw error;
       }
 
       const data = await response.json();
 
       if (!data.success) {
-        const error = new Error(data.error || "API request failed");
-        
+        const error = new Error(data.error || 'API request failed');
+
         // 監視システムにAPI エラーを記録
         if (typeof window !== 'undefined') {
           const { monitoring } = await import('./monitoring');
           monitoring.trackApiCall(endpoint, method, duration, response.status, error);
         }
-        
+
         throw error;
       }
 
@@ -205,20 +202,20 @@ class ApiClient {
       return data.data;
     } catch (error) {
       const duration = performance.now() - startTime;
-      
+
       // 監視システムにネットワークエラーを記録
       if (typeof window !== 'undefined') {
         const { monitoring } = await import('./monitoring');
         monitoring.trackApiCall(endpoint, method, duration, 0, error as Error);
       }
-      
+
       throw error;
     }
   }
 
   // 学習計画API
   async getStudyPlan(userId?: string): Promise<StudyWeek[]> {
-    const url = userId ? `/api/study/plan?userId=${userId}` : "/api/study/plan";
+    const url = userId ? `/api/study/plan?userId=${userId}` : '/api/study/plan';
     return this.request<StudyWeek[]>(url);
   }
 
@@ -227,12 +224,12 @@ class ApiClient {
   }
 
   async getCurrentWeek(): Promise<StudyWeek> {
-    return this.request<StudyWeek>("/api/study/current-week");
+    return this.request<StudyWeek>('/api/study/current-week');
   }
 
   async completeTask(weekNumber: number, dayIndex: number): Promise<void> {
-    await this.request("/api/study/complete-task", {
-      method: "POST",
+    await this.request('/api/study/complete-task', {
+      method: 'POST',
       body: JSON.stringify({ weekNumber, dayIndex }),
     });
   }
@@ -247,8 +244,8 @@ class ApiClient {
       completed?: boolean;
     }
   ): Promise<void> {
-    await this.request("/api/study/progress", {
-      method: "PUT",
+    await this.request('/api/study/progress', {
+      method: 'PUT',
       body: JSON.stringify({
         weekNumber,
         dayIndex,
@@ -259,38 +256,31 @@ class ApiClient {
 
   // 学習記録API
   async getStudyLogs(): Promise<StudyLog[]> {
-    return this.request<StudyLog[]>("/api/studylog");
+    return this.request<StudyLog[]>('/api/studylog');
   }
 
-  async createStudyLog(
-    studyLog: Omit<StudyLog, "id" | "efficiency">
-  ): Promise<StudyLog> {
-    return this.request<StudyLog>("/api/studylog", {
-      method: "POST",
+  async createStudyLog(studyLog: Omit<StudyLog, 'id' | 'efficiency'>): Promise<StudyLog> {
+    return this.request<StudyLog>('/api/studylog', {
+      method: 'POST',
       body: JSON.stringify(studyLog),
     });
   }
 
-  async updateStudyLog(
-    id: number,
-    studyLog: Partial<Omit<StudyLog, "id" | "efficiency">>
-  ): Promise<StudyLog> {
+  async updateStudyLog(id: number, studyLog: Partial<Omit<StudyLog, 'id' | 'efficiency'>>): Promise<StudyLog> {
     return this.request<StudyLog>(`/api/studylog/${id}`, {
-      method: "PUT",
+      method: 'PUT',
       body: JSON.stringify(studyLog),
     });
   }
 
   async deleteStudyLog(id: number): Promise<void> {
     await this.request(`/api/studylog/${id}`, {
-      method: "DELETE",
+      method: 'DELETE',
     });
   }
 
   async getStudyLogsBySubject(subject: string): Promise<StudyLog[]> {
-    return this.request<StudyLog[]>(
-      `/api/studylog/subject/${encodeURIComponent(subject)}`
-    );
+    return this.request<StudyLog[]>(`/api/studylog/subject/${encodeURIComponent(subject)}`);
   }
 
   async getStudyLogStats(): Promise<{
@@ -305,144 +295,123 @@ class ApiClient {
       latestActivity: string;
     }>;
   }> {
-    return this.request("/api/studylog/stats");
+    return this.request('/api/studylog/stats');
   }
 
   // 午前問題記録API
   async getMorningTests(): Promise<MorningTest[]> {
-    return this.request<MorningTest[]>("/api/test/morning");
+    return this.request<MorningTest[]>('/api/test/morning');
   }
 
-  async createMorningTest(
-    test: Omit<MorningTest, "id" | "accuracy">
-  ): Promise<MorningTest> {
-    return this.request<MorningTest>("/api/test/morning", {
-      method: "POST",
+  async createMorningTest(test: Omit<MorningTest, 'id' | 'accuracy'>): Promise<MorningTest> {
+    return this.request<MorningTest>('/api/test/morning', {
+      method: 'POST',
       body: JSON.stringify(test),
     });
   }
 
   async deleteMorningTest(id: number): Promise<void> {
     await this.request(`/api/test/morning/${id}`, {
-      method: "DELETE",
+      method: 'DELETE',
     });
   }
 
   async getMorningTestStats(): Promise<TestStats> {
-    return this.request<TestStats>("/api/test/morning/stats");
+    return this.request<TestStats>('/api/test/morning/stats');
   }
 
   // 午後問題記録API
   async getAfternoonTests(): Promise<AfternoonTest[]> {
-    return this.request<AfternoonTest[]>("/api/test/afternoon");
+    return this.request<AfternoonTest[]>('/api/test/afternoon');
   }
 
-  async createAfternoonTest(
-    test: Omit<AfternoonTest, "id">
-  ): Promise<AfternoonTest> {
-    return this.request<AfternoonTest>("/api/test/afternoon", {
-      method: "POST",
+  async createAfternoonTest(test: Omit<AfternoonTest, 'id'>): Promise<AfternoonTest> {
+    return this.request<AfternoonTest>('/api/test/afternoon', {
+      method: 'POST',
       body: JSON.stringify(test),
     });
   }
 
   async deleteAfternoonTest(id: number): Promise<void> {
     await this.request(`/api/test/afternoon/${id}`, {
-      method: "DELETE",
+      method: 'DELETE',
     });
   }
 
   async getAfternoonTestStats(): Promise<TestStats> {
-    return this.request<TestStats>("/api/test/afternoon/stats");
+    return this.request<TestStats>('/api/test/afternoon/stats');
   }
 
   // 期間指定テスト記録取得
-  async getMorningTestsByDateRange(
-    startDate: string,
-    endDate: string
-  ): Promise<MorningTest[]> {
-    return this.request<MorningTest[]>("/api/test/morning/date-range", {
-      method: "POST",
+  async getMorningTestsByDateRange(startDate: string, endDate: string): Promise<MorningTest[]> {
+    return this.request<MorningTest[]>('/api/test/morning/date-range', {
+      method: 'POST',
       body: JSON.stringify({ startDate, endDate }),
     });
   }
 
-  async getAfternoonTestsByDateRange(
-    startDate: string,
-    endDate: string
-  ): Promise<AfternoonTest[]> {
-    return this.request<AfternoonTest[]>("/api/test/afternoon/date-range", {
-      method: "POST",
+  async getAfternoonTestsByDateRange(startDate: string, endDate: string): Promise<AfternoonTest[]> {
+    return this.request<AfternoonTest[]>('/api/test/afternoon/date-range', {
+      method: 'POST',
       body: JSON.stringify({ startDate, endDate }),
     });
   }
 
   // 分析API
   async runAnalysis(userId?: string): Promise<any> {
-    const params = userId ? `?userId=${encodeURIComponent(userId)}` : "";
+    const params = userId ? `?userId=${encodeURIComponent(userId)}` : '';
     return this.request(`/api/analysis/analyze${params}`, {
-      method: "POST",
+      method: 'POST',
     });
   }
 
   async getLatestAnalysis(userId?: string): Promise<any> {
-    const params = userId ? `?userId=${encodeURIComponent(userId)}` : "";
+    const params = userId ? `?userId=${encodeURIComponent(userId)}` : '';
     return this.request(`/api/analysis/latest${params}`);
   }
 
-  async getAnalysisHistory(
-    startDate: string,
-    endDate: string,
-    userId?: string
-  ): Promise<any[]> {
+  async getAnalysisHistory(startDate: string, endDate: string, userId?: string): Promise<any[]> {
     const params = new URLSearchParams({ startDate, endDate });
-    if (userId) params.append("userId", userId);
+    if (userId) params.append('userId', userId);
     return this.request(`/api/analysis/history?${params.toString()}`);
   }
 
   // 予測API
   async runPrediction(examDate: string, userId?: string): Promise<any> {
-    const params = userId ? `?userId=${encodeURIComponent(userId)}` : "";
+    const params = userId ? `?userId=${encodeURIComponent(userId)}` : '';
     return this.request(`/api/analysis/predict${params}`, {
-      method: "POST",
+      method: 'POST',
       body: JSON.stringify({ examDate }),
     });
   }
 
   async getLatestPrediction(userId?: string): Promise<any> {
-    const params = userId ? `?userId=${encodeURIComponent(userId)}` : "";
+    const params = userId ? `?userId=${encodeURIComponent(userId)}` : '';
     return this.request(`/api/analysis/prediction/latest${params}`);
   }
 
-  async getPredictionsByExamDate(
-    examDate: string,
-    userId?: string
-  ): Promise<any[]> {
-    const params = userId ? `?userId=${encodeURIComponent(userId)}` : "";
+  async getPredictionsByExamDate(examDate: string, userId?: string): Promise<any[]> {
+    const params = userId ? `?userId=${encodeURIComponent(userId)}` : '';
     return this.request(`/api/analysis/prediction/exam/${examDate}${params}`);
   }
 
   // Quiz API
-  async getQuestions(options?: {
-    category?: string;
-    limit?: number;
-    random?: boolean;
-  }): Promise<Question[]> {
+  async getQuestions(options?: { category?: string; limit?: number; random?: boolean }): Promise<Question[]> {
     const params = new URLSearchParams();
-    if (options?.category) params.append("category", options.category);
-    if (options?.limit) params.append("limit", options.limit.toString());
-    if (options?.random) params.append("random", "true");
-    
+    if (options?.category) params.append('category', options.category);
+    if (options?.limit) params.append('limit', options.limit.toString());
+    if (options?.random) params.append('random', 'true');
+
     const query = params.toString();
-    return this.request<Question[]>(`/api/quiz/questions${query ? `?${query}` : ""}`);
+    return this.request<Question[]>(`/api/quiz/questions${query ? `?${query}` : ''}`);
   }
 
   async getQuizCategories(): Promise<QuizCategory[]> {
-    return this.request<QuizCategory[]>("/api/quiz/categories");
+    return this.request<QuizCategory[]>('/api/quiz/categories');
   }
 
   async startQuizSession(options: {
-    sessionType: "category" | "random" | "review" | "weak_points";
+    sessionType: 'category' | 'random' | 'review' | 'weak_points';
     questionCount: number;
     category?: string;
   }): Promise<{
@@ -452,8 +421,8 @@ class ApiClient {
     sessionType: string;
     category?: string;
   }> {
-    return this.request("/api/quiz/start", {
-      method: "POST",
+    return this.request('/api/quiz/start', {
+      method: 'POST',
       body: JSON.stringify(options),
     });
   }
@@ -468,31 +437,31 @@ class ApiClient {
     isCorrect: boolean;
     correctAnswer: string;
   }> {
-    return this.request("/api/quiz/answer", {
-      method: "POST",
+    return this.request('/api/quiz/answer', {
+      method: 'POST',
       body: JSON.stringify(options),
     });
   }
 
   async completeQuizSession(sessionId: number): Promise<QuizSession> {
-    return this.request("/api/quiz/complete", {
-      method: "POST",
+    return this.request('/api/quiz/complete', {
+      method: 'POST',
       body: JSON.stringify({ sessionId }),
     });
   }
 
   async getQuizSessions(limit?: number): Promise<QuizSession[]> {
-    const params = limit ? `?limit=${limit}` : "";
+    const params = limit ? `?limit=${limit}` : '';
     return this.request<QuizSession[]>(`/api/quiz/sessions${params}`);
   }
 
   async getQuizStats(): Promise<QuizStats> {
-    return this.request<QuizStats>("/api/quiz/stats");
+    return this.request<QuizStats>('/api/quiz/stats');
   }
 
   // 新しいQuiz API機能
   async getWeakPoints(limit?: number): Promise<any[]> {
-    const params = limit ? `?limit=${limit}` : "";
+    const params = limit ? `?limit=${limit}` : '';
     return this.request<any[]>(`/api/quiz/weak-points${params}`);
   }
 
@@ -501,15 +470,17 @@ class ApiClient {
     weakCategories?: string[];
     questions: Question[];
   }> {
-    const params = limit ? `?limit=${limit}` : "";
+    const params = limit ? `?limit=${limit}` : '';
     return this.request(`/api/quiz/recommendations${params}`);
   }
 
-  async getQuestionById(id: string): Promise<Question & {
-    answerHistory?: UserAnswer[];
-    relatedQuestions?: Question[];
-    difficultyAnalysis?: any;
-  }> {
+  async getQuestionById(id: string): Promise<
+    Question & {
+      answerHistory?: UserAnswer[];
+      relatedQuestions?: Question[];
+      difficultyAnalysis?: any;
+    }
+  > {
     return this.request(`/api/quiz/questions/${id}`);
   }
 
@@ -522,13 +493,10 @@ class ApiClient {
     categoryProgress: any[];
     recentActivity: QuizSession[];
   }> {
-    return this.request("/api/quiz/progress");
+    return this.request('/api/quiz/progress');
   }
 
-  async getDetailedAnalysis(options?: {
-    category?: string;
-    period?: number;
-  }): Promise<{
+  async getDetailedAnalysis(options?: { category?: string; period?: number }): Promise<{
     period: number;
     category?: string;
     efficiencyAnalysis: any[];
@@ -537,11 +505,11 @@ class ApiClient {
     reviewEffectiveness: any[];
   }> {
     const params = new URLSearchParams();
-    if (options?.category) params.append("category", options.category);
-    if (options?.period) params.append("period", options.period.toString());
-    
+    if (options?.category) params.append('category', options.category);
+    if (options?.period) params.append('period', options.period.toString());
+
     const query = params.toString();
-    return this.request(`/api/quiz/detailed-analysis${query ? `?${query}` : ""}`);
+    return this.request(`/api/quiz/detailed-analysis${query ? `?${query}` : ''}`);
   }
 
   async getLearningTrends(days?: number): Promise<{
@@ -550,30 +518,26 @@ class ApiClient {
     cumulativeProgress: any[];
     categoryTrends: any[];
   }> {
-    const params = days ? `?days=${days}` : "";
+    const params = days ? `?days=${days}` : '';
     return this.request(`/api/quiz/learning-trends${params}`);
   }
 
-  async exportQuizData(options: {
-    format?: "json" | "csv";
-    period?: number;
-    categories?: string[];
-  }): Promise<any> {
+  async exportQuizData(options: { format?: 'json' | 'csv'; period?: number; categories?: string[] }): Promise<any> {
     const response = await fetch(`${API_BASE_URL}/api/quiz/export`, {
-      method: "POST",
+      method: 'POST',
       headers: {
         ...this.getAuthHeaders(),
       },
       body: JSON.stringify(options),
     });
 
-    if (options.format === "csv") {
+    if (options.format === 'csv') {
       return response.blob();
     }
 
     const data = await response.json();
     if (!data.success) {
-      throw new Error(data.error || "Export failed");
+      throw new Error(data.error || 'Export failed');
     }
     return data.data;
   }
@@ -586,14 +550,11 @@ class ApiClient {
     growthAnalysis: any[];
     categoryBalance: any[];
   }> {
-    const params = period ? `?period=${period}` : "";
+    const params = period ? `?period=${period}` : '';
     return this.request(`/api/analysis/performance-metrics${params}`);
   }
 
-  async evaluateExamReadiness(options: {
-    examDate: string;
-    targetScore?: number;
-  }): Promise<{
+  async evaluateExamReadiness(options: { examDate: string; targetScore?: number }): Promise<{
     examDate: string;
     daysToExam: number;
     targetScore: number;
@@ -603,8 +564,8 @@ class ApiClient {
     studyRecommendations: any[];
     passProbability: number;
   }> {
-    return this.request("/api/analysis/exam-readiness", {
-      method: "POST",
+    return this.request('/api/analysis/exam-readiness', {
+      method: 'POST',
       body: JSON.stringify(options),
     });
   }
@@ -619,23 +580,23 @@ class ApiClient {
       recommendedDailyQuestions: number;
     };
   }> {
-    return this.request("/api/analysis/learning-pattern");
+    return this.request('/api/analysis/learning-pattern');
   }
 
   // 復習システムAPI
   async generateReviewSchedule(): Promise<{ message: string; generated_count: number }> {
-    return this.request("/api/analysis/review/generate", {
-      method: "POST",
+    return this.request('/api/analysis/review/generate', {
+      method: 'POST',
     });
   }
 
   async getTodayReviews(): Promise<any[]> {
-    return this.request("/api/analysis/review/today");
+    return this.request('/api/analysis/review/today');
   }
 
   async completeReview(reviewItemId: string, understanding: number): Promise<{ message: string }> {
     return this.request(`/api/analysis/review/complete/${reviewItemId}`, {
-      method: "POST",
+      method: 'POST',
       body: JSON.stringify({
         understanding_after: understanding,
       }),
@@ -681,8 +642,8 @@ class ApiClient {
     }>;
     overallScore: number;
   }> {
-    return this.request("/api/learning-efficiency-analysis/generate", {
-      method: "POST",
+    return this.request('/api/learning-efficiency-analysis/generate', {
+      method: 'POST',
       body: JSON.stringify({
         userId: options.userId,
         timeRange: {
@@ -732,7 +693,7 @@ class ApiClient {
   async generateMLAnalysis(userId: number): Promise<MLAnalysisResult> {
     return this.request<MLAnalysisResult>(`/api/learning-efficiency-analysis/generate`, {
       method: 'POST',
-      body: JSON.stringify({ userId })
+      body: JSON.stringify({ userId }),
     });
   }
 

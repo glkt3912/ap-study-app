@@ -1,10 +1,10 @@
-import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
-import './globals.css'
-import { AuthProvider } from '../contexts/AuthContext'
-import { MonitoringProvider } from '../components/MonitoringProvider'
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import './globals.css';
+import { AuthProvider } from '../contexts/AuthContext';
+import { MonitoringProvider } from '../components/MonitoringProvider';
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: '応用情報技術者試験 学習管理アプリ',
@@ -18,29 +18,23 @@ export const metadata: Metadata = {
   icons: {
     apple: '/icon-192x192.png',
   },
-}
+};
 
 export function generateViewport() {
   return {
     themeColor: '#3B82F6',
-  }
+  };
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ja">
+    <html lang='ja'>
       <body className={inter.className}>
         <MonitoringProvider>
-          <AuthProvider>
-            {children}
-          </AuthProvider>
+          <AuthProvider>{children}</AuthProvider>
         </MonitoringProvider>
         {/* Service Worker disabled for debugging */}
       </body>
     </html>
-  )
+  );
 }

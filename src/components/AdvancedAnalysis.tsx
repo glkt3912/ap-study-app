@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect, lazy, Suspense } from "react";
-import { apiClient } from "../lib/api";
+import React, { useState, useEffect, lazy, Suspense } from 'react';
+import { apiClient } from '../lib/api';
 
 const PieChart = lazy(() => import('recharts').then(module => ({ default: module.PieChart })));
 const Pie = lazy(() => import('recharts').then(module => ({ default: module.Pie })));
@@ -57,7 +57,7 @@ interface ExamReadiness {
     category: string;
     questions_attempted: number;
     accuracy_rate: number;
-    readiness_level: "excellent" | "good" | "needs_improvement" | "critical";
+    readiness_level: 'excellent' | 'good' | 'needs_improvement' | 'critical';
   }>;
   overallReadiness: string;
   studyRecommendations: Array<{
@@ -94,7 +94,7 @@ interface LearningPattern {
 }
 
 export function AdvancedAnalysis() {
-  const [activeTab, setActiveTab] = useState<"performance" | "readiness" | "pattern" | "efficiency">("performance");
+  const [activeTab, setActiveTab] = useState<'performance' | 'readiness' | 'pattern' | 'efficiency'>('performance');
   const [performanceMetrics, setPerformanceMetrics] = useState<PerformanceMetrics | null>(null);
   const [examReadiness, setExamReadiness] = useState<ExamReadiness | null>(null);
   const [learningPattern, setLearningPattern] = useState<LearningPattern | null>(null);
@@ -102,13 +102,13 @@ export function AdvancedAnalysis() {
   const [error, setError] = useState<string | null>(null);
 
   // 試験日設定用
-  const [examDate, setExamDate] = useState("");
+  const [examDate, setExamDate] = useState('');
   const [targetScore, setTargetScore] = useState(60);
 
   useEffect(() => {
-    if (activeTab === "performance") {
+    if (activeTab === 'performance') {
       loadPerformanceMetrics();
-    } else if (activeTab === "pattern") {
+    } else if (activeTab === 'pattern') {
       loadLearningPattern();
     }
   }, [activeTab]);
@@ -120,7 +120,7 @@ export function AdvancedAnalysis() {
       const data = await apiClient.getPerformanceMetrics(30);
       setPerformanceMetrics(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "パフォーマンス指標の取得に失敗しました");
+      setError(err instanceof Error ? err.message : 'パフォーマンス指標の取得に失敗しました');
     } finally {
       setLoading(false);
     }
@@ -128,7 +128,7 @@ export function AdvancedAnalysis() {
 
   const loadExamReadiness = async () => {
     if (!examDate) {
-      setError("試験日を設定してください");
+      setError('試験日を設定してください');
       return;
     }
 
@@ -141,7 +141,7 @@ export function AdvancedAnalysis() {
       });
       setExamReadiness(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "試験準備度評価に失敗しました");
+      setError(err instanceof Error ? err.message : '試験準備度評価に失敗しました');
     } finally {
       setLoading(false);
     }
@@ -154,7 +154,7 @@ export function AdvancedAnalysis() {
       const data = await apiClient.getLearningPattern();
       setLearningPattern(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "学習パターン分析に失敗しました");
+      setError(err instanceof Error ? err.message : '学習パターン分析に失敗しました');
     } finally {
       setLoading(false);
     }
@@ -162,132 +162,141 @@ export function AdvancedAnalysis() {
 
   const getReadinessColor = (level: string) => {
     switch (level) {
-      case "excellent": return "text-green-600 bg-green-100 dark:text-green-400 dark:bg-green-900/20";
-      case "good": return "text-blue-600 bg-blue-100 dark:text-blue-400 dark:bg-blue-900/20";
-      case "needs_improvement": return "text-yellow-600 bg-yellow-100 dark:text-yellow-400 dark:bg-yellow-900/20";
-      case "critical": return "text-red-600 bg-red-100 dark:text-red-400 dark:bg-red-900/20";
-      default: return "text-gray-600 bg-gray-100 dark:text-gray-400 dark:bg-gray-700";
+      case 'excellent':
+        return 'text-green-600 bg-green-100 dark:text-green-400 dark:bg-green-900/20';
+      case 'good':
+        return 'text-blue-600 bg-blue-100 dark:text-blue-400 dark:bg-blue-900/20';
+      case 'needs_improvement':
+        return 'text-yellow-600 bg-yellow-100 dark:text-yellow-400 dark:bg-yellow-900/20';
+      case 'critical':
+        return 'text-red-600 bg-red-100 dark:text-red-400 dark:bg-red-900/20';
+      default:
+        return 'text-gray-600 bg-gray-100 dark:text-gray-400 dark:bg-gray-700';
     }
   };
 
-  const dayNames = ["日", "月", "火", "水", "木", "金", "土"];
+  const dayNames = ['日', '月', '火', '水', '木', '金', '土'];
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-      <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">高度な学習分析</h2>
+    <div className='bg-white dark:bg-gray-800 rounded-lg shadow-md p-6'>
+      <h2 className='text-2xl font-bold text-gray-800 dark:text-white mb-6'>高度な学習分析</h2>
 
       {/* タブナビゲーション */}
-      <div className="flex overflow-x-auto border-b border-gray-200 dark:border-gray-700 mb-6 scrollbar-hide">
+      <div className='flex overflow-x-auto border-b border-gray-200 dark:border-gray-700 mb-6 scrollbar-hide'>
         {[
-          { key: "performance", label: "パフォーマンス指標", shortLabel: "指標" },
-          { key: "readiness", label: "試験準備度", shortLabel: "準備度" },
-          { key: "pattern", label: "学習パターン", shortLabel: "パターン" },
-          { key: "efficiency", label: "学習効率分析", shortLabel: "効率" }
-        ].map((tab) => (
+          { key: 'performance', label: 'パフォーマンス指標', shortLabel: '指標' },
+          { key: 'readiness', label: '試験準備度', shortLabel: '準備度' },
+          { key: 'pattern', label: '学習パターン', shortLabel: 'パターン' },
+          { key: 'efficiency', label: '学習効率分析', shortLabel: '効率' },
+        ].map(tab => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key as any)}
             className={`flex-shrink-0 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
               activeTab === tab.key
-                ? "border-blue-500 text-blue-600 dark:border-blue-400 dark:text-blue-400"
-                : "border-transparent text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-white"
+                ? 'border-blue-500 text-blue-600 dark:border-blue-400 dark:text-blue-400'
+                : 'border-transparent text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-white'
             }`}
           >
-            <span className="hidden sm:inline">{tab.label}</span>
-            <span className="sm:hidden">{tab.shortLabel}</span>
+            <span className='hidden sm:inline'>{tab.label}</span>
+            <span className='sm:hidden'>{tab.shortLabel}</span>
           </button>
         ))}
       </div>
 
       {error && (
-        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 text-red-700 dark:text-red-300 px-4 py-3 rounded mb-4">
+        <div className='bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 text-red-700 dark:text-red-300 px-4 py-3 rounded mb-4'>
           {error}
         </div>
       )}
 
       {loading && (
-        <div className="flex justify-center items-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-          <span className="ml-2 text-gray-600 dark:text-gray-300">読み込み中...</span>
+        <div className='flex justify-center items-center py-8'>
+          <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500'></div>
+          <span className='ml-2 text-gray-600 dark:text-gray-300'>読み込み中...</span>
         </div>
       )}
 
       {/* パフォーマンス指標タブ */}
-      {activeTab === "performance" && performanceMetrics && !loading && (
-        <div className="space-y-6">
+      {activeTab === 'performance' && performanceMetrics && !loading && (
+        <div className='space-y-6'>
           {/* 学習継続性 */}
-          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-            <h3 className="font-semibold text-lg mb-3 text-gray-800 dark:text-white">学習継続性</h3>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+          <div className='bg-gray-50 dark:bg-gray-700 rounded-lg p-4'>
+            <h3 className='font-semibold text-lg mb-3 text-gray-800 dark:text-white'>学習継続性</h3>
+            <div className='grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4'>
+              <div className='text-center'>
+                <div className='text-2xl font-bold text-blue-600 dark:text-blue-400'>
                   {performanceMetrics.studyConsistency.study_days}
                 </div>
-                <div className="text-sm text-gray-600 dark:text-gray-300">学習日数</div>
+                <div className='text-sm text-gray-600 dark:text-gray-300'>学習日数</div>
               </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+              <div className='text-center'>
+                <div className='text-2xl font-bold text-green-600 dark:text-green-400'>
                   {Math.round(performanceMetrics.studyConsistency.consistency_rate)}%
                 </div>
-                <div className="text-sm text-gray-600 dark:text-gray-300">継続率</div>
+                <div className='text-sm text-gray-600 dark:text-gray-300'>継続率</div>
               </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+              <div className='text-center'>
+                <div className='text-2xl font-bold text-purple-600 dark:text-purple-400'>
                   {performanceMetrics.studyConsistency.total_sessions}
                 </div>
-                <div className="text-sm text-gray-600 dark:text-gray-300">総セッション数</div>
+                <div className='text-sm text-gray-600 dark:text-gray-300'>総セッション数</div>
               </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">
+              <div className='text-center'>
+                <div className='text-2xl font-bold text-orange-600 dark:text-orange-400'>
                   {Math.round(performanceMetrics.studyConsistency.avg_session_duration || 0)}分
                 </div>
-                <div className="text-sm text-gray-600 dark:text-gray-300">平均学習時間</div>
+                <div className='text-sm text-gray-600 dark:text-gray-300'>平均学習時間</div>
               </div>
             </div>
           </div>
 
           {/* 学習効率 */}
-          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-            <h3 className="font-semibold text-lg mb-3 text-gray-800 dark:text-white">学習効率</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+          <div className='bg-gray-50 dark:bg-gray-700 rounded-lg p-4'>
+            <h3 className='font-semibold text-lg mb-3 text-gray-800 dark:text-white'>学習効率</h3>
+            <div className='grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4'>
+              <div className='text-center'>
+                <div className='text-2xl font-bold text-blue-600 dark:text-blue-400'>
                   {Math.round(performanceMetrics.learningEfficiency.avg_score || 0)}点
                 </div>
-                <div className="text-sm text-gray-600 dark:text-gray-300">平均スコア</div>
+                <div className='text-sm text-gray-600 dark:text-gray-300'>平均スコア</div>
               </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+              <div className='text-center'>
+                <div className='text-2xl font-bold text-green-600 dark:text-green-400'>
                   {Math.round(performanceMetrics.learningEfficiency.avg_time_per_question || 0)}秒
                 </div>
-                <div className="text-sm text-gray-600 dark:text-gray-300">問題あたり平均時間</div>
+                <div className='text-sm text-gray-600 dark:text-gray-300'>問題あたり平均時間</div>
               </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+              <div className='text-center'>
+                <div className='text-2xl font-bold text-purple-600 dark:text-purple-400'>
                   {performanceMetrics.learningEfficiency.total_questions_attempted || 0}
                 </div>
-                <div className="text-sm text-gray-600 dark:text-gray-300">総回答問題数</div>
+                <div className='text-sm text-gray-600 dark:text-gray-300'>総回答問題数</div>
               </div>
             </div>
           </div>
 
           {/* カテゴリバランス */}
-          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-            <h3 className="font-semibold text-lg mb-3 text-gray-800 dark:text-white">カテゴリ別学習バランス</h3>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+          <div className='bg-gray-50 dark:bg-gray-700 rounded-lg p-4'>
+            <h3 className='font-semibold text-lg mb-3 text-gray-800 dark:text-white'>カテゴリ別学習バランス</h3>
+            <div className='grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6'>
               {/* 円グラフ */}
               <div>
-                <h4 className="font-medium mb-3 text-gray-700 dark:text-gray-300">問題数の分布</h4>
-                <Suspense fallback={<div className="h-48 flex items-center justify-center text-gray-500">グラフを読み込み中...</div>}>
-                  <ResponsiveContainer width="100%" height={200}>
+                <h4 className='font-medium mb-3 text-gray-700 dark:text-gray-300'>問題数の分布</h4>
+                <Suspense
+                  fallback={
+                    <div className='h-48 flex items-center justify-center text-gray-500'>グラフを読み込み中...</div>
+                  }
+                >
+                  <ResponsiveContainer width='100%' height={200}>
                     <PieChart>
                       <Pie
                         data={performanceMetrics.categoryBalance}
-                        cx="50%"
-                        cy="50%"
+                        cx='50%'
+                        cy='50%'
                         outerRadius={60}
-                        fill="#8884d8"
-                        dataKey="questions_attempted"
+                        fill='#8884d8'
+                        dataKey='questions_attempted'
                         label={({ category, proportion }) => `${category}: ${Math.round(proportion)}%`}
                         labelLine={false}
                       >
@@ -302,21 +311,21 @@ export function AdvancedAnalysis() {
               </div>
 
               {/* バー表示 */}
-              <div className="space-y-2">
+              <div className='space-y-2'>
                 {performanceMetrics.categoryBalance.map((category, index) => (
-                  <div key={index} className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-800 dark:text-gray-200">{category.category}</span>
-                    <div className="flex items-center space-x-2">
-                      <div className="w-24 bg-gray-200 dark:bg-gray-600 rounded-full h-2">
+                  <div key={index} className='flex items-center justify-between'>
+                    <span className='text-sm font-medium text-gray-800 dark:text-gray-200'>{category.category}</span>
+                    <div className='flex items-center space-x-2'>
+                      <div className='w-24 bg-gray-200 dark:bg-gray-600 rounded-full h-2'>
                         <div
-                          className="bg-blue-500 h-2 rounded-full"
+                          className='bg-blue-500 h-2 rounded-full'
                           style={{ width: `${Math.min(category.proportion, 100)}%` }}
                         ></div>
                       </div>
-                      <span className="text-sm text-gray-600 dark:text-gray-300 w-12">
+                      <span className='text-sm text-gray-600 dark:text-gray-300 w-12'>
                         {Math.round(category.proportion)}%
                       </span>
-                      <span className="text-sm text-green-600 dark:text-green-400 w-12">
+                      <span className='text-sm text-green-600 dark:text-green-400 w-12'>
                         {Math.round(category.accuracy_rate * 100)}%
                       </span>
                     </div>
@@ -328,43 +337,43 @@ export function AdvancedAnalysis() {
 
           {/* 成長分析グラフ */}
           {performanceMetrics.growthAnalysis.length > 0 && (
-            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-              <h3 className="font-semibold text-lg mb-3 text-gray-800 dark:text-white">週次成長分析</h3>
-              <Suspense fallback={<div className="h-64 flex items-center justify-center text-gray-500">グラフを読み込み中...</div>}>
-                <ResponsiveContainer width="100%" height={300}>
+            <div className='bg-gray-50 dark:bg-gray-700 rounded-lg p-4'>
+              <h3 className='font-semibold text-lg mb-3 text-gray-800 dark:text-white'>週次成長分析</h3>
+              <Suspense
+                fallback={
+                  <div className='h-64 flex items-center justify-center text-gray-500'>グラフを読み込み中...</div>
+                }
+              >
+                <ResponsiveContainer width='100%' height={300}>
                   <LineChart data={performanceMetrics.growthAnalysis}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis 
-                      dataKey="week_start" 
-                      tickFormatter={(value) => new Date(value).toLocaleDateString('ja-JP', { month: 'short', day: 'numeric' })}
+                    <CartesianGrid strokeDasharray='3 3' />
+                    <XAxis
+                      dataKey='week_start'
+                      tickFormatter={value =>
+                        new Date(value).toLocaleDateString('ja-JP', { month: 'short', day: 'numeric' })
+                      }
                     />
                     <YAxis />
-                    <Tooltip 
-                      labelFormatter={(value) => `週開始: ${new Date(value).toLocaleDateString('ja-JP')}`}
+                    <Tooltip
+                      labelFormatter={value => `週開始: ${new Date(value).toLocaleDateString('ja-JP')}`}
                       formatter={(value: any, name: any) => [
-                        name === 'avg_score' ? `${Number(value).toFixed(1)}点` : 
-                        name === 'score_change' ? `${Number(value) > 0 ? '+' : ''}${Number(value).toFixed(1)}点` :
-                        `${value}回`,
-                        name === 'avg_score' ? '平均スコア' : 
-                        name === 'score_change' ? 'スコア変化' :
-                        'セッション数'
+                        name === 'avg_score'
+                          ? `${Number(value).toFixed(1)}点`
+                          : name === 'score_change'
+                            ? `${Number(value) > 0 ? '+' : ''}${Number(value).toFixed(1)}点`
+                            : `${value}回`,
+                        name === 'avg_score' ? '平均スコア' : name === 'score_change' ? 'スコア変化' : 'セッション数',
                       ]}
                     />
                     <Legend />
-                    <Line 
-                      type="monotone" 
-                      dataKey="avg_score" 
-                      stroke="#3B82F6" 
-                      strokeWidth={3}
-                      name="avg_score"
-                    />
-                    <Line 
-                      type="monotone" 
-                      dataKey="score_change" 
-                      stroke="#10B981" 
+                    <Line type='monotone' dataKey='avg_score' stroke='#3B82F6' strokeWidth={3} name='avg_score' />
+                    <Line
+                      type='monotone'
+                      dataKey='score_change'
+                      stroke='#10B981'
                       strokeWidth={2}
-                      strokeDasharray="5 5"
-                      name="score_change"
+                      strokeDasharray='5 5'
+                      name='score_change'
                     />
                   </LineChart>
                 </ResponsiveContainer>
@@ -375,41 +384,37 @@ export function AdvancedAnalysis() {
       )}
 
       {/* 試験準備度タブ */}
-      {activeTab === "readiness" && (
-        <div className="space-y-6">
+      {activeTab === 'readiness' && (
+        <div className='space-y-6'>
           {/* 試験設定 */}
-          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-            <h3 className="font-semibold text-lg mb-3 text-gray-800 dark:text-white">試験設定</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className='bg-gray-50 dark:bg-gray-700 rounded-lg p-4'>
+            <h3 className='font-semibold text-lg mb-3 text-gray-800 dark:text-white'>試験設定</h3>
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  試験日
-                </label>
+                <label className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1'>試験日</label>
                 <input
-                  type="date"
+                  type='date'
                   value={examDate}
-                  onChange={(e) => setExamDate(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                  onChange={e => setExamDate(e.target.value)}
+                  className='w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white'
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  目標点数
-                </label>
+                <label className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1'>目標点数</label>
                 <input
-                  type="number"
+                  type='number'
                   value={targetScore}
-                  onChange={(e) => setTargetScore(parseInt(e.target.value))}
-                  min="0"
-                  max="100"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                  onChange={e => setTargetScore(parseInt(e.target.value))}
+                  min='0'
+                  max='100'
+                  className='w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white'
                 />
               </div>
             </div>
             <button
               onClick={loadExamReadiness}
               disabled={!examDate || loading}
-              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
+              className='mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed'
             >
               準備度を評価
             </button>
@@ -417,46 +422,51 @@ export function AdvancedAnalysis() {
 
           {/* 試験準備度結果 */}
           {examReadiness && !loading && (
-            <div className="space-y-4">
+            <div className='space-y-4'>
               {/* 総合評価 */}
-              <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-                <h3 className="font-semibold text-lg mb-3 text-gray-800 dark:text-white">総合評価</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+              <div className='bg-gray-50 dark:bg-gray-700 rounded-lg p-4'>
+                <h3 className='font-semibold text-lg mb-3 text-gray-800 dark:text-white'>総合評価</h3>
+                <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+                  <div className='text-center'>
+                    <div className='text-2xl font-bold text-blue-600 dark:text-blue-400'>
                       {examReadiness.daysToExam}日
                     </div>
-                    <div className="text-sm text-gray-600 dark:text-gray-300">試験まで</div>
+                    <div className='text-sm text-gray-600 dark:text-gray-300'>試験まで</div>
                   </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+                  <div className='text-center'>
+                    <div className='text-2xl font-bold text-green-600 dark:text-green-400'>
                       {Math.round(examReadiness.passProbability)}%
                     </div>
-                    <div className="text-sm text-gray-600 dark:text-gray-300">合格予測</div>
+                    <div className='text-sm text-gray-600 dark:text-gray-300'>合格予測</div>
                   </div>
-                  <div className="text-center">
-                    <div className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${
-                      examReadiness.overallReadiness === "excellent" ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400" :
-                      examReadiness.overallReadiness === "good" ? "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400" :
-                      examReadiness.overallReadiness === "needs_improvement" ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400" :
-                      "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400"
-                    }`}>
+                  <div className='text-center'>
+                    <div
+                      className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${
+                        examReadiness.overallReadiness === 'excellent'
+                          ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
+                          : examReadiness.overallReadiness === 'good'
+                            ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400'
+                            : examReadiness.overallReadiness === 'needs_improvement'
+                              ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
+                              : 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400'
+                      }`}
+                    >
                       {examReadiness.overallReadiness}
                     </div>
-                    <div className="text-sm text-gray-600 dark:text-gray-300 mt-1">総合準備度</div>
+                    <div className='text-sm text-gray-600 dark:text-gray-300 mt-1'>総合準備度</div>
                   </div>
                 </div>
               </div>
 
               {/* カテゴリ別準備度 */}
-              <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-                <h3 className="font-semibold text-lg mb-3 text-gray-800 dark:text-white">カテゴリ別準備度</h3>
-                <div className="space-y-2">
+              <div className='bg-gray-50 dark:bg-gray-700 rounded-lg p-4'>
+                <h3 className='font-semibold text-lg mb-3 text-gray-800 dark:text-white'>カテゴリ別準備度</h3>
+                <div className='space-y-2'>
                   {examReadiness.categoryReadiness.map((category, index) => (
-                    <div key={index} className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-gray-800 dark:text-gray-200">{category.category}</span>
-                      <div className="flex items-center space-x-2">
-                        <span className="text-sm text-gray-600 dark:text-gray-300">
+                    <div key={index} className='flex items-center justify-between'>
+                      <span className='text-sm font-medium text-gray-800 dark:text-gray-200'>{category.category}</span>
+                      <div className='flex items-center space-x-2'>
+                        <span className='text-sm text-gray-600 dark:text-gray-300'>
                           {Math.round(category.accuracy_rate * 100)}%
                         </span>
                         <span className={`px-2 py-1 rounded text-xs ${getReadinessColor(category.readiness_level)}`}>
@@ -469,15 +479,17 @@ export function AdvancedAnalysis() {
               </div>
 
               {/* 学習推奨 */}
-              <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-                <h3 className="font-semibold text-lg mb-3 text-gray-800 dark:text-white">学習推奨</h3>
-                <div className="space-y-2">
+              <div className='bg-gray-50 dark:bg-gray-700 rounded-lg p-4'>
+                <h3 className='font-semibold text-lg mb-3 text-gray-800 dark:text-white'>学習推奨</h3>
+                <div className='space-y-2'>
                   {examReadiness.studyRecommendations.map((rec, index) => (
-                    <div key={index} className="flex items-start space-x-2">
-                      <span className={`inline-block w-2 h-2 rounded-full mt-2 ${
-                        rec.priority === "high" ? "bg-red-500" : "bg-yellow-500"
-                      }`}></span>
-                      <span className="text-sm text-gray-700 dark:text-gray-300">{rec.recommendation}</span>
+                    <div key={index} className='flex items-start space-x-2'>
+                      <span
+                        className={`inline-block w-2 h-2 rounded-full mt-2 ${
+                          rec.priority === 'high' ? 'bg-red-500' : 'bg-yellow-500'
+                        }`}
+                      ></span>
+                      <span className='text-sm text-gray-700 dark:text-gray-300'>{rec.recommendation}</span>
                     </div>
                   ))}
                 </div>
@@ -488,50 +500,46 @@ export function AdvancedAnalysis() {
       )}
 
       {/* 学習パターンタブ */}
-      {activeTab === "pattern" && learningPattern && !loading && (
-        <div className="space-y-6">
+      {activeTab === 'pattern' && learningPattern && !loading && (
+        <div className='space-y-6'>
           {/* 推奨学習条件 */}
-          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-            <h3 className="font-semibold text-lg mb-3 text-gray-800 dark:text-white">推奨学習条件</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="text-center">
-                <div className="text-xl font-bold text-blue-600 dark:text-blue-400">
+          <div className='bg-gray-50 dark:bg-gray-700 rounded-lg p-4'>
+            <h3 className='font-semibold text-lg mb-3 text-gray-800 dark:text-white'>推奨学習条件</h3>
+            <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+              <div className='text-center'>
+                <div className='text-xl font-bold text-blue-600 dark:text-blue-400'>
                   {learningPattern.recommendations.optimalTimeSlot}
                 </div>
-                <div className="text-sm text-gray-600 dark:text-gray-300">最適学習時間帯</div>
+                <div className='text-sm text-gray-600 dark:text-gray-300'>最適学習時間帯</div>
               </div>
-              <div className="text-center">
-                <div className="text-xl font-bold text-green-600 dark:text-green-400">
+              <div className='text-center'>
+                <div className='text-xl font-bold text-green-600 dark:text-green-400'>
                   {learningPattern.recommendations.optimalDayOfWeek}
                 </div>
-                <div className="text-sm text-gray-600 dark:text-gray-300">最適学習曜日</div>
+                <div className='text-sm text-gray-600 dark:text-gray-300'>最適学習曜日</div>
               </div>
-              <div className="text-center">
-                <div className="text-xl font-bold text-purple-600 dark:text-purple-400">
+              <div className='text-center'>
+                <div className='text-xl font-bold text-purple-600 dark:text-purple-400'>
                   {learningPattern.recommendations.recommendedDailyQuestions}問
                 </div>
-                <div className="text-sm text-gray-600 dark:text-gray-300">推奨日次問題数</div>
+                <div className='text-sm text-gray-600 dark:text-gray-300'>推奨日次問題数</div>
               </div>
             </div>
           </div>
 
           {/* 時間帯別パフォーマンス */}
-          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-            <h3 className="font-semibold text-lg mb-3 text-gray-800 dark:text-white">時間帯別パフォーマンス</h3>
-            <div className="space-y-2">
+          <div className='bg-gray-50 dark:bg-gray-700 rounded-lg p-4'>
+            <h3 className='font-semibold text-lg mb-3 text-gray-800 dark:text-white'>時間帯別パフォーマンス</h3>
+            <div className='space-y-2'>
               {learningPattern.timePattern.map((time, index) => (
-                <div key={index} className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-800 dark:text-gray-200">{time.study_hour}時台</span>
-                  <div className="flex items-center space-x-4">
-                    <span className="text-sm text-gray-600 dark:text-gray-300">
-                      {time.session_count}セッション
-                    </span>
-                    <span className="text-sm text-green-600 dark:text-green-400">
-                      {Math.round(time.avg_score)}点
-                    </span>
-                    <div className="w-16 bg-gray-200 dark:bg-gray-600 rounded-full h-2">
+                <div key={index} className='flex items-center justify-between'>
+                  <span className='text-sm font-medium text-gray-800 dark:text-gray-200'>{time.study_hour}時台</span>
+                  <div className='flex items-center space-x-4'>
+                    <span className='text-sm text-gray-600 dark:text-gray-300'>{time.session_count}セッション</span>
+                    <span className='text-sm text-green-600 dark:text-green-400'>{Math.round(time.avg_score)}点</span>
+                    <div className='w-16 bg-gray-200 dark:bg-gray-600 rounded-full h-2'>
                       <div
-                        className="bg-blue-500 h-2 rounded-full"
+                        className='bg-blue-500 h-2 rounded-full'
                         style={{ width: `${(time.avg_score / 100) * 100}%` }}
                       ></div>
                     </div>
@@ -542,22 +550,20 @@ export function AdvancedAnalysis() {
           </div>
 
           {/* 曜日別パフォーマンス */}
-          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-            <h3 className="font-semibold text-lg mb-3 text-gray-800 dark:text-white">曜日別パフォーマンス</h3>
-            <div className="space-y-2">
+          <div className='bg-gray-50 dark:bg-gray-700 rounded-lg p-4'>
+            <h3 className='font-semibold text-lg mb-3 text-gray-800 dark:text-white'>曜日別パフォーマンス</h3>
+            <div className='space-y-2'>
               {learningPattern.frequencyPattern.map((day, index) => (
-                <div key={index} className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-800 dark:text-gray-200">{dayNames[day.day_of_week]}曜日</span>
-                  <div className="flex items-center space-x-4">
-                    <span className="text-sm text-gray-600 dark:text-gray-300">
-                      {day.session_count}セッション
-                    </span>
-                    <span className="text-sm text-green-600 dark:text-green-400">
-                      {Math.round(day.avg_score)}点
-                    </span>
-                    <div className="w-16 bg-gray-200 dark:bg-gray-600 rounded-full h-2">
+                <div key={index} className='flex items-center justify-between'>
+                  <span className='text-sm font-medium text-gray-800 dark:text-gray-200'>
+                    {dayNames[day.day_of_week]}曜日
+                  </span>
+                  <div className='flex items-center space-x-4'>
+                    <span className='text-sm text-gray-600 dark:text-gray-300'>{day.session_count}セッション</span>
+                    <span className='text-sm text-green-600 dark:text-green-400'>{Math.round(day.avg_score)}点</span>
+                    <div className='w-16 bg-gray-200 dark:bg-gray-600 rounded-full h-2'>
                       <div
-                        className="bg-green-500 h-2 rounded-full"
+                        className='bg-green-500 h-2 rounded-full'
                         style={{ width: `${(day.avg_score / 100) * 100}%` }}
                       ></div>
                     </div>
@@ -570,27 +576,29 @@ export function AdvancedAnalysis() {
       )}
 
       {/* 学習効率分析タブ */}
-      {activeTab === "efficiency" && (
-        <div className="space-y-6">
-          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 text-blue-800 dark:text-blue-300 px-4 py-3 rounded">
-            <div className="flex items-center">
-              <span className="mr-2">📊</span>
-              <span className="font-medium">新機能: 学習効率分析</span>
+      {activeTab === 'efficiency' && (
+        <div className='space-y-6'>
+          <div className='bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 text-blue-800 dark:text-blue-300 px-4 py-3 rounded'>
+            <div className='flex items-center'>
+              <span className='mr-2'>📊</span>
+              <span className='font-medium'>新機能: 学習効率分析</span>
             </div>
-            <p className="text-sm mt-1">
+            <p className='text-sm mt-1'>
               時間帯別・分野別の学習効率を詳細に分析し、個人最適化された学習提案を提供します。
             </p>
           </div>
-          
+
           {/* LearningEfficiencyDashboardコンポーネントを埋め込み */}
-          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-1">
-            <div className="bg-white dark:bg-gray-800 rounded">
-              <Suspense fallback={
-                <div className="h-96 flex items-center justify-center">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-                  <span className="ml-3 text-gray-600 dark:text-gray-300">学習効率分析を読み込み中...</span>
-                </div>
-              }>
+          <div className='bg-gray-50 dark:bg-gray-700 rounded-lg p-1'>
+            <div className='bg-white dark:bg-gray-800 rounded'>
+              <Suspense
+                fallback={
+                  <div className='h-96 flex items-center justify-center'>
+                    <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500'></div>
+                    <span className='ml-3 text-gray-600 dark:text-gray-300'>学習効率分析を読み込み中...</span>
+                  </div>
+                }
+              >
                 <LearningEfficiencyDashboardComponent />
               </Suspense>
             </div>
@@ -602,8 +610,8 @@ export function AdvancedAnalysis() {
 }
 
 // 動的インポート用のLazy Componentを定義
-const LearningEfficiencyDashboardComponent = lazy(() => 
+const LearningEfficiencyDashboardComponent = lazy(() =>
   import('./LearningEfficiencyDashboard').then(module => ({
-    default: module.LearningEfficiencyDashboard
+    default: module.LearningEfficiencyDashboard,
   }))
 );
