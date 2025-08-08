@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, act } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import Dashboard from '../Dashboard'
 import { ThemeProvider } from '../../contexts/ThemeContext'
@@ -59,18 +59,22 @@ describe('Dashboard', () => {
     })
   })
 
-  it('renders dashboard title', () => {
+  it('renders dashboard title', async () => {
     vi.mocked(mockApiClient.getStudyPlan).mockResolvedValue([])
 
-    render(<MockedDashboard studyData={[]} />)
+    await act(async () => {
+      render(<MockedDashboard studyData={[]} />)
+    })
     
     expect(screen.getByText('学習進捗')).toBeInTheDocument()
   })
 
-  it('displays loading state initially', () => {
+  it('displays loading state initially', async () => {
     vi.mocked(mockApiClient.getStudyPlan).mockImplementation(() => new Promise(() => {})) // Never resolves
 
-    render(<MockedDashboard isLoading={true} />)
+    await act(async () => {
+      render(<MockedDashboard isLoading={true} />)
+    })
     
     expect(screen.queryByText('学習進捗')).not.toBeInTheDocument()
   })
@@ -95,7 +99,9 @@ describe('Dashboard', () => {
 
     vi.mocked(mockApiClient.getStudyPlan).mockResolvedValue(mockData)
 
-    render(<MockedDashboard studyData={mockData} />)
+    await act(async () => {
+      render(<MockedDashboard studyData={mockData} />)
+    })
     
     await waitFor(() => {
       expect(screen.getByText('テスト週')).toBeInTheDocument()
@@ -107,7 +113,9 @@ describe('Dashboard', () => {
   it('displays error message when API call fails', async () => {
     vi.mocked(mockApiClient.getStudyPlan).mockRejectedValue(new Error('API Error'))
 
-    render(<MockedDashboard studyData={[]} />)
+    await act(async () => {
+      render(<MockedDashboard studyData={[]} />)
+    })
     
     expect(screen.getByText('今日の学習タスクはありません')).toBeInTheDocument()
   })
@@ -115,7 +123,9 @@ describe('Dashboard', () => {
   it('displays empty state when no weeks available', async () => {
     vi.mocked(mockApiClient.getStudyPlan).mockResolvedValue([])
 
-    render(<MockedDashboard studyData={[]} />)
+    await act(async () => {
+      render(<MockedDashboard studyData={[]} />)
+    })
     
     expect(screen.getByText('今日の学習タスクはありません')).toBeInTheDocument()
   })
@@ -157,11 +167,13 @@ describe('Dashboard', () => {
 
     vi.mocked(mockApiClient.getBatchDashboardMLData).mockResolvedValue(mockMLData)
 
-    render(<MockedDashboard studyData={[]} />)
+    await act(async () => {
+      render(<MockedDashboard studyData={[]} />)
+    })
 
     await waitFor(() => {
       expect(mockApiClient.getBatchDashboardMLData).toHaveBeenCalledWith(1)
-      expect(screen.getByText('🤖 AI学習コーチ')).toBeInTheDocument()
+      expect(screen.getByText('AI学習コーチ')).toBeInTheDocument()
       expect(screen.getByText('85%')).toBeInTheDocument()
       expect(screen.getByText('合格予測確率')).toBeInTheDocument()
     })
@@ -189,7 +201,9 @@ describe('Dashboard', () => {
     vi.mocked(mockApiClient.getPredictiveAnalysis).mockResolvedValue(mockPredictiveAnalysis)
     vi.mocked(mockApiClient.getPersonalizedRecommendations).mockResolvedValue(null as any)
 
-    render(<MockedDashboard studyData={[]} />)
+    await act(async () => {
+      render(<MockedDashboard studyData={[]} />)
+    })
 
     await waitFor(() => {
       expect(mockApiClient.getBatchDashboardMLData).toHaveBeenCalledWith(1)
@@ -197,7 +211,7 @@ describe('Dashboard', () => {
       expect(mockApiClient.getPredictiveAnalysis).toHaveBeenCalledWith(1)
       expect(mockApiClient.getPersonalizedRecommendations).toHaveBeenCalledWith(1)
       
-      expect(screen.getByText('🤖 AI学習コーチ')).toBeInTheDocument()
+      expect(screen.getByText('AI学習コーチ')).toBeInTheDocument()
       expect(screen.getByText('90%')).toBeInTheDocument()
     })
   })

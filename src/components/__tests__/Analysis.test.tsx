@@ -128,9 +128,46 @@ describe('Analysis Component - Batch API Integration', () => {
 
       vi.mocked(mockApiClient.getBatchAnalysisData).mockResolvedValue(mockBatchData)
       vi.mocked(mockApiClient.getLatestAnalysis).mockResolvedValue({
+        id: 1,
+        userId: 1,
         analysisDate: '2024-01-01',
         overallScore: 85,
-        recommendations: []
+        studyPattern: {
+          totalStudyTime: 120,
+          averageStudyTime: 60,
+          studyFrequency: 5,
+          bestStudyTime: '18:00',
+          consistencyScore: 8,
+          preferredSubjects: ['Math'],
+          learningVelocity: 1.2,
+          concentrationSpan: 45
+        },
+        weaknessAnalysis: {
+          weakSubjects: [],
+          weakTopics: [],
+          improvementAreas: [],
+          rootCauses: []
+        },
+        studyRecommendation: {
+          dailyStudyTime: 120,
+          weeklyGoal: 840,
+          focusSubjects: ['Math'],
+          reviewSchedule: [],
+          adaptivePacing: {
+            currentPace: 'normal',
+            recommendedPace: 'normal',
+            reason: 'Good progress'
+          }
+        },
+        learningEfficiencyScore: 85,
+        predictions: {
+          examPassProbability: 85,
+          recommendedStudyHours: 3,
+          riskFactors: [],
+          successFactors: [],
+          milestonesPrediction: []
+        },
+        personalizedRecommendations: []
       })
 
       render(<MockedAnalysis />)
@@ -155,11 +192,11 @@ describe('Analysis Component - Batch API Integration', () => {
       vi.mocked(mockApiClient.getStudyLogs).mockResolvedValue([])
       vi.mocked(mockApiClient.getMorningTests).mockResolvedValue([])
       vi.mocked(mockApiClient.getAfternoonTests).mockResolvedValue([])
-      vi.mocked(mockApiClient.getStudyLogStats).mockResolvedValue(null)
-      vi.mocked(mockApiClient.getPredictiveAnalysis).mockResolvedValue(null)
-      vi.mocked(mockApiClient.getPersonalizedRecommendations).mockResolvedValue(null)
-      vi.mocked(mockApiClient.getAdvancedWeakPoints).mockResolvedValue(null)
-      vi.mocked(mockApiClient.getLatestAnalysis).mockResolvedValue(null)
+      vi.mocked(mockApiClient.getStudyLogStats).mockResolvedValue(null as any)
+      vi.mocked(mockApiClient.getPredictiveAnalysis).mockResolvedValue(null as any)
+      vi.mocked(mockApiClient.getPersonalizedRecommendations).mockResolvedValue(null as any)
+      vi.mocked(mockApiClient.getAdvancedWeakPoints).mockResolvedValue(null as any)
+      vi.mocked(mockApiClient.getLatestAnalysis).mockResolvedValue(null as any)
 
       render(<MockedAnalysis />)
 
@@ -199,7 +236,7 @@ describe('Analysis Component - Batch API Integration', () => {
       render(<MockedAnalysis />)
 
       await waitFor(() => {
-        expect(screen.getByText('🤖 AI予測分析')).toBeInTheDocument()
+        expect(screen.getByText('🔮 予測分析結果')).toBeInTheDocument()
         expect(screen.getByText('92%')).toBeInTheDocument()
         expect(screen.getByText('合格予測確率')).toBeInTheDocument()
       })
@@ -243,9 +280,8 @@ describe('Analysis Component - Batch API Integration', () => {
       render(<MockedAnalysis />)
 
       await waitFor(() => {
-        expect(screen.getByText('📋 パーソナライズ学習推奨')).toBeInTheDocument()
-        expect(screen.getByText('ネットワーク、データベース')).toBeInTheDocument()
-        expect(screen.getByText('120分')).toBeInTheDocument()
+        expect(screen.getByText('🎯 パーソナライズド推奨')).toBeInTheDocument()
+        expect(screen.getByText('ネットワーク, データベース (120分)')).toBeInTheDocument()
       })
     })
 
@@ -306,17 +342,17 @@ describe('Analysis Component - Batch API Integration', () => {
       })
 
       // ML分析生成後のデータ取得をモック
-      vi.mocked(mockApiClient.getPredictiveAnalysis).mockResolvedValue(null)
-      vi.mocked(mockApiClient.getPersonalizedRecommendations).mockResolvedValue(null)
-      vi.mocked(mockApiClient.getAdvancedWeakPoints).mockResolvedValue(null)
+      vi.mocked(mockApiClient.getPredictiveAnalysis).mockResolvedValue(null as any)
+      vi.mocked(mockApiClient.getPersonalizedRecommendations).mockResolvedValue(null as any)
+      vi.mocked(mockApiClient.getAdvancedWeakPoints).mockResolvedValue(null as any)
 
       render(<MockedAnalysis />)
 
       await waitFor(() => {
-        expect(screen.getByRole('button', { name: /ml分析を実行/i })).toBeInTheDocument()
+        expect(screen.getByRole('button', { name: /ML分析実行/i })).toBeInTheDocument()
       })
 
-      fireEvent.click(screen.getByRole('button', { name: /ml分析を実行/i }))
+      fireEvent.click(screen.getByRole('button', { name: /ML分析実行/i }))
 
       await waitFor(() => {
         expect(mockApiClient.generateMLAnalysis).toHaveBeenCalledWith(1)
@@ -354,7 +390,7 @@ describe('Analysis Component - Batch API Integration', () => {
       render(<MockedAnalysis />)
 
       await waitFor(() => {
-        const generateButton = screen.getByRole('button', { name: /ml分析を実行/i })
+        const generateButton = screen.getByRole('button', { name: /ML分析実行/i })
         fireEvent.click(generateButton)
       })
 
@@ -372,12 +408,12 @@ describe('Analysis Component - Batch API Integration', () => {
         resolvePromise = resolve
       })
       
-      vi.mocked(mockApiClient.getBatchAnalysisData).mockReturnValue(pendingPromise)
+      vi.mocked(mockApiClient.getBatchAnalysisData).mockReturnValue(pendingPromise as any)
 
       render(<MockedAnalysis />)
 
-      // ローディング状態を確認
-      expect(screen.getByText(/データを読み込み中/)).toBeInTheDocument()
+      // ローディング状態を確認（スケルトンローダー）
+      expect(document.querySelector('.animate-pulse')).toBeInTheDocument()
 
       // プロミスを解決
       resolvePromise!({
@@ -393,7 +429,7 @@ describe('Analysis Component - Batch API Integration', () => {
       vi.mocked(mockApiClient.getLatestAnalysis).mockResolvedValue(null)
 
       await waitFor(() => {
-        expect(screen.queryByText(/データを読み込み中/)).not.toBeInTheDocument()
+        expect(document.querySelector('.animate-pulse')).not.toBeInTheDocument()
       })
     })
 
@@ -417,23 +453,23 @@ describe('Analysis Component - Batch API Integration', () => {
         resolveMlPromise = resolve
       })
       
-      vi.mocked(mockApiClient.generateMLAnalysis).mockReturnValue(pendingMlPromise)
+      vi.mocked(mockApiClient.generateMLAnalysis).mockReturnValue(pendingMlPromise as any)
 
       render(<MockedAnalysis />)
 
       await waitFor(() => {
-        const generateButton = screen.getByRole('button', { name: /ml分析を実行/i })
+        const generateButton = screen.getByRole('button', { name: /ML分析実行/i })
         fireEvent.click(generateButton)
       })
 
       // ML生成中の状態を確認
-      expect(screen.getByText(/生成中.../)).toBeInTheDocument()
+      expect(screen.getByText(/分析中.../)).toBeInTheDocument()
 
       // ML生成を完了
       resolveMlPromise!({} as any)
 
       await waitFor(() => {
-        expect(screen.queryByText(/生成中.../)).not.toBeInTheDocument()
+        expect(screen.queryByText(/分析中.../)).not.toBeInTheDocument()
       })
     })
   })
