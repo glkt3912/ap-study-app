@@ -611,10 +611,9 @@ class ApiClient {
   }
 
   async completeReview(reviewItemId: string, understanding: number): Promise<{ message: string }> {
-    return this.request("/api/analysis/review/complete", {
+    return this.request(`/api/analysis/review/complete/${reviewItemId}`, {
       method: "POST",
       body: JSON.stringify({
-        review_item_id: reviewItemId,
         understanding_after: understanding,
       }),
     });

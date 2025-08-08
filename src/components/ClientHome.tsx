@@ -17,7 +17,7 @@ import { studyPlanData } from '@/data/studyPlan'
 import { apiClient } from '@/lib/api'
 
 export default function ClientHome() {
-  const { isAuthenticated, user, isLoading: authLoading } = useAuth()
+  const { isAuthenticated, user, isLoading: authLoading, logout } = useAuth()
   const [activeTab, setActiveTab] = useState('dashboard')
   const [studyData, setStudyData] = useState(studyPlanData)
   const [loading, setLoading] = useState(true)
@@ -143,10 +143,7 @@ export default function ClientHome() {
                     {user.name || user.email}
                   </span>
                   <button
-                    onClick={() => {
-                      // ログアウト処理実装予定
-                      setShowAuthModal(true)
-                    }}
+                    onClick={logout}
                     className="text-sm px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                   >
                     ログアウト
