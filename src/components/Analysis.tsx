@@ -90,8 +90,8 @@ export default function Analysis() {
   const [isGeneratingML, setIsGeneratingML] = useState(false)
   const [mlError, setMlError] = useState<string | null>(null)
 
-  // ML分析データ取得関数
-  const fetchMLAnalysisData = useCallback(async () => {
+  // ML分析データ個別取得（フォールバック用）
+  const fetchMLAnalysisDataFallback = useCallback(async () => {
     if (!user?.id) return
     
     try {
@@ -117,14 +117,14 @@ export default function Analysis() {
     }
   }, [user?.id])
 
-  const fetchAnalysisData = useCallback(async () => {
+  // フォールバック: 個別API呼び出し (バックエンド未対応時)
+  const fetchAnalysisDataFallback = useCallback(async () => {
     try {
-      setIsLoading(true)
       const [logs, morningData, afternoonData, stats] = await Promise.all([
         apiClient.getStudyLogs(),
         apiClient.getMorningTests(),
         apiClient.getAfternoonTests(),
-        apiClient.getStudyLogStats().catch(() => null) // エラー時はnullを返す
+        apiClient.getStudyLogStats().catch(() => null)
       ])
       setStudyLogs(logs)
       setMorningTests(morningData)
@@ -134,20 +134,61 @@ export default function Analysis() {
       // 従来の分析結果を取得
       await fetchLatestAnalysis()
       
-      // ML分析データを取得（ユーザー認証時のみ）
+      // ML分析データを個別取得（ユーザー認証時のみ）
       if (user?.id) {
-        await fetchMLAnalysisData()
+        await fetchMLAnalysisDataFallback()
       }
     } catch (error) {
-      // 分析データの取得に失敗
+      setMlError('データの取得に失敗しました。再度お試しください。')
+      // エラーログは開発環境でのみ出力
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error('分析データ取得エラー:', error)
+      }
+    }
+  }, [user?.id, fetchMLAnalysisDataFallback])
+
+  // バッチ処理: 分析データ一括取得 (7個API → 1個API)
+  const fetchBatchAnalysisData = useCallback(async () => {
+    if (!user?.id) return
+    
+    try {
+      setIsLoading(true)
+      setMlError(null)
+      
+      const batchData = await apiClient.getBatchAnalysisData(user.id)
+      
+      // 基本データ設定
+      setStudyLogs(batchData.studyLogs)
+      setMorningTests(batchData.morningTests)
+      setAfternoonTests(batchData.afternoonTests)
+      setStudyStats(batchData.studyLogStats)
+      
+      // MLデータ設定
+      setPredictiveAnalysis(batchData.predictiveAnalysis)
+      setPersonalizedRecommendations(batchData.personalizedRecommendations)
+      setAdvancedWeakPoints(batchData.advancedWeakPoints)
+      
+      // 従来の分析結果を取得
+      await fetchLatestAnalysis()
+      
+    } catch (error) {
+      // バッチAPI失敗時はフォールバックを使用
+      await fetchAnalysisDataFallback()
+      
+      // エラーログは開発環境でのみ出力
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error('バッチ分析データ取得エラー、フォールバックを使用:', error)
+      }
     } finally {
       setIsLoading(false)
     }
-  }, [user?.id, fetchMLAnalysisData])
+  }, [user?.id, fetchAnalysisDataFallback])
 
   useEffect(() => {
-    fetchAnalysisData()
-  }, [fetchAnalysisData])
+    fetchBatchAnalysisData()
+  }, [fetchBatchAnalysisData])
 
   const fetchLatestAnalysis = async () => {
     try {
@@ -182,7 +223,7 @@ export default function Analysis() {
       await apiClient.generateMLAnalysis(user.id)
       
       // 生成後に関連データも再取得
-      await fetchMLAnalysisData()
+      await fetchMLAnalysisDataFallback()
     } catch (error) {
       setMlError('ML分析の生成に失敗しました')
       // エラーログは開発環境でのみ出力

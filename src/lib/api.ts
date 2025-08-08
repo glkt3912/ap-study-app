@@ -764,6 +764,46 @@ class ApiClient {
   }
 
   /**
+   * バッチ処理: 分析ページ用データ一括取得 (7個のAPI統合)
+   */
+  async getBatchAnalysisData(userId?: number): Promise<{
+    studyLogs: StudyLog[];
+    morningTests: MorningTest[];
+    afternoonTests: AfternoonTest[];
+    studyLogStats: any;
+    predictiveAnalysis: PredictiveAnalysis | null;
+    personalizedRecommendations: PersonalizedRecommendations | null;
+    advancedWeakPoints: AdvancedWeakPointsAnalysis | null;
+  }> {
+    const params = userId ? `?userId=${userId}` : '';
+    return this.request(`/api/batch/analysis-data${params}`);
+  }
+
+  /**
+   * バッチ処理: Quiz機能用データ一括取得 (5個のAPI統合)
+   */
+  async getBatchQuizData(userId?: number): Promise<{
+    categories: QuizCategory[];
+    progress: any;
+    recommendations: RecommendedQuestionsResponse | null;
+    weakPoints: any[];
+    learningTrends: any;
+  }> {
+    const params = userId ? `?userId=${userId}` : '';
+    return this.request(`/api/batch/quiz-data${params}`);
+  }
+
+  /**
+   * バッチ処理: ダッシュボード用ML分析データ取得 (2個のAPI統合)
+   */
+  async getBatchDashboardMLData(userId: number): Promise<{
+    predictiveAnalysis: PredictiveAnalysis | null;
+    personalizedRecommendations: PersonalizedRecommendations | null;
+  }> {
+    return this.request(`/api/batch/dashboard-ml-data/${userId}`);
+  }
+
+  /**
    * 高度監視メトリクス取得
    */
   async getSystemMetrics(): Promise<SystemMetrics> {

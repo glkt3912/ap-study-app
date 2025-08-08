@@ -62,12 +62,37 @@ export default function Quiz() {
   
   const [activeTab, setActiveTab] = useState<"quiz" | "progress" | "recommendations" | "trends">("quiz");
 
-  // 初期データ取得
+  // バッチ処理: Quiz機能用データ一括取得 (5個API → 1個API)
   useEffect(() => {
-    const loadInitialData = async () => {
+    const loadBatchQuizData = async () => {
       try {
         setState(prev => ({ ...prev, loading: true }));
         
+        const batchData = await apiClient.getBatchQuizData();
+        
+        setState(prev => ({ 
+          ...prev, 
+          categories: batchData.categories, 
+          progress: batchData.progress,
+          recommendations: batchData.recommendations,
+          weakPoints: batchData.weakPoints,
+          learningTrends: batchData.learningTrends,
+          loading: false 
+        }));
+      } catch (error) {
+        // バッチAPI失敗時はフォールバックを使用
+        await loadInitialDataFallback();
+        
+        if (process.env.NODE_ENV === 'development') {
+          // eslint-disable-next-line no-console
+          console.error('バッチQuizデータ取得エラー、フォールバックを使用:', error);
+        }
+      }
+    };
+
+    // フォールバック: 個別API呼び出し (バックエンド未対応時)
+    const loadInitialDataFallback = async () => {
+      try {
         const [categories, progress, recommendations, weakPoints, learningTrends] = await Promise.all([
           apiClient.getQuizCategories(),
           apiClient.getQuizProgress().catch(() => null),
@@ -94,7 +119,7 @@ export default function Quiz() {
       }
     };
 
-    loadInitialData();
+    loadBatchQuizData();
   }, []);
 
   // Quiz開始
