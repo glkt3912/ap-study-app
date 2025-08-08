@@ -1,7 +1,7 @@
-import { render, screen, fireEvent } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { ThemeProvider } from '../../contexts/ThemeContext'
-import ThemeToggle from '../ui/ThemeToggle'
+import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { ThemeProvider } from '../../contexts/ThemeContext';
+import ThemeToggle from '../ui/ThemeToggle';
 
 // Mock Next.js useRouter
 vi.mock('next/navigation', () => ({
@@ -9,62 +9,62 @@ vi.mock('next/navigation', () => ({
     push: vi.fn(),
     refresh: vi.fn(),
   }),
-}))
+}));
 
 describe('ThemeToggle', () => {
   beforeEach(() => {
     // Clear localStorage before each test
-    localStorage.clear()
-  })
+    localStorage.clear();
+  });
 
   it('renders theme toggle button', () => {
     render(
       <ThemeProvider>
         <ThemeToggle />
       </ThemeProvider>
-    )
+    );
 
-    const button = screen.getByRole('button')
-    expect(button).toBeInTheDocument()
-  })
+    const button = screen.getByRole('button');
+    expect(button).toBeInTheDocument();
+  });
 
   it('toggles theme when clicked', () => {
     render(
       <ThemeProvider>
         <ThemeToggle />
       </ThemeProvider>
-    )
+    );
 
-    const button = screen.getByRole('button')
-    
+    const button = screen.getByRole('button');
+
     // Initial state should be light theme
-    expect(button).toHaveTextContent('🌙Dark')
-    
+    expect(button).toHaveTextContent('🌙Dark');
+
     // Click to toggle to dark theme
-    fireEvent.click(button)
-    expect(button).toHaveTextContent('☀️Light')
-    
+    fireEvent.click(button);
+    expect(button).toHaveTextContent('☀️Light');
+
     // Click to toggle back to light theme
-    fireEvent.click(button)
-    expect(button).toHaveTextContent('🌙Dark')
-  })
+    fireEvent.click(button);
+    expect(button).toHaveTextContent('🌙Dark');
+  });
 
   it('applies correct CSS classes based on theme', () => {
     const TestComponent = () => (
       <ThemeProvider>
-        <div data-testid="themed-content" className="bg-white dark:bg-gray-900">
+        <div data-testid='themed-content' className='bg-white dark:bg-gray-900'>
           <ThemeToggle />
         </div>
       </ThemeProvider>
-    )
+    );
 
-    render(<TestComponent />)
-    const button = screen.getByRole('button')
-    
+    render(<TestComponent />);
+    const button = screen.getByRole('button');
+
     // Toggle to dark theme
-    fireEvent.click(button)
-    
+    fireEvent.click(button);
+
     // Check if dark class is applied to document
-    expect(document.documentElement).toHaveClass('dark')
-  })
-})
+    expect(document.documentElement).toHaveClass('dark');
+  });
+});

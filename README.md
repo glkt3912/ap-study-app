@@ -188,12 +188,12 @@ npm run lint         # コード品質チェック
 
 ### 必須環境変数
 
-| 変数名 | デフォルト値 | 説明 |
-|--------|-------------|------|
-| `NEXT_PUBLIC_API_URL` | `http://localhost:8000` | バックエンドAPI URL (Hono.js) |
-| `NODE_ENV` | `development` | 実行環境 |
-| `NEXT_PUBLIC_APP_NAME` | `応用情報技術者試験 学習管理アプリ` | アプリケーション名 |
-| `NEXT_PUBLIC_APP_VERSION` | `1.0.0` | アプリケーションバージョン |
+| 変数名                    | デフォルト値                        | 説明                          |
+| ------------------------- | ----------------------------------- | ----------------------------- |
+| `NEXT_PUBLIC_API_URL`     | `http://localhost:8000`             | バックエンドAPI URL (Hono.js) |
+| `NODE_ENV`                | `development`                       | 実行環境                      |
+| `NEXT_PUBLIC_APP_NAME`    | `応用情報技術者試験 学習管理アプリ` | アプリケーション名            |
+| `NEXT_PUBLIC_APP_VERSION` | `1.0.0`                             | アプリケーションバージョン    |
 
 ### 🔧 設定例
 
@@ -231,21 +231,21 @@ vim .env.local
 
 ```typescript
 // 型安全なAPI呼び出し例
-import { apiClient } from '@/lib/api'
+import { apiClient } from '@/lib/api';
 
 // 学習プラン取得 + エラーハンドリング
-const { data, error, loading } = await apiClient.getStudyPlan()
+const { data, error, loading } = await apiClient.getStudyPlan();
 if (error) {
   // フォールバック: モックデータ使用
-  return mockStudyPlan
+  return mockStudyPlan;
 }
 
 // POSTリクエスト例 (学習記録保存)
 const result = await apiClient.createStudyLog({
   date: '2024-01-01',
   hours: 3,
-  understanding: 4
-})
+  understanding: 4,
+});
 ```
 
 **連携機能**: 自動エラーハンドリング・フォールバック・リトライ・CORS対応済み
@@ -255,7 +255,7 @@ const result = await apiClient.createStudyLog({
 開発効率向上のための専用診断機能:
 
 - `/debug` - 総合診断
-- `/css-test` - CSSテスト  
+- `/css-test` - CSSテスト
 - `/env-check` - 環境チェック
 - `/api-test` - API接続テスト
 - `/test-dark` - ダークモードテスト

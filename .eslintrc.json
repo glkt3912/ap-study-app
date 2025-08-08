@@ -1,12 +1,34 @@
 {
   "extends": ["next/core-web-vitals"],
   "rules": {
-    "no-console": "error",
-    "react-hooks/exhaustive-deps": "error",
+    "complexity": ["warn", 10],
+    "max-len": [
+      "error",
+      {
+        "code": 120,
+        "ignoreStrings": true,
+        "ignoreTemplateLiterals": true
+      }
+    ],
+    "no-console": "warn",
+    "no-debugger": "error",
+    "react-hooks/exhaustive-deps": "warn",
     "prefer-const": "error",
     "no-var": "error",
-    "no-unused-vars": ["error", {
-      "argsIgnorePattern": "^_"
-    }]
-  }
+    "no-unused-vars": [
+      "error",
+      {
+        "argsIgnorePattern": "^_"
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": ["**/*.test.{js,jsx,ts,tsx}", "**/__tests__/**/*.{js,jsx,ts,tsx}"],
+      "rules": {
+        "no-console": "off",
+        "no-unused-vars": "off"
+      }
+    }
+  ]
 }

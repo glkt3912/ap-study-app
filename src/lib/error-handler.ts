@@ -112,7 +112,7 @@ class ErrorHandler {
     // エラーカテゴリを自動判定
     const category = context?.category || this.categorizeError(error);
     const severity = context?.severity || this.determineSeverity(category, error);
-    
+
     const standardError: StandardError = {
       id: errorId,
       category,
@@ -127,13 +127,13 @@ class ErrorHandler {
       },
       timestamp,
       context: {
-        ...((context?.url || (typeof window !== 'undefined' && window.location.href)) && { 
-          url: context?.url || window.location.href 
+        ...((context?.url || (typeof window !== 'undefined' && window.location.href)) && {
+          url: context?.url || window.location.href,
         }),
         ...(context?.method && { method: context.method }),
         ...(context?.userId && { userId: context.userId }),
         ...(context?.requestId && { requestId: context.requestId }),
-        ...((typeof navigator !== 'undefined' && navigator.userAgent) && { userAgent: navigator.userAgent }),
+        ...(typeof navigator !== 'undefined' && navigator.userAgent && { userAgent: navigator.userAgent }),
         ...(error?.stack && { stackTrace: error.stack }),
       },
       retryable: this.isRetryable(category, error),
@@ -151,7 +151,7 @@ class ErrorHandler {
     context?: Parameters<typeof this.standardizeError>[1]
   ): Promise<StandardError> {
     const standardError = this.standardizeError(error, context);
-    
+
     // エラー履歴に追加
     this.errorHistory.unshift(standardError);
     if (this.errorHistory.length > 100) {
@@ -228,7 +228,7 @@ class ErrorHandler {
       ...(context?.url && { url: context.url }),
       ...(context?.method && { method: context.method }),
       code: context?.timeout ? 'NETWORK_TIMEOUT' : 'NETWORK_ERROR',
-      userMessage: context?.timeout 
+      userMessage: context?.timeout
         ? 'リクエストがタイムアウトしました。しばらく待ってから再度お試しください。'
         : 'ネットワークエラーが発生しました。インターネット接続を確認してください。',
     };
@@ -239,12 +239,9 @@ class ErrorHandler {
   /**
    * バリデーションエラー専用ハンドラー
    */
-  public handleValidationError(
-    fieldErrors: Record<string, string[]>,
-    generalMessage?: string
-  ): StandardError {
+  public handleValidationError(fieldErrors: Record<string, string[]>, generalMessage?: string): StandardError {
     const validationError = new Error(generalMessage || 'Validation failed');
-    
+
     const validationContext = {
       category: ErrorCategory.VALIDATION,
       severity: ErrorSeverity.LOW,
@@ -254,7 +251,7 @@ class ErrorHandler {
 
     const standardError = this.standardizeError(validationError, validationContext);
     standardError.details = { fieldErrors, ...standardError.details };
-    
+
     return standardError;
   }
 
@@ -314,7 +311,7 @@ class ErrorHandler {
     if (_error?.name === 'TypeError' && _error?.message?.includes('fetch')) {
       return ErrorCategory.NETWORK;
     }
-    
+
     if (_error?.status || _error?.statusCode) {
       const status = _error.status || _error.statusCode;
       if (status === 401) return ErrorCategory.AUTHENTICATION;
@@ -327,7 +324,7 @@ class ErrorHandler {
     }
 
     if (_error?.name === 'ValidationError') return ErrorCategory.VALIDATION;
-    
+
     return ErrorCategory.UNKNOWN;
   }
 
@@ -431,7 +428,9 @@ class ErrorHandler {
         actions.push({
           type: 'redirect',
           label: 'ホームに戻る',
-          action: () => { window.location.href = '/'; },
+          action: () => {
+            window.location.href = '/';
+          },
         });
         break;
     }
@@ -486,7 +485,7 @@ class ErrorHandler {
           await new Promise(resolve => setTimeout(resolve, automaticAction.delay));
         }
         await automaticAction.action();
-        
+
         // 成功した場合、試行回数をリセット
         this.retryAttempts.delete(attemptKey);
       } catch (recoveryError) {
@@ -503,7 +502,6 @@ class ErrorHandler {
     //   message: error.userMessage,
     //   actions: error.recoveryActions?.map(action => action.label),
     // });
-
     // 将来的にはここで UI コンポーネントを呼び出し
     // notificationService.show({
     //   type: 'error',
@@ -518,14 +516,12 @@ class ErrorHandler {
 export const errorHandler = new ErrorHandler();
 
 // ユーティリティ関数
-export const handleError = (error: any, context?: any) => 
-  errorHandler.handleError(error, context);
+export const handleError = (error: any, context?: any) => errorHandler.handleError(error, context);
 
 export const handleApiError = (error: any, endpoint: string, method: string, context?: any) =>
   errorHandler.handleApiError(error, endpoint, method, context);
 
-export const handleNetworkError = (error: any, context?: any) =>
-  errorHandler.handleNetworkError(error, context);
+export const handleNetworkError = (error: any, context?: any) => errorHandler.handleNetworkError(error, context);
 
 export const handleValidationError = (fieldErrors: Record<string, string[]>, message?: string) =>
   errorHandler.handleValidationError(fieldErrors, message);
