@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Dashboard from '@/components/Dashboard';
 import WeeklyPlan from '@/components/WeeklyPlan';
 import StudyLog from '@/components/StudyLog';
@@ -15,20 +15,34 @@ import { AuthModal } from '@/components/auth';
 import { ErrorToastManager } from '@/components/ErrorToast';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useAuth } from '@/contexts/AuthContext';
-import { useTheme } from '@/contexts/ThemeContext';
+// import { useTheme } from '@/contexts/ThemeContext';
 import { studyPlanData } from '@/data/studyPlan';
 import { apiClient } from '@/lib/api';
 import { errorHandler } from '@/lib/error-handler';
 
 export default function ClientHome() {
   const { isAuthenticated, user, isLoading: authLoading, logout } = useAuth();
-  const { theme } = useTheme();
+  // const { theme } = useTheme(); // テーマは現在未使用
   const [activeTab, setActiveTab] = useState('dashboard');
   const [studyData, setStudyData] = useState(studyPlanData);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+
+  // タブ定義（メモ化で最適化）
+  const tabs = useMemo(() => [
+    { id: 'dashboard', name: 'ダッシュボード', icon: '📊' },
+    { id: 'plan', name: '学習計画', icon: '📅' },
+    { id: 'log', name: '学習記録', icon: '✏️' },
+    { id: 'test', name: '問題演習', icon: '📝' },
+    { id: 'quiz', name: 'Quiz', icon: '🧭' },
+    { id: 'analysis', name: '分析', icon: '📈' },
+    { id: 'advanced', name: '高度分析', icon: '🎯' },
+    { id: 'review', name: '復習システム', icon: '🔄' },
+    { id: 'export', name: 'エクスポート', icon: '💾' },
+    { id: 'debug', name: '診断', icon: '🧪' },
+  ], []);
 
   // コンポーネントマウント確認
   useEffect(() => {
@@ -82,19 +96,6 @@ export default function ClientHome() {
 
     fetchStudyData();
   }, [user?.id]);
-
-  const tabs = [
-    { id: 'dashboard', name: 'ダッシュボード', icon: '📊' },
-    { id: 'plan', name: '学習計画', icon: '📅' },
-    { id: 'log', name: '学習記録', icon: '✏️' },
-    { id: 'test', name: '問題演習', icon: '📝' },
-    { id: 'quiz', name: 'Quiz', icon: '🧭' },
-    { id: 'analysis', name: '分析', icon: '📈' },
-    { id: 'advanced', name: '高度分析', icon: '🎯' },
-    { id: 'review', name: '復習システム', icon: '🔄' },
-    { id: 'export', name: 'エクスポート', icon: '💾' },
-    { id: 'debug', name: '診断', icon: '🧪' },
-  ];
 
   const renderContent = () => {
     switch (activeTab) {
@@ -158,7 +159,8 @@ export default function ClientHome() {
                 </button>
               )}
 
-              {mounted && <ThemeToggle />}
+              {/* Temporarily disabled */}
+              {/* {mounted && <ThemeToggle />} */}
             </div>
           </div>
         </div>
@@ -166,27 +168,32 @@ export default function ClientHome() {
 
       <nav className='bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700'>
         <div className='max-w-6xl mx-auto relative'>
-          {/* スクロールインジケーター */}
-          <div className='absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white dark:from-slate-800 to-transparent pointer-events-none flex items-center justify-end pr-2 sm:hidden z-10'>
-            <span className='text-gray-400 dark:text-gray-500 text-sm'>→</span>
+          {/* スクロール可能なタブナビゲーション */}
+          <div className='overflow-x-auto scrollbar-modern relative'>
+            <div className='flex min-w-max px-2'>
+              {tabs.map(tab => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex-shrink-0 py-4 px-4 lg:px-6 border-b-2 font-medium text-sm transition-all duration-200 whitespace-nowrap relative ${
+                    activeTab === tab.id
+                      ? 'border-blue-500 text-blue-600 dark:border-blue-400 dark:text-blue-400 shadow-sm'
+                      : 'border-transparent text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-white hover:border-gray-300 dark:hover:border-gray-600 hover:bg-slate-50 dark:hover:bg-slate-700/50'
+                  }`}
+                >
+                  <span className='mr-2'>{tab.icon}</span>
+                  {tab.name}
+                  {activeTab === tab.id && (
+                    <div className='absolute inset-0 bg-gradient-to-r from-blue-50/50 to-blue-100/50 dark:from-blue-900/20 dark:to-blue-800/20 rounded-t-lg -z-10' />
+                  )}
+                </button>
+              ))}
+            </div>
           </div>
-          
-          <div className='flex overflow-x-auto scrollbar-hide px-4'>
-            {tabs.map(tab => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex-shrink-0 py-4 px-3 sm:px-4 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
-                  activeTab === tab.id
-                    ? 'border-blue-500 text-blue-600 dark:border-blue-400 dark:text-blue-400'
-                    : 'border-transparent text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-white hover:border-gray-300 dark:hover:border-gray-600'
-                }`}
-              >
-                <span className='mr-1 sm:mr-2'>{tab.icon}</span>
-                <span className='hidden sm:inline'>{tab.name}</span>
-                <span className='sm:hidden text-xs'>{tab.name.slice(0, 2)}</span>
-              </button>
-            ))}
+
+          {/* スクロールヒント - 小画面のみ表示 */}
+          <div className='md:hidden bg-slate-50/80 dark:bg-slate-700/30 px-4 py-1 text-xs text-center text-gray-500 dark:text-gray-400 backdrop-blur-sm'>
+            ← スワイプでスクロール →
           </div>
         </div>
       </nav>
