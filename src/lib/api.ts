@@ -170,10 +170,6 @@ class ApiClient {
       if (!response.ok) {
         const error = new Error(`HTTP error! status: ${response.status}`);
 
-        // デバッグ: 404エラーの詳細ログ
-        if (response.status === 404) {
-          console.error(`[API 404 ERROR] URL: ${url}, Method: ${method}, Endpoint: ${endpoint}`);
-        }
 
         // 監視システムにAPI エラーを記録
         if (typeof window !== 'undefined') {
@@ -376,7 +372,6 @@ class ApiClient {
       return await this.request(`/api/analysis/latest${params}`);
     } catch (error) {
       // 404エラーの場合はnullを返す
-      console.warn('Latest analysis API failed, returning null:', error);
       return null;
     }
   }
@@ -566,7 +561,6 @@ class ApiClient {
       return await this.request(`/api/analysis/performance-metrics${params}`);
     } catch (error) {
       // エラー時はデフォルト値を返す
-      console.warn('Performance metrics API failed, returning default values:', error);
       return {
         period: period || 30,
         studyConsistency: {
@@ -706,7 +700,6 @@ class ApiClient {
     try {
       return await this.request<PredictiveAnalysis>(`/api/learning-efficiency-analysis/predict/${userId}`);
     } catch (error) {
-      console.warn(`予測分析API単体呼び出し失敗 (userId: ${userId}):`, error);
       throw error; // Dashboard等で.catch()される
     }
   }
@@ -718,7 +711,6 @@ class ApiClient {
     try {
       return await this.request<PersonalizedRecommendations>(`/api/learning-efficiency-analysis/recommendations/${userId}`);
     } catch (error) {
-      console.warn(`パーソナライズ推奨API単体呼び出し失敗 (userId: ${userId}):`, error);
       throw error; // Dashboard等で.catch()される
     }
   }
@@ -776,7 +768,6 @@ class ApiClient {
         success: true
       } as BatchStudyDataResponse;
     } catch (error) {
-      console.warn('バッチ学習データ取得でエラーが発生しました:', error);
       return {
         studyPlan: [],
         studyLogs: [],
@@ -814,7 +805,6 @@ class ApiClient {
         advancedWeakPoints: null
       };
     } catch (error) {
-      console.warn('バッチ分析データ取得でエラーが発生しました:', error);
       return {
         studyLogs: [],
         morningTests: [],
@@ -851,7 +841,6 @@ class ApiClient {
         learningTrends: null
       };
     } catch (error) {
-      console.warn('バッチクイズデータ取得でエラーが発生しました:', error);
       return {
         categories: [],
         progress: null,

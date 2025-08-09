@@ -13,9 +13,7 @@ import { AdvancedAnalysis } from '@/components/AdvancedAnalysis';
 import { ReviewSystem } from '@/components/ReviewSystem';
 import { AuthModal } from '@/components/auth';
 import { ErrorToastManager } from '@/components/ErrorToast';
-import { ThemeToggle } from '@/components/ThemeToggle';
 import { useAuth } from '@/contexts/AuthContext';
-// import { useTheme } from '@/contexts/ThemeContext';
 import { studyPlanData } from '@/data/studyPlan';
 import { apiClient } from '@/lib/api';
 import { errorHandler } from '@/lib/error-handler';
@@ -27,7 +25,6 @@ export default function ClientHome() {
   const [studyData, setStudyData] = useState(studyPlanData);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [mounted, setMounted] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
 
   // タブ定義（メモ化で最適化）
@@ -44,10 +41,6 @@ export default function ClientHome() {
     { id: 'debug', name: '診断', icon: '🧪' },
   ], []);
 
-  // コンポーネントマウント確認
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   // バックエンドからデータを取得
   useEffect(() => {
@@ -159,8 +152,6 @@ export default function ClientHome() {
                 </button>
               )}
 
-              {/* Temporarily disabled */}
-              {/* {mounted && <ThemeToggle />} */}
             </div>
           </div>
         </div>
