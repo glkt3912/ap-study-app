@@ -869,36 +869,17 @@ class ApiClient {
     predictiveAnalysis: PredictiveAnalysis | null;
     personalizedRecommendations: PersonalizedRecommendations | null;
   }> {
-    console.log(`[DEBUG] getBatchDashboardMLData 開始: userId = ${userId}`);
-    
-    // 個別のAPIリクエストを安全に実行（tryブロック外で実行）
+    // 個別のAPIリクエストを安全に実行
     const predictiveAnalysisResult = await this.request<PredictiveAnalysis>(`/api/learning-efficiency-analysis/predict/${userId}`)
-      .then((result) => {
-        console.log(`[DEBUG] 予測分析API成功: userId=${userId}`);
-        return result;
-      })
-      .catch((error) => {
-        console.warn(`[DEBUG] 予測分析API失敗 (userId: ${userId}):`, error.message);
-        return null;
-      });
+      .catch(() => null);
 
     const personalizedRecommendationsResult = await this.request<PersonalizedRecommendations>(`/api/learning-efficiency-analysis/recommendations/${userId}`)
-      .then((result) => {
-        console.log(`[DEBUG] パーソナライズ推奨API成功: userId=${userId}`);
-        return result;
-      })
-      .catch((error) => {
-        console.warn(`[DEBUG] パーソナライズ推奨API失敗 (userId: ${userId}):`, error.message);
-        return null;
-      });
+      .catch(() => null);
 
-    const result = {
+    return {
       predictiveAnalysis: predictiveAnalysisResult,
       personalizedRecommendations: personalizedRecommendationsResult
     };
-    
-    console.log(`[DEBUG] getBatchDashboardMLData 完了:`, result);
-    return result;
   }
 
   /**

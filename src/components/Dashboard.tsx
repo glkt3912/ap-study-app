@@ -24,12 +24,10 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
   // フォールバック: 個別AI分析データ取得 (バックエンド未対応時)
   const fetchAIDataFallback = useCallback(async () => {
     if (!user?.id || user.id <= 0) {
-      console.log('[DEBUG] fetchAIDataFallback: 無効なユーザーID、AI分析をスキップ');
       return;
     }
 
     try {
-      console.log(`[DEBUG] fetchAIDataFallback: user.id = ${user.id}`);
       const [predictions, recommendations] = await Promise.all([
         apiClient.getPredictiveAnalysis(user.id).catch(() => null),
         apiClient.getPersonalizedRecommendations(user.id).catch(() => null),
@@ -49,13 +47,11 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
   // バッチ処理: ダッシュボードML分析データ一括取得 (2個API → 1個API)
   const fetchBatchDashboardMLData = useCallback(async () => {
     if (!user?.id || user.id <= 0) {
-      console.log('[DEBUG] fetchBatchDashboardMLData: 無効なユーザーID、バッチML分析をスキップ');
       return;
     }
 
     try {
       setIsLoadingAI(true);
-      console.log(`[DEBUG] fetchBatchDashboardMLData: user.id = ${user.id}`);
       const batchData = await apiClient.getBatchDashboardMLData(user.id);
 
       setPredictiveAnalysis(batchData.predictiveAnalysis);
