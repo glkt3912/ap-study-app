@@ -249,10 +249,10 @@ export default function Quiz() {
   if (state.loading) {
     return (
       <div className='max-w-4xl mx-auto p-6'>
-        <div className='bg-white rounded-lg shadow-lg p-8'>
+        <div className='bg-white dark:bg-slate-800 rounded-lg shadow-lg p-8'>
           <div className='text-center'>
             <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto'></div>
-            <p className='mt-4 text-gray-600'>読み込み中...</p>
+            <p className='mt-4 text-gray-600 dark:text-gray-300'>読み込み中...</p>
           </div>
         </div>
       </div>
@@ -263,10 +263,10 @@ export default function Quiz() {
   if (state.error) {
     return (
       <div className='max-w-4xl mx-auto p-6'>
-        <div className='bg-white rounded-lg shadow-lg p-8'>
+        <div className='bg-white dark:bg-slate-800 rounded-lg shadow-lg p-8'>
           <div className='text-center'>
             <div className='text-red-500 text-lg font-semibold mb-4'>エラー</div>
-            <p className='text-gray-600 mb-6'>{state.error}</p>
+            <p className='text-slate-600 dark:text-slate-400 mb-6'>{state.error}</p>
             <button
               onClick={() => setState(prev => ({ ...prev, error: null }))}
               className='bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors'
@@ -283,30 +283,30 @@ export default function Quiz() {
   if (state.result) {
     return (
       <div className='max-w-4xl mx-auto p-6'>
-        <div className='bg-white rounded-lg shadow-lg p-8'>
+        <div className='bg-white dark:bg-slate-800 rounded-lg shadow-lg p-8'>
           <div className='text-center'>
-            <h2 className='text-2xl font-bold text-gray-800 mb-6'>Quiz結果</h2>
+            <h2 className='text-2xl font-bold text-slate-900 dark:text-slate-100 mb-6'>Quiz結果</h2>
 
             <div className='grid grid-cols-1 md:grid-cols-3 gap-6 mb-8'>
               <div className='bg-blue-50 p-4 rounded-lg'>
                 <div className='text-2xl font-bold text-blue-600'>{state.result.score}%</div>
-                <div className='text-sm text-gray-600'>正答率</div>
+                <div className='text-sm text-gray-600 dark:text-gray-300'>正答率</div>
               </div>
               <div className='bg-green-50 p-4 rounded-lg'>
                 <div className='text-2xl font-bold text-green-600'>
                   {state.result.correctAnswers}/{state.result.totalQuestions}
                 </div>
-                <div className='text-sm text-gray-600'>正解数</div>
+                <div className='text-sm text-gray-600 dark:text-gray-300'>正解数</div>
               </div>
               <div className='bg-purple-50 p-4 rounded-lg'>
                 <div className='text-2xl font-bold text-purple-600'>{state.result.avgTimePerQ}秒</div>
-                <div className='text-sm text-gray-600'>平均解答時間</div>
+                <div className='text-sm text-gray-600 dark:text-gray-300'>平均解答時間</div>
               </div>
             </div>
 
             {state.result.category && (
               <div className='mb-6'>
-                <span className='bg-gray-100 px-3 py-1 rounded-full text-sm text-gray-600'>
+                <span className='bg-gray-100 dark:bg-gray-700 px-3 py-1 rounded-full text-sm text-gray-600 dark:text-gray-300'>
                   カテゴリ: {state.result.category}
                 </span>
               </div>
@@ -342,10 +342,10 @@ export default function Quiz() {
 
     return (
       <div className='max-w-4xl mx-auto p-6'>
-        <div className='bg-white rounded-lg shadow-lg p-8'>
+        <div className='bg-white dark:bg-slate-800 rounded-lg shadow-lg p-8'>
           {/* プログレスバー */}
           <div className='mb-6'>
-            <div className='flex justify-between text-sm text-gray-600 mb-2'>
+            <div className='flex justify-between text-sm text-gray-600 dark:text-gray-300 mb-2'>
               <span>
                 問題 {state.session.currentIndex + 1} / {state.session.questions.length}
               </span>
@@ -364,7 +364,7 @@ export default function Quiz() {
             <div className='flex flex-wrap gap-2 mb-4'>
               <span className='bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm'>{currentQuestion.category}</span>
               {currentQuestion.subcategory && (
-                <span className='bg-gray-100 text-gray-600 px-2 py-1 rounded text-sm'>
+                <span className='bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-1 rounded text-sm'>
                   {currentQuestion.subcategory}
                 </span>
               )}
@@ -376,7 +376,7 @@ export default function Quiz() {
 
           {/* 問題文 */}
           <div className='mb-8'>
-            <h3 className='text-xl font-semibold text-gray-800 mb-4'>問題 {currentQuestion.number}</h3>
+            <h3 className='text-xl font-semibold text-slate-900 dark:text-slate-100 mb-4'>問題 {currentQuestion.number}</h3>
             <p className='text-gray-700 leading-relaxed whitespace-pre-wrap'>{currentQuestion.question}</p>
           </div>
 
@@ -425,14 +425,14 @@ export default function Quiz() {
   // Quiz開始画面
   return (
     <div className='max-w-4xl mx-auto p-6'>
-      <div className='bg-white rounded-lg shadow-lg p-8'>
-        <h2 className='text-2xl font-bold text-gray-800 mb-8 text-center'>応用情報技術者試験 過去問Quiz</h2>
+      <div className='bg-white dark:bg-slate-800 rounded-lg shadow-lg p-8'>
+        <h2 className='text-2xl font-bold text-slate-900 dark:text-slate-100 mb-8 text-center'>応用情報技術者試験 過去問Quiz</h2>
 
         <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
           {/* ランダム問題 */}
-          <div className='border-2 border-dashed border-gray-300 rounded-lg p-6 hover:border-blue-400 transition-colors'>
-            <h3 className='text-lg font-semibold text-gray-800 mb-4'>ランダム問題</h3>
-            <p className='text-gray-600 mb-6 text-sm'>全カテゴリからランダムに問題を出題します</p>
+          <div className='border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-lg p-6 hover:border-blue-400 transition-colors'>
+            <h3 className='text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4'>ランダム問題</h3>
+            <p className='text-slate-600 dark:text-slate-400 mb-6 text-sm'>全カテゴリからランダムに問題を出題します</p>
             <div className='space-y-3'>
               <button
                 onClick={() => startQuiz('random', 5)}
@@ -451,8 +451,8 @@ export default function Quiz() {
 
           {/* カテゴリ別問題 */}
           <div className='border-2 border-dashed border-gray-300 rounded-lg p-6 hover:border-green-400 transition-colors'>
-            <h3 className='text-lg font-semibold text-gray-800 mb-4'>カテゴリ別問題</h3>
-            <p className='text-gray-600 mb-6 text-sm'>特定の分野に集中して学習できます</p>
+            <h3 className='text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4'>カテゴリ別問題</h3>
+            <p className='text-slate-600 dark:text-slate-400 mb-6 text-sm'>特定の分野に集中して学習できます</p>
             <div className='space-y-2'>
               {state.categories.map(category => (
                 <button

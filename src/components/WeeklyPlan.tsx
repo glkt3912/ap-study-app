@@ -50,10 +50,10 @@ export default function WeeklyPlan({ studyData, setStudyData }: WeeklyPlanProps)
 
   return (
     <div className='space-y-6'>
-      <div className='bg-white rounded-lg shadow'>
-        <div className='p-6 border-b border-gray-200'>
-          <h2 className='text-xl font-semibold text-gray-900'>学習計画</h2>
-          <p className='text-gray-600 mt-1'>週別の詳細な学習計画と進捗管理</p>
+      <div className='bg-white dark:bg-slate-800 rounded-lg shadow-md'>
+        <div className='p-6 border-b border-slate-200 dark:border-slate-700'>
+          <h2 className='text-xl font-semibold text-slate-900 dark:text-slate-100'>学習計画</h2>
+          <p className='text-slate-600 dark:text-slate-400 mt-1'>週別の詳細な学習計画と進捗管理</p>
         </div>
 
         <div className='p-6'>
@@ -65,7 +65,7 @@ export default function WeeklyPlan({ studyData, setStudyData }: WeeklyPlanProps)
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   selectedWeek === week.weekNumber
                     ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
                 }`}
               >
                 第{week.weekNumber}週
@@ -76,7 +76,7 @@ export default function WeeklyPlan({ studyData, setStudyData }: WeeklyPlanProps)
           {selectedWeekData && (
             <div className='space-y-6'>
               <div>
-                <h3 className='text-lg font-semibold text-gray-900 mb-2'>
+                <h3 className='text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2'>
                   第{selectedWeekData.weekNumber}週: {selectedWeekData.title}
                 </h3>
                 <div className='flex items-center space-x-4 mb-4'>
@@ -85,10 +85,10 @@ export default function WeeklyPlan({ studyData, setStudyData }: WeeklyPlanProps)
                   </span>
                 </div>
                 <div className='space-y-2 mb-6'>
-                  <h4 className='font-medium text-gray-900'>学習目標:</h4>
+                  <h4 className='font-medium text-slate-900 dark:text-slate-100'>学習目標:</h4>
                   <ul className='list-disc list-inside space-y-1'>
                     {selectedWeekData.goals.map((goal, index) => (
-                      <li key={index} className='text-gray-700'>
+                      <li key={index} className='text-slate-700 dark:text-slate-300'>
                         {goal}
                       </li>
                     ))}
@@ -103,20 +103,22 @@ export default function WeeklyPlan({ studyData, setStudyData }: WeeklyPlanProps)
                     <div
                       key={dayIndex}
                       className={`border rounded-lg p-4 transition-colors ${
-                        day.completed ? 'bg-green-50 border-green-200' : 'bg-white border-gray-200'
+                        day.completed 
+                          ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800' 
+                          : 'bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-600'
                       }`}
                     >
                       <div className='flex items-start justify-between mb-3'>
                         <div className='flex-1'>
                           <div className='flex items-center space-x-3 mb-2'>
-                            <span className='font-medium text-gray-900'>{day.day}曜日</span>
-                            <h4 className='text-lg font-semibold text-gray-900'>{day.subject}</h4>
+                            <span className='font-medium text-slate-900 dark:text-slate-100'>{day.day}曜日</span>
+                            <h4 className='text-lg font-semibold text-slate-900 dark:text-slate-100'>{day.subject}</h4>
                             <button
                               onClick={() => handleTaskComplete(weekIndex, dayIndex)}
                               className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
                                 day.completed
                                   ? 'bg-green-600 text-white'
-                                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                                  : 'bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-500'
                               }`}
                             >
                               {day.completed ? '完了' : '未完了'}
@@ -135,7 +137,7 @@ export default function WeeklyPlan({ studyData, setStudyData }: WeeklyPlanProps)
                         </div>
                       </div>
 
-                      <div className='text-sm text-gray-600'>
+                      <div className='text-sm text-slate-600 dark:text-slate-400'>
                         予定時間: {day.estimatedTime}分 | 実際の時間: {day.actualTime}分
                       </div>
                     </div>

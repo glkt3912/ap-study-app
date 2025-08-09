@@ -155,9 +155,9 @@ export default function TestRecord() {
 
   return (
     <div className='space-y-6'>
-      <div className='bg-white rounded-lg shadow'>
-        <div className='p-6 border-b border-gray-200'>
-          <h2 className='text-xl font-semibold text-gray-900'>問題演習記録</h2>
+      <div className='bg-white dark:bg-slate-800 rounded-lg shadow-md'>
+        <div className='p-6 border-b border-slate-200 dark:border-slate-700'>
+          <h2 className='text-xl font-semibold text-slate-900 dark:text-slate-100'>問題演習記録</h2>
           <p className='text-gray-600 mt-1'>午前・午後問題の演習結果を記録して弱点を把握しましょう</p>
         </div>
 
@@ -296,7 +296,7 @@ export default function TestRecord() {
               </form>
 
               <div className='space-y-4 mt-8'>
-                <h3 className='text-lg font-semibold text-gray-900'>演習履歴</h3>
+                <h3 className='text-lg font-semibold text-slate-900 dark:text-slate-100'>演習履歴</h3>
                 {morningTests.length === 0 ? (
                   <p className='text-gray-500 text-center py-8'>まだ演習記録がありません</p>
                 ) : (
@@ -305,11 +305,11 @@ export default function TestRecord() {
                       <div key={test.id} className='border rounded-lg p-4 bg-gray-50'>
                         <div className='flex items-start justify-between mb-2'>
                           <div>
-                            <h4 className='font-medium text-gray-900'>{test.category}</h4>
+                            <h4 className='font-medium text-slate-900 dark:text-slate-100'>{test.category}</h4>
                             <p className='text-sm text-gray-600'>{test.date}</p>
                           </div>
                           <div className='text-right'>
-                            <div className='text-sm font-medium text-gray-900'>
+                            <div className='text-sm font-medium text-slate-900 dark:text-slate-100'>
                               {test.correctAnswers}/{test.totalQuestions} (
                               {test.accuracy?.toFixed(1) ||
                                 ((test.correctAnswers / test.totalQuestions) * 100).toFixed(1)}
@@ -424,7 +424,7 @@ export default function TestRecord() {
               </form>
 
               <div className='space-y-4 mt-8'>
-                <h3 className='text-lg font-semibold text-gray-900'>演習履歴</h3>
+                <h3 className='text-lg font-semibold text-slate-900 dark:text-slate-100'>演習履歴</h3>
                 {afternoonTests.length === 0 ? (
                   <p className='text-gray-500 text-center py-8'>まだ演習記録がありません</p>
                 ) : (
@@ -433,11 +433,11 @@ export default function TestRecord() {
                       <div key={test.id} className='border rounded-lg p-4 bg-gray-50'>
                         <div className='flex items-start justify-between mb-2'>
                           <div>
-                            <h4 className='font-medium text-gray-900'>{test.category}</h4>
+                            <h4 className='font-medium text-slate-900 dark:text-slate-100'>{test.category}</h4>
                             <p className='text-sm text-gray-600'>{test.date}</p>
                           </div>
                           <div className='text-right'>
-                            <div className='text-sm font-medium text-gray-900'>{test.score}点</div>
+                            <div className='text-sm font-medium text-slate-900 dark:text-slate-100'>{test.score}点</div>
                             <div className='text-xs text-gray-500'>{test.timeSpent}分</div>
                           </div>
                         </div>

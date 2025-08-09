@@ -32,7 +32,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [mounted, setMounted] = useState(false);
 
   // トークン検証とユーザー情報取得
   const verifyToken = useCallback(async (token: string): Promise<boolean> => {
@@ -74,7 +73,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       setIsLoading(false);
-      setMounted(true);
     };
 
     initAuth();
@@ -168,11 +166,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     },
     [user]
   );
-
-  // Prevent hydration mismatch
-  if (!mounted) {
-    return <>{children}</>;
-  }
 
   const contextValue: AuthContextType = {
     user,

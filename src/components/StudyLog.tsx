@@ -207,9 +207,9 @@ export default function StudyLog() {
 
   return (
     <div className='space-y-6'>
-      <div className='bg-white rounded-lg shadow'>
-        <div className='p-6 border-b border-gray-200'>
-          <h2 className='text-xl font-semibold text-gray-900'>学習記録</h2>
+      <div className='bg-white dark:bg-slate-800 rounded-lg shadow-md'>
+        <div className='p-6 border-b border-slate-200 dark:border-slate-700'>
+          <h2 className='text-xl font-semibold text-slate-900 dark:text-slate-100'>学習記録</h2>
           <p className='text-gray-600 mt-1'>日々の学習内容を記録して進捗を管理しましょう</p>
         </div>
 
@@ -347,7 +347,7 @@ export default function StudyLog() {
 
           {/* フィルター・ソートコントロール */}
           <div className='bg-gray-50 rounded-lg p-4 mb-6'>
-            <h3 className='text-lg font-semibold text-gray-900 mb-4'>フィルター・ソート</h3>
+            <h3 className='text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4'>フィルター・ソート</h3>
             <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
               <div>
                 <label className='block text-sm font-medium text-gray-700 mb-1'>科目</label>
@@ -423,7 +423,7 @@ export default function StudyLog() {
           })()}
 
           <div className='space-y-4'>
-            <h3 className='text-lg font-semibold text-gray-900'>学習履歴</h3>
+            <h3 className='text-lg font-semibold text-slate-900 dark:text-slate-100'>学習履歴</h3>
             {(() => {
               const filteredLogs = getFilteredLogs();
               return filteredLogs.length === 0 ? (
@@ -436,11 +436,11 @@ export default function StudyLog() {
                     <div key={index} className='border rounded-lg p-4 bg-gray-50'>
                       <div className='flex items-start justify-between mb-2'>
                         <div>
-                          <h4 className='font-medium text-gray-900'>{log.subject}</h4>
+                          <h4 className='font-medium text-slate-900 dark:text-slate-100'>{log.subject}</h4>
                           <p className='text-sm text-gray-600'>{log.date}</p>
                         </div>
                         <div className='text-right'>
-                          <div className='text-sm font-medium text-gray-900'>{log.studyTime}分</div>
+                          <div className='text-sm font-medium text-slate-900 dark:text-slate-100'>{log.studyTime}分</div>
                           <div className='flex space-x-1'>
                             {[1, 2, 3, 4, 5].map(rating => (
                               <span

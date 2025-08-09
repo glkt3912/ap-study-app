@@ -111,7 +111,7 @@ export function LearningEfficiencyDashboard() {
 
   // 時間帯のグラフ用データ変換
   const hourlyChartData =
-    analysis?.hourlyEfficiency.map(h => ({
+    analysis?.hourlyEfficiency?.map(h => ({
       ...h,
       hour: `${h.hour}:00`,
       efficiencyScore: Math.round(h.efficiencyScore * 100) / 100,
@@ -119,7 +119,7 @@ export function LearningEfficiencyDashboard() {
 
   // 分野別効率のグラフ用データ変換
   const subjectChartData =
-    analysis?.subjectEfficiency.map(s => ({
+    analysis?.subjectEfficiency?.map(s => ({
       ...s,
       learningVelocity: Math.round(s.learningVelocity * 100) / 100,
       completionRate: Math.round(s.completionRate * 100),
@@ -176,11 +176,11 @@ export function LearningEfficiencyDashboard() {
           {/* 総合スコア */}
           <div className='bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg p-6'>
             <div className='text-center'>
-              <div className='text-4xl font-bold text-blue-600 dark:text-blue-400 mb-2'>{analysis.overallScore}</div>
+              <div className='text-4xl font-bold text-blue-600 dark:text-blue-400 mb-2'>{analysis?.overallScore || 0}</div>
               <div className='text-lg text-gray-700 dark:text-gray-300 mb-1'>総合学習効率スコア</div>
               <div className='text-sm text-gray-500 dark:text-gray-400'>
-                {new Date(analysis.timeRange.startDate).toLocaleDateString()} 〜{' '}
-                {new Date(analysis.timeRange.endDate).toLocaleDateString()}
+                {new Date(analysis?.timeRange?.startDate || new Date()).toLocaleDateString()} 〜{' '}
+                {new Date(analysis?.timeRange?.endDate || new Date()).toLocaleDateString()}
               </div>
             </div>
           </div>
@@ -189,7 +189,7 @@ export function LearningEfficiencyDashboard() {
           <div className='bg-gray-50 dark:bg-gray-700 rounded-lg p-6'>
             <h3 className='text-xl font-semibold text-gray-800 dark:text-white mb-4'>🎯 改善提案</h3>
             <div className='space-y-4'>
-              {analysis.recommendations.map((rec, index) => (
+              {analysis?.recommendations?.map((rec, index) => (
                 <div key={index} className={`border rounded-lg p-4 ${getPriorityColor(rec.priority)}`}>
                   <div className='flex items-start space-x-3'>
                     <span className='text-2xl'>{getTypeIcon(rec.type)}</span>
@@ -295,7 +295,7 @@ export function LearningEfficiencyDashboard() {
             <div className='bg-gray-50 dark:bg-gray-700 rounded-lg p-6'>
               <h3 className='text-lg font-semibold text-gray-800 dark:text-white mb-4'>分野別詳細</h3>
               <div className='space-y-3'>
-                {analysis.subjectEfficiency.map((subject, index) => (
+                {analysis?.subjectEfficiency?.map((subject, index) => (
                   <div key={index} className='bg-white dark:bg-gray-800 rounded p-3'>
                     <div className='font-medium text-gray-800 dark:text-gray-200 mb-2'>{subject.subject}</div>
                     <div className='grid grid-cols-2 gap-2 text-sm text-gray-600 dark:text-gray-300'>
@@ -313,11 +313,11 @@ export function LearningEfficiencyDashboard() {
             <div className='bg-gray-50 dark:bg-gray-700 rounded-lg p-6'>
               <h3 className='text-lg font-semibold text-gray-800 dark:text-white mb-4'>最適時間帯TOP5</h3>
               <div className='space-y-3'>
-                {analysis.hourlyEfficiency
-                  .filter(h => h.efficiencyScore > 0)
-                  .sort((a, b) => b.efficiencyScore - a.efficiencyScore)
-                  .slice(0, 5)
-                  .map((hour, index) => (
+                {analysis?.hourlyEfficiency
+                  ?.filter(h => h.efficiencyScore > 0)
+                  ?.sort((a, b) => b.efficiencyScore - a.efficiencyScore)
+                  ?.slice(0, 5)
+                  ?.map((hour, index) => (
                     <div key={index} className='bg-white dark:bg-gray-800 rounded p-3'>
                       <div className='flex items-center justify-between'>
                         <span className='font-medium text-gray-800 dark:text-gray-200'>

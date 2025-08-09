@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Dashboard from '@/components/Dashboard';
 import WeeklyPlan from '@/components/WeeklyPlan';
 import StudyLog from '@/components/StudyLog';
@@ -20,34 +20,27 @@ import { errorHandler } from '@/lib/error-handler';
 
 export default function ClientHome() {
   const { isAuthenticated, user, isLoading: authLoading, logout } = useAuth();
+  // const { theme } = useTheme(); // テーマは現在未使用
   const [activeTab, setActiveTab] = useState('dashboard');
   const [studyData, setStudyData] = useState(studyPlanData);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  const [mounted, setMounted] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
 
-  // ダークモード初期化
-  useEffect(() => {
-    setMounted(true);
-    if (typeof window !== 'undefined') {
-      const savedTheme = localStorage.getItem('ap-study-theme');
-      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const shouldBeDark = savedTheme ? savedTheme === 'dark' : systemPrefersDark;
+  // タブ定義（メモ化で最適化）
+  const tabs = useMemo(() => [
+    { id: 'dashboard', name: 'ダッシュボード', icon: '📊' },
+    { id: 'plan', name: '学習計画', icon: '📅' },
+    { id: 'log', name: '学習記録', icon: '✏️' },
+    { id: 'test', name: '問題演習', icon: '📝' },
+    { id: 'quiz', name: 'Quiz', icon: '🧭' },
+    { id: 'analysis', name: '分析', icon: '📈' },
+    { id: 'advanced', name: '高度分析', icon: '🎯' },
+    { id: 'review', name: '復習システム', icon: '🔄' },
+    { id: 'export', name: 'エクスポート', icon: '💾' },
+    { id: 'debug', name: '診断', icon: '🧪' },
+  ], []);
 
-      setIsDarkMode(shouldBeDark);
-      document.documentElement.classList.toggle('dark', shouldBeDark);
-    }
-  }, []);
-
-  const toggleDarkMode = () => {
-    if (!mounted || typeof window === 'undefined') return;
-    const newMode = !isDarkMode;
-    setIsDarkMode(newMode);
-    document.documentElement.classList.toggle('dark', newMode);
-    localStorage.setItem('ap-study-theme', newMode ? 'dark' : 'light');
-  };
 
   // バックエンドからデータを取得
   useEffect(() => {
@@ -97,19 +90,6 @@ export default function ClientHome() {
     fetchStudyData();
   }, [user?.id]);
 
-  const tabs = [
-    { id: 'dashboard', name: 'ダッシュボード', icon: '📊' },
-    { id: 'plan', name: '学習計画', icon: '📅' },
-    { id: 'log', name: '学習記録', icon: '✏️' },
-    { id: 'test', name: '問題演習', icon: '📝' },
-    { id: 'quiz', name: 'Quiz', icon: '🧭' },
-    { id: 'analysis', name: '分析', icon: '📈' },
-    { id: 'advanced', name: '高度分析', icon: '🎯' },
-    { id: 'review', name: '復習システム', icon: '🔄' },
-    { id: 'export', name: 'エクスポート', icon: '💾' },
-    { id: 'debug', name: '診断', icon: '🧪' },
-  ];
-
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard':
@@ -138,15 +118,15 @@ export default function ClientHome() {
   };
 
   return (
-    <div className='min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200'>
-      <header className='bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700'>
+    <div className='min-h-screen bg-slate-100 dark:bg-slate-900 transition-colors duration-200'>
+      <header className='bg-white dark:bg-slate-800 shadow-sm border-b border-slate-200 dark:border-slate-700'>
         <div className='max-w-6xl mx-auto px-4 py-3 sm:py-4'>
           <div className='flex justify-between items-center'>
             <div>
-              <h1 className='text-xl sm:text-2xl font-bold text-gray-900 dark:text-white'>
+              <h1 className='text-xl sm:text-2xl font-bold text-slate-900 dark:text-slate-100'>
                 応用情報技術者試験 学習管理
               </h1>
-              <p className='text-sm sm:text-base text-gray-600 dark:text-gray-300 mt-1'>
+              <p className='text-sm sm:text-base text-slate-600 dark:text-slate-400 mt-1'>
                 試験まで残り: <span className='font-semibold text-blue-600 dark:text-blue-400'>約12週間</span>
               </p>
             </div>
@@ -154,10 +134,10 @@ export default function ClientHome() {
               {/* 認証状態表示・ログインボタン */}
               {isAuthenticated && user ? (
                 <div className='flex items-center space-x-3'>
-                  <span className='text-sm text-gray-600 dark:text-gray-300'>{user.name || user.email}</span>
+                  <span className='text-sm text-slate-600 dark:text-slate-400'>{user.name || user.email}</span>
                   <button
                     onClick={logout}
-                    className='text-sm px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors'
+                    className='text-sm px-3 py-1 border border-slate-300 dark:border-slate-600 rounded-md hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100 transition-colors'
                   >
                     ログアウト
                   </button>
@@ -172,42 +152,39 @@ export default function ClientHome() {
                 </button>
               )}
 
-              {mounted ? (
-                <button
-                  onClick={toggleDarkMode}
-                  className='p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors'
-                  aria-label='テーマ切り替え'
-                >
-                  <span className='text-xl'>{isDarkMode ? '☀️' : '🌙'}</span>
-                </button>
-              ) : (
-                <div className='p-2 rounded-lg bg-gray-100'>
-                  <span className='text-xl'>🌙</span>
-                </div>
-              )}
             </div>
           </div>
         </div>
       </header>
 
-      <nav className='bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700'>
-        <div className='max-w-6xl mx-auto'>
-          <div className='flex overflow-x-auto scrollbar-hide px-4'>
-            {tabs.map(tab => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex-shrink-0 py-4 px-3 sm:px-4 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
-                  activeTab === tab.id
-                    ? 'border-blue-500 text-blue-600 dark:border-blue-400 dark:text-blue-400'
-                    : 'border-transparent text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-white hover:border-gray-300 dark:hover:border-gray-600'
-                }`}
-              >
-                <span className='mr-1 sm:mr-2'>{tab.icon}</span>
-                <span className='hidden sm:inline'>{tab.name}</span>
-                <span className='sm:hidden text-xs'>{tab.name.slice(0, 2)}</span>
-              </button>
-            ))}
+      <nav className='bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700'>
+        <div className='max-w-6xl mx-auto relative'>
+          {/* スクロール可能なタブナビゲーション */}
+          <div className='overflow-x-auto scrollbar-modern relative'>
+            <div className='flex min-w-max px-2'>
+              {tabs.map(tab => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex-shrink-0 py-4 px-4 lg:px-6 border-b-2 font-medium text-sm transition-all duration-200 whitespace-nowrap relative ${
+                    activeTab === tab.id
+                      ? 'border-blue-500 text-blue-600 dark:border-blue-400 dark:text-blue-400 shadow-sm'
+                      : 'border-transparent text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-white hover:border-gray-300 dark:hover:border-gray-600 hover:bg-slate-50 dark:hover:bg-slate-700/50'
+                  }`}
+                >
+                  <span className='mr-2'>{tab.icon}</span>
+                  {tab.name}
+                  {activeTab === tab.id && (
+                    <div className='absolute inset-0 bg-gradient-to-r from-blue-50/50 to-blue-100/50 dark:from-blue-900/20 dark:to-blue-800/20 rounded-t-lg -z-10' />
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* スクロールヒント - 小画面のみ表示 */}
+          <div className='md:hidden bg-slate-50/80 dark:bg-slate-700/30 px-4 py-1 text-xs text-center text-gray-500 dark:text-gray-400 backdrop-blur-sm'>
+            ← スワイプでスクロール →
           </div>
         </div>
       </nav>
