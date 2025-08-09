@@ -471,11 +471,7 @@ class ApiClient {
     return this.request<any[]>(`/api/quiz/weak-points${params}`);
   }
 
-  async getRecommendedQuestions(limit?: number): Promise<{
-    reason: string;
-    weakCategories?: string[];
-    questions: Question[];
-  }> {
+  async getRecommendedQuestions(limit?: number): Promise<RecommendedQuestionsResponse> {
     const params = limit ? `?limit=${limit}` : '';
     return this.request(`/api/quiz/recommendations${params}`);
   }
@@ -765,12 +761,24 @@ class ApiClient {
       return {
         studyPlan: studyPlan.status === 'fulfilled' ? studyPlan.value : [],
         studyLogs: studyLogs.status === 'fulfilled' ? studyLogs.value : [],
+        testResults: { morningTests: [], afternoonTests: [] },
+        analysisResults: [],
+        recommendations: {} as PersonalizedRecommendations,
+        systemMetrics: {} as SystemMetrics,
+        lastUpdated: new Date().toISOString(),
+        cacheStatus: 'fresh' as const,
         success: true
       } as BatchStudyDataResponse;
     } catch (error) {
       return {
         studyPlan: [],
         studyLogs: [],
+        testResults: { morningTests: [], afternoonTests: [] },
+        analysisResults: [],
+        recommendations: {} as PersonalizedRecommendations,
+        systemMetrics: {} as SystemMetrics,
+        lastUpdated: new Date().toISOString(),
+        cacheStatus: 'expired' as const,
         success: false
       } as BatchStudyDataResponse;
     }
@@ -792,7 +800,7 @@ class ApiClient {
       // 個別エンドポイントから必要なデータを取得
       const [studyLogs, performanceMetrics] = await Promise.allSettled([
         this.getStudyLogs(),
-        userId ? this.getPerformanceMetrics(userId.toString()) : Promise.resolve(null)
+        userId ? this.getPerformanceMetrics(userId) : Promise.resolve(null)
       ]);
 
       return {
@@ -830,13 +838,13 @@ class ApiClient {
     try {
       // 利用可能な個別エンドポイントからデータを取得
       const recommendations = userId 
-        ? await this.getRecommendedQuestions({ count: 10 }).catch(() => null)
+        ? await this.getRecommendedQuestions(10).catch(() => null)
         : null;
 
       return {
         categories: [],
         progress: null,
-        recommendations,
+        recommendations: recommendations as RecommendedQuestionsResponse | null,
         weakPoints: [],
         learningTrends: null
       };
@@ -945,6 +953,7 @@ export interface RecommendedQuestionsResponse {
 }
 
 export interface BatchStudyDataResponse {
+  studyPlan: StudyWeek[];
   studyLogs: StudyLog[];
   testResults: {
     morningTests: MorningTest[];
@@ -955,6 +964,7 @@ export interface BatchStudyDataResponse {
   systemMetrics: SystemMetrics;
   lastUpdated: string;
   cacheStatus: 'fresh' | 'stale' | 'expired';
+  success: boolean;
 }
 
 export interface SystemMetrics {
