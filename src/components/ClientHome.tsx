@@ -13,41 +13,27 @@ import { AdvancedAnalysis } from '@/components/AdvancedAnalysis';
 import { ReviewSystem } from '@/components/ReviewSystem';
 import { AuthModal } from '@/components/auth';
 import { ErrorToastManager } from '@/components/ErrorToast';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTheme } from '@/contexts/ThemeContext';
 import { studyPlanData } from '@/data/studyPlan';
 import { apiClient } from '@/lib/api';
 import { errorHandler } from '@/lib/error-handler';
 
 export default function ClientHome() {
   const { isAuthenticated, user, isLoading: authLoading, logout } = useAuth();
+  const { theme } = useTheme();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [studyData, setStudyData] = useState(studyPlanData);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isDarkMode, setIsDarkMode] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
 
-  // ダークモード初期化
+  // コンポーネントマウント確認
   useEffect(() => {
     setMounted(true);
-    if (typeof window !== 'undefined') {
-      const savedTheme = localStorage.getItem('ap-study-theme');
-      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const shouldBeDark = savedTheme ? savedTheme === 'dark' : systemPrefersDark;
-
-      setIsDarkMode(shouldBeDark);
-      document.documentElement.classList.toggle('dark', shouldBeDark);
-    }
   }, []);
-
-  const toggleDarkMode = () => {
-    if (!mounted || typeof window === 'undefined') return;
-    const newMode = !isDarkMode;
-    setIsDarkMode(newMode);
-    document.documentElement.classList.toggle('dark', newMode);
-    localStorage.setItem('ap-study-theme', newMode ? 'dark' : 'light');
-  };
 
   // バックエンドからデータを取得
   useEffect(() => {
@@ -138,15 +124,15 @@ export default function ClientHome() {
   };
 
   return (
-    <div className='min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200'>
-      <header className='bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700'>
+    <div className='min-h-screen bg-slate-100 dark:bg-slate-900 transition-colors duration-200'>
+      <header className='bg-white dark:bg-slate-800 shadow-sm border-b border-slate-200 dark:border-slate-700'>
         <div className='max-w-6xl mx-auto px-4 py-3 sm:py-4'>
           <div className='flex justify-between items-center'>
             <div>
-              <h1 className='text-xl sm:text-2xl font-bold text-gray-900 dark:text-white'>
+              <h1 className='text-xl sm:text-2xl font-bold text-slate-900 dark:text-slate-100'>
                 応用情報技術者試験 学習管理
               </h1>
-              <p className='text-sm sm:text-base text-gray-600 dark:text-gray-300 mt-1'>
+              <p className='text-sm sm:text-base text-slate-600 dark:text-slate-400 mt-1'>
                 試験まで残り: <span className='font-semibold text-blue-600 dark:text-blue-400'>約12週間</span>
               </p>
             </div>
@@ -154,10 +140,10 @@ export default function ClientHome() {
               {/* 認証状態表示・ログインボタン */}
               {isAuthenticated && user ? (
                 <div className='flex items-center space-x-3'>
-                  <span className='text-sm text-gray-600 dark:text-gray-300'>{user.name || user.email}</span>
+                  <span className='text-sm text-slate-600 dark:text-slate-400'>{user.name || user.email}</span>
                   <button
                     onClick={logout}
-                    className='text-sm px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors'
+                    className='text-sm px-3 py-1 border border-slate-300 dark:border-slate-600 rounded-md hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100 transition-colors'
                   >
                     ログアウト
                   </button>
@@ -172,26 +158,19 @@ export default function ClientHome() {
                 </button>
               )}
 
-              {mounted ? (
-                <button
-                  onClick={toggleDarkMode}
-                  className='p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors'
-                  aria-label='テーマ切り替え'
-                >
-                  <span className='text-xl'>{isDarkMode ? '☀️' : '🌙'}</span>
-                </button>
-              ) : (
-                <div className='p-2 rounded-lg bg-gray-100'>
-                  <span className='text-xl'>🌙</span>
-                </div>
-              )}
+              {mounted && <ThemeToggle />}
             </div>
           </div>
         </div>
       </header>
 
-      <nav className='bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700'>
-        <div className='max-w-6xl mx-auto'>
+      <nav className='bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700'>
+        <div className='max-w-6xl mx-auto relative'>
+          {/* スクロールインジケーター */}
+          <div className='absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white dark:from-slate-800 to-transparent pointer-events-none flex items-center justify-end pr-2 sm:hidden z-10'>
+            <span className='text-gray-400 dark:text-gray-500 text-sm'>→</span>
+          </div>
+          
           <div className='flex overflow-x-auto scrollbar-hide px-4'>
             {tabs.map(tab => (
               <button

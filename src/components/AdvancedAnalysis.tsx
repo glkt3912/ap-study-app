@@ -300,7 +300,7 @@ export function AdvancedAnalysis() {
                         label={({ category, proportion }) => `${category}: ${Math.round(proportion)}%`}
                         labelLine={false}
                       >
-                        {performanceMetrics.categoryBalance.map((entry, index) => (
+                        {performanceMetrics?.categoryBalance?.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={`hsl(${index * 45}, 70%, 60%)`} />
                         ))}
                       </Pie>
@@ -312,7 +312,7 @@ export function AdvancedAnalysis() {
 
               {/* バー表示 */}
               <div className='space-y-2'>
-                {performanceMetrics.categoryBalance.map((category, index) => (
+                {performanceMetrics?.categoryBalance?.map((category, index) => (
                   <div key={index} className='flex items-center justify-between'>
                     <span className='text-sm font-medium text-gray-800 dark:text-gray-200'>{category.category}</span>
                     <div className='flex items-center space-x-2'>
@@ -462,7 +462,7 @@ export function AdvancedAnalysis() {
               <div className='bg-gray-50 dark:bg-gray-700 rounded-lg p-4'>
                 <h3 className='font-semibold text-lg mb-3 text-gray-800 dark:text-white'>カテゴリ別準備度</h3>
                 <div className='space-y-2'>
-                  {examReadiness.categoryReadiness.map((category, index) => (
+                  {examReadiness?.categoryReadiness?.map((category, index) => (
                     <div key={index} className='flex items-center justify-between'>
                       <span className='text-sm font-medium text-gray-800 dark:text-gray-200'>{category.category}</span>
                       <div className='flex items-center space-x-2'>
@@ -482,7 +482,7 @@ export function AdvancedAnalysis() {
               <div className='bg-gray-50 dark:bg-gray-700 rounded-lg p-4'>
                 <h3 className='font-semibold text-lg mb-3 text-gray-800 dark:text-white'>学習推奨</h3>
                 <div className='space-y-2'>
-                  {examReadiness.studyRecommendations.map((rec, index) => (
+                  {examReadiness?.studyRecommendations?.map((rec, index) => (
                     <div key={index} className='flex items-start space-x-2'>
                       <span
                         className={`inline-block w-2 h-2 rounded-full mt-2 ${
@@ -531,7 +531,7 @@ export function AdvancedAnalysis() {
           <div className='bg-gray-50 dark:bg-gray-700 rounded-lg p-4'>
             <h3 className='font-semibold text-lg mb-3 text-gray-800 dark:text-white'>時間帯別パフォーマンス</h3>
             <div className='space-y-2'>
-              {learningPattern.timePattern.map((time, index) => (
+              {learningPattern?.timePattern?.map((time, index) => (
                 <div key={index} className='flex items-center justify-between'>
                   <span className='text-sm font-medium text-gray-800 dark:text-gray-200'>{time.study_hour}時台</span>
                   <div className='flex items-center space-x-4'>
@@ -545,7 +545,11 @@ export function AdvancedAnalysis() {
                     </div>
                   </div>
                 </div>
-              ))}
+              )) || (
+                <p className='text-sm text-gray-500 dark:text-gray-400'>
+                  学習データが蓄積されると、時間帯別のパフォーマンス分析が表示されます。
+                </p>
+              )}
             </div>
           </div>
 
@@ -553,7 +557,7 @@ export function AdvancedAnalysis() {
           <div className='bg-gray-50 dark:bg-gray-700 rounded-lg p-4'>
             <h3 className='font-semibold text-lg mb-3 text-gray-800 dark:text-white'>曜日別パフォーマンス</h3>
             <div className='space-y-2'>
-              {learningPattern.frequencyPattern.map((day, index) => (
+              {learningPattern?.frequencyPattern?.map((day, index) => (
                 <div key={index} className='flex items-center justify-between'>
                   <span className='text-sm font-medium text-gray-800 dark:text-gray-200'>
                     {dayNames[day.day_of_week]}曜日
@@ -569,7 +573,11 @@ export function AdvancedAnalysis() {
                     </div>
                   </div>
                 </div>
-              ))}
+              )) || (
+                <p className='text-sm text-gray-500 dark:text-gray-400'>
+                  学習データが蓄積されると、曜日別のパフォーマンス分析が表示されます。
+                </p>
+              )}
             </div>
           </div>
         </div>

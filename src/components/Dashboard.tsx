@@ -23,9 +23,13 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
 
   // フォールバック: 個別AI分析データ取得 (バックエンド未対応時)
   const fetchAIDataFallback = useCallback(async () => {
-    if (!user?.id) return;
+    if (!user?.id || user.id <= 0) {
+      console.log('[DEBUG] fetchAIDataFallback: 無効なユーザーID、AI分析をスキップ');
+      return;
+    }
 
     try {
+      console.log(`[DEBUG] fetchAIDataFallback: user.id = ${user.id}`);
       const [predictions, recommendations] = await Promise.all([
         apiClient.getPredictiveAnalysis(user.id).catch(() => null),
         apiClient.getPersonalizedRecommendations(user.id).catch(() => null),
@@ -44,10 +48,14 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
 
   // バッチ処理: ダッシュボードML分析データ一括取得 (2個API → 1個API)
   const fetchBatchDashboardMLData = useCallback(async () => {
-    if (!user?.id) return;
+    if (!user?.id || user.id <= 0) {
+      console.log('[DEBUG] fetchBatchDashboardMLData: 無効なユーザーID、バッチML分析をスキップ');
+      return;
+    }
 
     try {
       setIsLoadingAI(true);
+      console.log(`[DEBUG] fetchBatchDashboardMLData: user.id = ${user.id}`);
       const batchData = await apiClient.getBatchDashboardMLData(user.id);
 
       setPredictiveAnalysis(batchData.predictiveAnalysis);
@@ -112,14 +120,14 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
   return (
     <div className='space-y-6'>
       <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6'>
-        <div className='bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6'>
+        <div className='bg-white dark:bg-slate-800 rounded-lg shadow-md p-4 sm:p-6'>
           <div className='flex items-center'>
             <div className='p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex-shrink-0'>
               <span className='text-xl sm:text-2xl'>📚</span>
             </div>
             <div className='ml-3 sm:ml-4 min-w-0'>
-              <p className='text-sm font-medium text-gray-600 dark:text-gray-300 truncate'>学習進捗</p>
-              <p className='text-xl sm:text-2xl font-bold text-gray-900 dark:text-white'>
+              <p className='text-sm font-medium text-slate-600 dark:text-slate-400 truncate'>学習進捗</p>
+              <p className='text-xl sm:text-2xl font-bold text-slate-900 dark:text-slate-100'>
                 {progressPercentage.toFixed(1)}%
               </p>
               <p className='text-xs text-gray-500 dark:text-gray-400'>
@@ -129,14 +137,14 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
           </div>
         </div>
 
-        <div className='bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6'>
+        <div className='bg-white dark:bg-slate-800 rounded-lg shadow-md p-4 sm:p-6'>
           <div className='flex items-center'>
             <div className='p-2 bg-green-100 dark:bg-green-900/30 rounded-lg flex-shrink-0'>
               <span className='text-xl sm:text-2xl'>⏱️</span>
             </div>
             <div className='ml-3 sm:ml-4 min-w-0'>
-              <p className='text-sm font-medium text-gray-600 dark:text-gray-300 truncate'>総学習時間</p>
-              <p className='text-xl sm:text-2xl font-bold text-gray-900 dark:text-white'>
+              <p className='text-sm font-medium text-slate-600 dark:text-slate-400 truncate'>総学習時間</p>
+              <p className='text-xl sm:text-2xl font-bold text-slate-900 dark:text-slate-100'>
                 {Math.floor(totalStudyTime / 60)}h
               </p>
               <p className='text-xs text-gray-500 dark:text-gray-400'>{totalStudyTime % 60}分</p>
@@ -144,14 +152,14 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
           </div>
         </div>
 
-        <div className='bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6'>
+        <div className='bg-white dark:bg-slate-800 rounded-lg shadow-md p-4 sm:p-6'>
           <div className='flex items-center'>
             <div className='p-2 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex-shrink-0'>
               <span className='text-xl sm:text-2xl'>🎯</span>
             </div>
             <div className='ml-3 sm:ml-4 min-w-0'>
-              <p className='text-sm font-medium text-gray-600 dark:text-gray-300 truncate'>平均理解度</p>
-              <p className='text-xl sm:text-2xl font-bold text-gray-900 dark:text-white'>
+              <p className='text-sm font-medium text-slate-600 dark:text-slate-400 truncate'>平均理解度</p>
+              <p className='text-xl sm:text-2xl font-bold text-slate-900 dark:text-slate-100'>
                 {averageUnderstanding.toFixed(1)}
               </p>
               <p className='text-xs text-gray-500 dark:text-gray-400'>/ 5.0</p>
@@ -159,14 +167,14 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
           </div>
         </div>
 
-        <div className='bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6'>
+        <div className='bg-white dark:bg-slate-800 rounded-lg shadow-md p-4 sm:p-6'>
           <div className='flex items-center'>
             <div className='p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex-shrink-0'>
               <span className='text-xl sm:text-2xl'>📅</span>
             </div>
             <div className='ml-3 sm:ml-4 min-w-0'>
-              <p className='text-sm font-medium text-gray-600 dark:text-gray-300 truncate'>現在の週</p>
-              <p className='text-xl sm:text-2xl font-bold text-gray-900 dark:text-white'>
+              <p className='text-sm font-medium text-slate-600 dark:text-slate-400 truncate'>現在の週</p>
+              <p className='text-xl sm:text-2xl font-bold text-slate-900 dark:text-slate-100'>
                 第{currentWeek?.weekNumber}週
               </p>
               <p className='text-xs text-gray-500 dark:text-gray-400 truncate'>{currentWeek?.title}</p>
@@ -179,7 +187,7 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
           🤖 AI学習コーチ (新機能)
           ======================================== */}
       {user?.id && predictiveAnalysis && (
-        <div className='bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 rounded-lg shadow p-6'>
+        <div className='bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 rounded-lg shadow-md p-6'>
           <div className='flex items-center justify-between mb-4'>
             <div className='flex items-center space-x-2'>
               <span className='text-2xl'>🤖</span>
@@ -217,13 +225,13 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
                 <h4 className='font-semibold text-gray-900 dark:text-white'>注意点</h4>
               </div>
               <div className='space-y-1'>
-                {predictiveAnalysis.riskFactors.slice(0, 2).map((factor, index) => (
-                  <div
+                {(predictiveAnalysis?.riskFactors || []).slice(0, 2).map((factor, index) => (
+                  <span
                     key={index}
-                    className='text-xs text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 px-2 py-1 rounded'
+                    className='inline-block text-xs text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 px-2 py-1 rounded'
                   >
                     {factor}
-                  </div>
+                  </span>
                 ))}
               </div>
             </div>
@@ -234,7 +242,7 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
                 <h4 className='font-semibold text-gray-900 dark:text-white'>強み</h4>
               </div>
               <div className='space-y-1'>
-                {predictiveAnalysis.successFactors.slice(0, 2).map((factor, index) => (
+                {(predictiveAnalysis?.successFactors || []).slice(0, 2).map((factor, index) => (
                   <div
                     key={index}
                     className='text-xs text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 px-2 py-1 rounded'
@@ -247,13 +255,15 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
           </div>
 
           {/* 今日の推奨アクション */}
-          {personalizedRecommendations && personalizedRecommendations.dailyStudyPlan.length > 0 && (
+          {personalizedRecommendations && 
+            personalizedRecommendations.dailyStudyPlan && 
+            personalizedRecommendations.dailyStudyPlan.length > 0 && (
             <div className='mt-4 bg-white dark:bg-gray-700 rounded-lg p-4'>
               <div className='flex items-center space-x-2 mb-3'>
                 <span className='text-lg'>📋</span>
                 <h4 className='font-semibold text-gray-900 dark:text-white'>今日の推奨アクション</h4>
               </div>
-              {personalizedRecommendations.dailyStudyPlan.slice(0, 1).map((plan, index) => (
+              {(personalizedRecommendations?.dailyStudyPlan || []).slice(0, 1).map((plan, index) => (
                 <div key={index} className='space-y-2'>
                   <div className='flex justify-between items-center'>
                     <span className='text-sm font-medium text-gray-900 dark:text-white'>
@@ -272,7 +282,7 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
                     </span>
                   </div>
                   <div className='text-xs text-gray-600 dark:text-gray-300'>
-                    目標時間: {plan.estimatedTime}分 | 学習目標: {plan.objectives.slice(0, 2).join(', ')}
+                    目標時間: {plan.estimatedTime}分 | 学習目標: {(plan.objectives || []).slice(0, 2).join(', ')}
                   </div>
                 </div>
               ))}
@@ -289,7 +299,7 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
       )}
 
       <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
-        <div className='bg-white dark:bg-gray-800 rounded-lg shadow'>
+        <div className='bg-white dark:bg-gray-800 rounded-lg shadow-md'>
           <div className='p-6 border-b border-gray-200 dark:border-gray-700'>
             <h3 className='text-lg font-semibold text-gray-900 dark:text-white'>今日の学習</h3>
           </div>
@@ -330,7 +340,7 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
           </div>
         </div>
 
-        <div className='bg-white dark:bg-gray-800 rounded-lg shadow'>
+        <div className='bg-white dark:bg-gray-800 rounded-lg shadow-md'>
           <div className='p-6 border-b border-gray-200 dark:border-gray-700'>
             <h3 className='text-lg font-semibold text-gray-900 dark:text-white'>週別進捗</h3>
           </div>
@@ -360,7 +370,7 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
         </div>
       </div>
 
-      <div className='bg-white dark:bg-gray-800 rounded-lg shadow'>
+      <div className='bg-white dark:bg-gray-800 rounded-lg shadow-md'>
         <div className='p-6 border-b border-gray-200 dark:border-gray-700'>
           <h3 className='text-lg font-semibold text-gray-900 dark:text-white'>学習フェーズ別進捗</h3>
         </div>

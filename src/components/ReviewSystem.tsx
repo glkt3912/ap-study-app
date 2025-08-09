@@ -96,9 +96,9 @@ export function ReviewSystem() {
   };
 
   return (
-    <div className='bg-white rounded-lg shadow-md p-4 sm:p-6'>
+    <div className='bg-white dark:bg-slate-800 rounded-lg shadow-md p-4 sm:p-6'>
       <div className='flex flex-col sm:flex-row sm:items-center justify-between mb-6 space-y-3 sm:space-y-0'>
-        <h2 className='text-xl sm:text-2xl font-bold text-gray-800'>復習システム</h2>
+        <h2 className='text-xl sm:text-2xl font-bold text-slate-900 dark:text-slate-100'>復習システム</h2>
         <button
           onClick={generateReviewSchedule}
           disabled={loading}
@@ -122,8 +122,8 @@ export function ReviewSystem() {
         <div className='bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6'>
           <h3 className='text-lg font-semibold mb-4'>復習中: {activeReview.category}</h3>
 
-          <div className='bg-white rounded-lg p-4 mb-4'>
-            <p className='text-gray-800 mb-4'>{activeReview.question_text}</p>
+          <div className='bg-white dark:bg-slate-700 rounded-lg p-4 mb-4'>
+            <p className='text-slate-900 dark:text-slate-100 mb-4'>{activeReview.question_text}</p>
 
             <div className='flex items-center space-x-4 mb-4'>
               <span className={`px-2 py-1 rounded text-xs ${getDifficultyColor(activeReview.difficulty)}`}>
@@ -186,7 +186,7 @@ export function ReviewSystem() {
               {todayReviews.map(item => (
                 <div key={item.id} className='border border-gray-200 rounded-lg p-3 sm:p-4'>
                   <div className='flex flex-col sm:flex-row sm:items-center justify-between mb-2 space-y-2 sm:space-y-0'>
-                    <h4 className='font-medium text-gray-800 text-sm sm:text-base'>{item.category}</h4>
+                    <h4 className='font-medium text-slate-900 dark:text-slate-100 text-sm sm:text-base'>{item.category}</h4>
                     <div className='flex items-center space-x-2'>
                       <span className={`px-2 py-1 rounded text-xs ${getDifficultyColor(item.difficulty)}`}>
                         {item.difficulty}
