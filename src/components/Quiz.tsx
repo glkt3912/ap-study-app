@@ -251,7 +251,7 @@ export default function Quiz() {
       <div className='max-w-4xl mx-auto p-6'>
         <div className='bg-white dark:bg-slate-800 rounded-lg shadow-lg p-8'>
           <div className='text-center'>
-            <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto'></div>
+            <div className='loading-spinner-lg mx-auto'></div>
             <p className='mt-4 text-gray-600 dark:text-gray-300'>読み込み中...</p>
           </div>
         </div>
@@ -269,7 +269,7 @@ export default function Quiz() {
             <p className='text-slate-600 dark:text-slate-400 mb-6'>{state.error}</p>
             <button
               onClick={() => setState(prev => ({ ...prev, error: null }))}
-              className='bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors'
+              className='btn-primary btn-large'
             >
               戻る
             </button>
@@ -315,7 +315,7 @@ export default function Quiz() {
             <div className='flex gap-4 justify-center'>
               <button
                 onClick={endQuiz}
-                className='bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors'
+                className='btn-primary btn-large'
               >
                 新しいQuizを開始
               </button>
@@ -362,13 +362,13 @@ export default function Quiz() {
           {/* 問題情報 */}
           <div className='mb-6'>
             <div className='flex flex-wrap gap-2 mb-4'>
-              <span className='bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm'>{currentQuestion.category}</span>
+              <span className='badge-info'>{currentQuestion.category}</span>
               {currentQuestion.subcategory && (
                 <span className='bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-1 rounded text-sm'>
                   {currentQuestion.subcategory}
                 </span>
               )}
-              <span className='bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-sm'>
+              <span className='badge-warning'>
                 難易度 {currentQuestion.difficulty}
               </span>
             </div>
@@ -377,7 +377,7 @@ export default function Quiz() {
           {/* 問題文 */}
           <div className='mb-8'>
             <h3 className='text-xl font-semibold text-slate-900 dark:text-slate-100 mb-4'>問題 {currentQuestion.number}</h3>
-            <p className='text-gray-700 leading-relaxed whitespace-pre-wrap'>{currentQuestion.question}</p>
+            <p className='text-gray-700 dark:text-gray-200 leading-relaxed whitespace-pre-wrap'>{currentQuestion.question}</p>
           </div>
 
           {/* 選択肢 */}
@@ -436,13 +436,13 @@ export default function Quiz() {
             <div className='space-y-3'>
               <button
                 onClick={() => startQuiz('random', 5)}
-                className='w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors'
+                className='w-full btn-primary'
               >
                 5問チャレンジ
               </button>
               <button
                 onClick={() => startQuiz('random', 10)}
-                className='w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors'
+                className='w-full btn-primary'
               >
                 10問チャレンジ
               </button>
@@ -600,7 +600,7 @@ export default function Quiz() {
                     startQuiz('weak_points', Math.min(state.recommendations.questions.length, 10));
                   }
                 }}
-                className='w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors'
+                className='w-full btn-success'
               >
                 推奨問題で学習開始 ({Math.min(state.recommendations.questions.length, 10)}問)
               </button>
@@ -709,7 +709,7 @@ export default function Quiz() {
             </>
           ) : (
             <div className='bg-gray-50 rounded-lg p-6 text-center'>
-              <p className='text-gray-600'>学習データが不足しています。問題演習を行うとトレンドが表示されます。</p>
+              <p className='text-gray-600 dark:text-gray-300'>学習データが不足しています。問題演習を行うとトレンドが表示されます。</p>
             </div>
           )}
         </div>

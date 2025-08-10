@@ -160,12 +160,12 @@ export default function DataExport({ studyData }: DataExportProps) {
   const stats = generateStats();
 
   return (
-    <div className='bg-white dark:bg-gray-800 rounded-lg shadow p-6'>
+    <div className='card-primary p-6'>
       <h2 className='text-2xl font-bold text-gray-900 dark:text-white mb-6'>📊 データエクスポート</h2>
 
       {/* 学習統計表示 */}
       <div className='grid grid-cols-2 md:grid-cols-4 gap-4 mb-8'>
-        <div className='bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg'>
+        <div className='stats-card bg-blue-50 dark:bg-blue-900/20'>
           <div className='text-2xl font-bold text-blue-600 dark:text-blue-400'>
             {stats.completedDays}/{stats.totalDays}
           </div>

@@ -78,7 +78,7 @@ export function ReviewSystem() {
       case 'hard':
         return 'text-red-600 bg-red-100';
       default:
-        return 'text-gray-600 bg-gray-100';
+        return 'text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700';
     }
   };
 
@@ -112,8 +112,8 @@ export function ReviewSystem() {
 
       {loading && (
         <div className='flex justify-center items-center py-8'>
-          <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500'></div>
-          <span className='ml-2 text-gray-600'>読み込み中...</span>
+          <div className='loading-spinner'></div>
+          <span className='ml-2 loading-text'>読み込み中...</span>
         </div>
       )}
 
@@ -129,14 +129,14 @@ export function ReviewSystem() {
               <span className={`px-2 py-1 rounded text-xs ${getDifficultyColor(activeReview.difficulty)}`}>
                 {activeReview.difficulty}
               </span>
-              <span className='text-sm text-gray-600'>復習回数: {activeReview.review_count}回</span>
-              <span className='text-sm text-gray-600'>前回理解度: {activeReview.understanding_level}/5</span>
+              <span className='text-sm text-gray-600 dark:text-gray-400'>復習回数: {activeReview.review_count}回</span>
+              <span className='text-sm text-gray-600 dark:text-gray-400'>前回理解度: {activeReview.understanding_level}/5</span>
             </div>
           </div>
 
           <div className='space-y-4'>
             <div>
-              <label className='block text-sm font-medium text-gray-700 mb-2'>現在の理解度 (1-5)</label>
+              <label className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2'>現在の理解度 (1-5)</label>
               <div className='flex space-x-2 justify-center sm:justify-start'>
                 {[1, 2, 3, 4, 5].map(level => (
                   <button
@@ -145,7 +145,7 @@ export function ReviewSystem() {
                     className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full text-xs sm:text-sm font-medium transition-colors ${
                       currentUnderstanding === level
                         ? 'bg-blue-500 text-white'
-                        : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+                        : 'bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-500'
                     }`}
                   >
                     {level}
@@ -178,7 +178,7 @@ export function ReviewSystem() {
         <div className='space-y-4'>
           <div className='flex items-center justify-between'>
             <h3 className='text-lg font-semibold'>本日の復習項目 ({todayReviews.length}件)</h3>
-            {todayReviews.length === 0 && <p className='text-gray-600'>本日の復習項目はありません。</p>}
+            {todayReviews.length === 0 && <p className='text-gray-600 dark:text-gray-400'>本日の復習項目はありません。</p>}
           </div>
 
           {todayReviews.length > 0 && (
@@ -197,10 +197,10 @@ export function ReviewSystem() {
                     </div>
                   </div>
 
-                  <p className='text-gray-600 text-xs sm:text-sm mb-3 line-clamp-2'>{item.question_text}</p>
+                  <p className='text-gray-600 dark:text-gray-300 text-xs sm:text-sm mb-3 line-clamp-2'>{item.question_text}</p>
 
                   <div className='flex flex-col sm:flex-row sm:items-center justify-between space-y-2 sm:space-y-0'>
-                    <div className='flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600'>
+                    <div className='flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600 dark:text-gray-400'>
                       <span>理解度: {item.understanding_level}/5</span>
                       <span>復習回数: {item.review_count}回</span>
                       <span className='hidden sm:inline'>次回: {getReviewIntervalText(item.review_count)}</span>
@@ -222,10 +222,10 @@ export function ReviewSystem() {
       {/* 忘却曲線の説明 */}
       <div className='mt-8 bg-gray-50 rounded-lg p-4'>
         <h4 className='font-semibold mb-2'>忘却曲線に基づく復習システム</h4>
-        <p className='text-sm text-gray-600 mb-2'>
+        <p className='text-sm text-gray-600 dark:text-gray-300 mb-2'>
           エビングハウスの忘却曲線理論に基づき、最適なタイミングで復習を提案します。
         </p>
-        <div className='text-xs text-gray-500'>復習間隔: 1日 → 3日 → 1週間 → 2週間 → 1ヶ月 → 2ヶ月 → 4ヶ月</div>
+        <div className='text-xs text-gray-500 dark:text-gray-400'>復習間隔: 1日 → 3日 → 1週間 → 2週間 → 1ヶ月 → 2ヶ月 → 4ヶ月</div>
       </div>
     </div>
   );

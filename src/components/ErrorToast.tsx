@@ -84,7 +84,7 @@ function ErrorToast({ error, onClose, onAction: _onAction }: ErrorToastProps) {
             <h4 className='text-sm font-semibold'>エラーが発生しました ({error.severity})</h4>
             <button
               onClick={handleClose}
-              className='text-gray-500 hover:text-gray-700 transition-colors'
+              className='text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors'
               aria-label='閉じる'
             >
               ✕
