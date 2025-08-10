@@ -255,7 +255,7 @@ export default function ApiTestPage() {
         </div>
 
         {/* 診断情報 */}
-        <div className='mt-8 bg-gray-100 dark:bg-gray-800 rounded-lg p-6'>
+        <div className='mt-8 bg-slate-100 dark:bg-slate-800 rounded-lg p-6'>
           <h2 className='text-xl font-semibold text-slate-800 dark:text-slate-200 mb-4'>📊 API診断ガイド</h2>
           <div className='grid grid-cols-1 md:grid-cols-2 gap-6 text-sm'>
             <div>

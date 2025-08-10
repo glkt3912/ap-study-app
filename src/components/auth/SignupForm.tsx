@@ -52,12 +52,12 @@ export function SignupForm({ onModeChange }: SignupFormProps) {
   };
 
   return (
-    <div className='bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md w-full max-w-md mx-auto'>
-      <h2 className='text-2xl font-bold text-center mb-6 text-gray-900 dark:text-white'>アカウント作成</h2>
+    <div className='card-primary p-8 rounded-lg shadow-md w-full max-w-md mx-auto'>
+      <h2 className='text-2xl font-bold text-center mb-6 text-primary'>アカウント作成</h2>
 
       <form onSubmit={handleSubmit} className='space-y-4'>
         <div>
-          <label htmlFor='name' className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1'>
+          <label htmlFor='name' className='block text-sm font-medium text-secondary mb-1'>
             名前（任意）
           </label>
           <input
@@ -66,13 +66,13 @@ export function SignupForm({ onModeChange }: SignupFormProps) {
             name='name'
             value={formData.name}
             onChange={handleChange}
-            className='w-full px-3 py-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400'
+            className='w-full px-3 py-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-primary rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400'
             placeholder='お名前'
           />
         </div>
 
         <div>
-          <label htmlFor='email' className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1'>
+          <label htmlFor='email' className='block text-sm font-medium text-secondary mb-1'>
             メールアドレス *
           </label>
           <input
@@ -82,13 +82,13 @@ export function SignupForm({ onModeChange }: SignupFormProps) {
             value={formData.email}
             onChange={handleChange}
             required
-            className='w-full px-3 py-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400'
+            className='w-full px-3 py-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-primary rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400'
             placeholder='email@example.com'
           />
         </div>
 
         <div>
-          <label htmlFor='password' className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1'>
+          <label htmlFor='password' className='block text-sm font-medium text-secondary mb-1'>
             パスワード *
           </label>
           <input
@@ -98,13 +98,13 @@ export function SignupForm({ onModeChange }: SignupFormProps) {
             value={formData.password}
             onChange={handleChange}
             required
-            className='w-full px-3 py-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400'
+            className='w-full px-3 py-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-primary rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400'
             placeholder='8文字以上のパスワード'
           />
         </div>
 
         <div>
-          <label htmlFor='confirmPassword' className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1'>
+          <label htmlFor='confirmPassword' className='block text-sm font-medium text-secondary mb-1'>
             パスワード確認 *
           </label>
           <input
@@ -114,7 +114,7 @@ export function SignupForm({ onModeChange }: SignupFormProps) {
             value={formData.confirmPassword}
             onChange={handleChange}
             required
-            className='w-full px-3 py-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400'
+            className='w-full px-3 py-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-primary rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400'
             placeholder='パスワードを再入力'
           />
         </div>
@@ -128,14 +128,14 @@ export function SignupForm({ onModeChange }: SignupFormProps) {
         <button
           type='submit'
           disabled={isLoading || !formData.email || !formData.password}
-          className='w-full bg-green-600 dark:bg-green-700 text-white py-2 px-4 rounded-md hover:bg-green-700 dark:hover:bg-green-600 disabled:bg-gray-400 dark:disabled:bg-gray-600 disabled:cursor-not-allowed transition-all duration-200'
+          className='w-full bg-green-600 dark:bg-green-700 text-white py-2 px-4 rounded-md hover:bg-green-700 dark:hover:bg-green-600 disabled:bg-slate-400 dark:disabled:bg-slate-600 disabled:cursor-not-allowed transition-all duration-200'
         >
           {isLoading ? 'アカウント作成中...' : 'アカウント作成'}
         </button>
       </form>
 
       <div className='mt-6 text-center'>
-        <p className='text-sm text-gray-600 dark:text-gray-300'>
+        <p className='text-sm text-secondary'>
           すでにアカウントをお持ちの方は{' '}
           <button
             onClick={() => onModeChange('login')}

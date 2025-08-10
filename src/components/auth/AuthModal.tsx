@@ -37,7 +37,7 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
         {/* 閉じるボタン */}
         <button
           onClick={onClose}
-          className='absolute -top-2 -right-2 w-8 h-8 bg-gray-600 dark:bg-gray-700 text-white rounded-full flex items-center justify-center hover:bg-gray-700 dark:hover:bg-gray-600 z-10'
+          className='absolute -top-2 -right-2 w-8 h-8 bg-slate-600 dark:bg-slate-700 text-white rounded-full flex items-center justify-center hover:bg-slate-700 dark:hover:bg-slate-600 z-10'
           aria-label='閉じる'
         >
           ✕
