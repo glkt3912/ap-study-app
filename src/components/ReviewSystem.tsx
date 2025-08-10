@@ -96,19 +96,19 @@ export function ReviewSystem() {
   };
 
   return (
-    <div className='bg-white dark:bg-slate-800 rounded-lg shadow-md p-4 sm:p-6'>
+    <div className='card-primary shadow-moderate p-4 sm:p-6'>
       <div className='flex flex-col sm:flex-row sm:items-center justify-between mb-6 space-y-3 sm:space-y-0'>
         <h2 className='text-xl sm:text-2xl font-bold text-slate-900 dark:text-slate-100'>復習システム</h2>
         <button
           onClick={generateReviewSchedule}
           disabled={loading}
-          className='px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:bg-gray-400 text-sm sm:text-base'
+          className='btn-primary hover-lift click-shrink focus-ring interactive-disabled text-sm sm:text-base'
         >
           復習スケジュール生成
         </button>
       </div>
 
-      {error && <div className='bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4'>{error}</div>}
+      {error && <div className='alert-error'>{error}</div>}
 
       {loading && (
         <div className='flex justify-center items-center py-8'>
@@ -119,10 +119,10 @@ export function ReviewSystem() {
 
       {/* アクティブな復習 */}
       {activeReview && !loading && (
-        <div className='bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6'>
+        <div className='card-accent border-primary-200 p-6 mb-6 hover-lift'>
           <h3 className='text-lg font-semibold mb-4'>復習中: {activeReview.category}</h3>
 
-          <div className='bg-white dark:bg-slate-700 rounded-lg p-4 mb-4'>
+          <div className='card-secondary rounded-lg p-4 mb-4'>
             <p className='text-slate-900 dark:text-slate-100 mb-4'>{activeReview.question_text}</p>
 
             <div className='flex items-center space-x-4 mb-4'>
@@ -142,10 +142,10 @@ export function ReviewSystem() {
                   <button
                     key={level}
                     onClick={() => setCurrentUnderstanding(level)}
-                    className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 ${
+                    className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 hover-lift click-shrink focus-ring ${
                       currentUnderstanding === level
-                        ? 'bg-blue-500 text-white'
-                        : 'bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-500'
+                        ? 'btn-primary'
+                        : 'btn-secondary'
                     }`}
                   >
                     {level}
@@ -158,13 +158,13 @@ export function ReviewSystem() {
               <button
                 onClick={() => completeReview(activeReview.id, currentUnderstanding)}
                 disabled={loading}
-                className='px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 disabled:bg-gray-400'
+                className='btn-success hover-lift click-shrink focus-ring interactive-disabled'
               >
                 復習完了
               </button>
               <button
                 onClick={() => setActiveReview(null)}
-                className='px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600'
+                className='btn-secondary hover-lift click-shrink focus-ring'
               >
                 キャンセル
               </button>
@@ -184,7 +184,7 @@ export function ReviewSystem() {
           {todayReviews.length > 0 && (
             <div className='space-y-3'>
               {todayReviews.map(item => (
-                <div key={item.id} className='border border-slate-200 rounded-lg p-3 sm:p-4'>
+                <div key={item.id} className='card-secondary border border-slate-200 dark:border-slate-700 rounded-lg p-3 sm:p-4 hover-lift'>
                   <div className='flex flex-col sm:flex-row sm:items-center justify-between mb-2 space-y-2 sm:space-y-0'>
                     <h4 className='font-medium text-slate-900 dark:text-slate-100 text-sm sm:text-base'>{item.category}</h4>
                     <div className='flex items-center space-x-2'>
@@ -207,7 +207,7 @@ export function ReviewSystem() {
                     </div>
                     <button
                       onClick={() => setActiveReview(item)}
-                      className='px-3 py-1 bg-blue-500 text-white text-xs sm:text-sm rounded hover:bg-blue-600 self-start sm:self-auto'
+                      className='btn-primary hover-lift click-shrink focus-ring text-xs sm:text-sm self-start sm:self-auto'
                     >
                       復習開始
                     </button>
@@ -220,7 +220,7 @@ export function ReviewSystem() {
       )}
 
       {/* 忘却曲線の説明 */}
-      <div className='mt-8 bg-gray-50 rounded-lg p-4'>
+      <div className='mt-8 card-accent rounded-lg p-4'>
         <h4 className='font-semibold mb-2'>忘却曲線に基づく復習システム</h4>
         <p className='text-sm text-gray-600 dark:text-gray-300 mb-2'>
           エビングハウスの忘却曲線理論に基づき、最適なタイミングで復習を提案します。

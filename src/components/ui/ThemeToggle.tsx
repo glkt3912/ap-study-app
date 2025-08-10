@@ -22,7 +22,7 @@ export default function ThemeToggle() {
   return (
     <button
       onClick={handleClick}
-      className='px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-lg font-medium'
+      className='btn-primary hover-lift click-shrink focus-ring text-lg font-medium'
     >
       <span className='text-xl mr-2'>{theme === 'light' ? '🌙' : '☀️'}</span>
       {theme === 'light' ? 'Dark' : 'Light'}

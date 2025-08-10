@@ -150,14 +150,14 @@ export default function ApiTestPage() {
   }, [runAllTests]);
 
   return (
-    <div className='min-h-screen bg-slate-50 dark:bg-slate-900 p-8'>
+    <div className='min-h-screen container-primary p-8'>
       <div className='max-w-6xl mx-auto'>
         <div className='flex justify-between items-center mb-8'>
           <h1 className='text-3xl font-bold text-slate-900 dark:text-white'>🔌 API接続テスト</h1>
           <button
             onClick={runAllTests}
             disabled={isRunning}
-            className='px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-slate-400 transition-all duration-200'
+            className='btn-primary hover-lift click-shrink focus-ring interactive-disabled'
           >
             {isRunning ? '🔄 テスト中...' : '🚀 テスト実行'}
           </button>
@@ -283,7 +283,7 @@ export default function ApiTestPage() {
         <div className='mt-8 text-center'>
           <button
             onClick={() => window.history.back()}
-            className='px-6 py-3 bg-slate-500 text-white rounded-lg hover:bg-slate-600 transition-all duration-200'
+            className='btn-secondary hover-lift click-shrink focus-ring'
           >
             ← 前のページに戻る
           </button>

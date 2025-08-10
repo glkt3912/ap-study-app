@@ -155,7 +155,7 @@ export default function TestRecord() {
 
   return (
     <div className='space-y-6'>
-      <div className='bg-white dark:bg-slate-800 rounded-lg shadow-md'>
+      <div className='card-primary shadow-moderate'>
         <div className='p-6 border-b border-slate-200 dark:border-slate-700'>
           <h2 className='text-xl font-semibold text-slate-900 dark:text-slate-100'>問題演習記録</h2>
           <p className='text-secondary mt-1'>午前・午後問題の演習結果を記録して弱点を把握しましょう</p>
@@ -213,7 +213,7 @@ export default function TestRecord() {
               <form onSubmit={handleMorningSubmit} className='space-y-4'>
                 <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                   <div>
-                    <label className='block text-sm font-medium text-gray-700 mb-1'>日付</label>
+                    <label className='label-primary'>日付</label>
                     <input
                       type='date'
                       value={newMorningTest.date}
@@ -222,7 +222,7 @@ export default function TestRecord() {
                     />
                   </div>
                   <div>
-                    <label className='block text-sm font-medium text-gray-700 mb-1'>分野</label>
+                    <label className='label-primary'>分野</label>
                     <select
                       value={newMorningTest.category}
                       onChange={e => setNewMorningTest({ ...newMorningTest, category: e.target.value })}
@@ -238,7 +238,7 @@ export default function TestRecord() {
                     </select>
                   </div>
                   <div>
-                    <label className='block text-sm font-medium text-gray-700 mb-1'>総問題数</label>
+                    <label className='label-primary'>総問題数</label>
                     <input
                       type='number'
                       value={newMorningTest.totalQuestions}
@@ -251,7 +251,7 @@ export default function TestRecord() {
                     />
                   </div>
                   <div>
-                    <label className='block text-sm font-medium text-gray-700 mb-1'>正答数</label>
+                    <label className='label-primary'>正答数</label>
                     <input
                       type='number'
                       value={newMorningTest.correctAnswers}
@@ -265,7 +265,7 @@ export default function TestRecord() {
                     />
                   </div>
                   <div>
-                    <label className='block text-sm font-medium text-gray-700 mb-1'>所要時間 (分)</label>
+                    <label className='label-primary'>所要時間 (分)</label>
                     <input
                       type='number'
                       value={newMorningTest.timeSpent}
@@ -289,7 +289,7 @@ export default function TestRecord() {
                 <button
                   type='submit'
                   disabled={isLoading}
-                  className='bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed'
+                  className='btn-primary hover-lift click-shrink focus-ring interactive-disabled'
                 >
                   {isLoading ? '保存中...' : '記録を追加'}
                 </button>
@@ -302,7 +302,7 @@ export default function TestRecord() {
                 ) : (
                   <div className='space-y-3'>
                     {morningTests.map(test => (
-                      <div key={test.id} className='border rounded-lg p-4 bg-gray-50'>
+                      <div key={test.id} className='card-secondary p-4 hover-lift'>
                         <div className='flex items-start justify-between mb-2'>
                           <div>
                             <h4 className='font-medium text-slate-900 dark:text-slate-100'>{test.category}</h4>
@@ -330,30 +330,30 @@ export default function TestRecord() {
           {activeTab === 'afternoon' && (
             <div className='space-y-6'>
               <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-                <div className='bg-orange-50 rounded-lg p-4'>
-                  <div className='text-2xl font-bold text-orange-600'>
+                <div className='metric-card hover-lift'>
+                  <div className='metric-value text-orange-600'>
                     {afternoonTests.length > 0
                       ? (afternoonTests.reduce((sum, test) => sum + test.score, 0) / afternoonTests.length).toFixed(1)
                       : '0.0'}
                   </div>
-                  <div className='text-sm text-orange-800'>平均得点</div>
+                  <div className='metric-label text-orange-800'>平均得点</div>
                 </div>
-                <div className='bg-green-50 rounded-lg p-4'>
-                  <div className='text-2xl font-bold text-green-600'>
+                <div className='metric-card hover-lift'>
+                  <div className='metric-value text-green-600'>
                     {afternoonTests.length > 0 ? Math.max(...afternoonTests.map(test => test.score)) : 0}
                   </div>
-                  <div className='text-sm text-green-800'>最高得点</div>
+                  <div className='metric-label text-green-800'>最高得点</div>
                 </div>
-                <div className='bg-purple-50 rounded-lg p-4'>
-                  <div className='text-2xl font-bold text-purple-600'>{afternoonTests.length}</div>
-                  <div className='text-sm text-purple-800'>演習回数</div>
+                <div className='metric-card hover-lift'>
+                  <div className='metric-value text-purple-600'>{afternoonTests.length}</div>
+                  <div className='metric-label text-purple-800'>演習回数</div>
                 </div>
               </div>
 
               <form onSubmit={handleAfternoonSubmit} className='space-y-4'>
                 <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                   <div>
-                    <label className='block text-sm font-medium text-gray-700 mb-1'>日付</label>
+                    <label className='label-primary'>日付</label>
                     <input
                       type='date'
                       value={newAfternoonTest.date}
@@ -363,7 +363,7 @@ export default function TestRecord() {
                     />
                   </div>
                   <div>
-                    <label className='block text-sm font-medium text-gray-700 mb-1'>分野</label>
+                    <label className='label-primary'>分野</label>
                     <select
                       value={newAfternoonTest.category}
                       onChange={e => setNewAfternoonTest({ ...newAfternoonTest, category: e.target.value })}
@@ -379,7 +379,7 @@ export default function TestRecord() {
                     </select>
                   </div>
                   <div>
-                    <label className='block text-sm font-medium text-gray-700 mb-1'>得点</label>
+                    <label className='label-primary'>得点</label>
                     <input
                       type='number'
                       value={newAfternoonTest.score}
@@ -391,7 +391,7 @@ export default function TestRecord() {
                     />
                   </div>
                   <div>
-                    <label className='block text-sm font-medium text-gray-700 mb-1'>所要時間 (分)</label>
+                    <label className='label-primary'>所要時間 (分)</label>
                     <input
                       type='number'
                       value={newAfternoonTest.timeSpent}
@@ -417,7 +417,7 @@ export default function TestRecord() {
                 <button
                   type='submit'
                   disabled={isLoading}
-                  className='bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed'
+                  className='btn-primary hover-lift click-shrink focus-ring interactive-disabled'
                 >
                   {isLoading ? '保存中...' : '記録を追加'}
                 </button>
@@ -430,7 +430,7 @@ export default function TestRecord() {
                 ) : (
                   <div className='space-y-3'>
                     {afternoonTests.map(test => (
-                      <div key={test.id} className='border rounded-lg p-4 bg-gray-50'>
+                      <div key={test.id} className='card-secondary p-4 hover-lift'>
                         <div className='flex items-start justify-between mb-2'>
                           <div>
                             <h4 className='font-medium text-slate-900 dark:text-slate-100'>{test.category}</h4>

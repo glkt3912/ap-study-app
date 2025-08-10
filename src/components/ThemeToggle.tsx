@@ -8,7 +8,7 @@ export function ThemeToggle() {
   return (
     <button
       onClick={toggleTheme}
-      className='p-2 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 transition-all duration-200'
+      className='p-2 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 hover-lift click-shrink focus-ring z-header'
       title={`現在: ${theme === 'light' ? 'ライト' : 'ダーク'}モード`}
     >
       {theme === 'light' ? (

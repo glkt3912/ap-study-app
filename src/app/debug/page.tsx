@@ -56,7 +56,7 @@ export default function DebugPage() {
   }
 
   return (
-    <div className='min-h-screen bg-slate-50 dark:bg-slate-900 p-8'>
+    <div className='min-h-screen container-primary p-8'>
       <div className='max-w-4xl mx-auto'>
         <h1 className='text-3xl font-bold text-slate-900 dark:text-white mb-8'>🧪 診断ページ</h1>
 
@@ -80,7 +80,7 @@ export default function DebugPage() {
             </div>
 
             {/* Tailwind基本 */}
-            <div className='bg-blue-500 text-white p-5 rounded-lg font-bold'>
+            <div className='btn-primary text-white p-5 rounded-lg font-bold'>
               🎯 Tailwind基本 (青背景)
               <br />
               これが見えればTailwind読み込み正常
@@ -133,7 +133,7 @@ export default function DebugPage() {
                 <strong>API接続:</strong> {apiTest}
               </div>
               <div>
-                <button onClick={testAlert} className='px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600'>
+                <button onClick={testAlert} className='btn-success hover-lift click-shrink focus-ring'>
                   アラートテスト
                 </button>
               </div>

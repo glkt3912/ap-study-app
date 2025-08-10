@@ -115,7 +115,7 @@ export default function EnvCheckPage() {
   }
 
   return (
-    <div className='min-h-screen bg-slate-50 dark:bg-slate-900 p-8'>
+    <div className='min-h-screen container-primary p-8'>
       <div className='max-w-6xl mx-auto'>
         <h1 className='text-3xl font-bold text-slate-900 dark:text-white mb-8'>🖥️ 環境チェック</h1>
 
@@ -268,7 +268,7 @@ export default function EnvCheckPage() {
         <div className='mt-8 text-center'>
           <button
             onClick={() => window.history.back()}
-            className='px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all duration-200'
+            className='btn-primary hover-lift click-shrink focus-ring'
           >
             ← 前のページに戻る
           </button>

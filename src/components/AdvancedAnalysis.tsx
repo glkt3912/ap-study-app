@@ -163,15 +163,15 @@ export function AdvancedAnalysis() {
   const getReadinessColor = (level: string) => {
     switch (level) {
       case 'excellent':
-        return 'text-green-600 bg-green-100 dark:text-green-400 dark:bg-green-900/20';
+        return 'badge-success';
       case 'good':
-        return 'text-blue-600 bg-blue-100 dark:text-blue-400 dark:bg-blue-900/20';
+        return 'badge-info';
       case 'needs_improvement':
-        return 'text-yellow-600 bg-yellow-100 dark:text-yellow-400 dark:bg-yellow-900/20';
+        return 'badge-warning';
       case 'critical':
-        return 'text-red-600 bg-red-100 dark:text-red-400 dark:bg-red-900/20';
+        return 'badge-error';
       default:
-        return 'text-gray-600 bg-gray-100 dark:text-gray-400 dark:bg-gray-700';
+        return 'badge-info';
     }
   };
 
@@ -192,10 +192,10 @@ export function AdvancedAnalysis() {
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key as any)}
-            className={`flex-shrink-0 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium border-b-2 transition-all duration-200 whitespace-nowrap ${
+            className={`flex-shrink-0 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium border-b-2 transition-all duration-200 whitespace-nowrap hover-lift click-shrink focus-ring ${
               activeTab === tab.key
-                ? 'border-blue-500 text-blue-600 dark:border-blue-400 dark:text-blue-400'
-                : 'border-transparent text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-white'
+                ? 'nav-tab-active'
+                : 'nav-tab-inactive'
             }`}
           >
             <span className='hidden sm:inline'>{tab.label}</span>
@@ -205,7 +205,7 @@ export function AdvancedAnalysis() {
       </div>
 
       {error && (
-        <div className='bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 text-red-700 dark:text-red-300 px-4 py-3 rounded mb-4'>
+        <div className='alert-error mb-4'>
           {error}
         </div>
       )}
@@ -221,7 +221,7 @@ export function AdvancedAnalysis() {
       {activeTab === 'performance' && performanceMetrics && !loading && (
         <div className='space-y-6'>
           {/* 学習継続性 */}
-          <div className='bg-gray-50 dark:bg-gray-700 rounded-lg p-4'>
+          <div className='card-accent p-4'>
             <h3 className='font-semibold text-lg mb-3 text-gray-800 dark:text-white'>学習継続性</h3>
             <div className='grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4'>
               <div className='text-center'>
@@ -252,7 +252,7 @@ export function AdvancedAnalysis() {
           </div>
 
           {/* 学習効率 */}
-          <div className='bg-gray-50 dark:bg-gray-700 rounded-lg p-4'>
+          <div className='card-accent p-4'>
             <h3 className='font-semibold text-lg mb-3 text-gray-800 dark:text-white'>学習効率</h3>
             <div className='grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4'>
               <div className='text-center'>
@@ -277,7 +277,7 @@ export function AdvancedAnalysis() {
           </div>
 
           {/* カテゴリバランス */}
-          <div className='bg-gray-50 dark:bg-gray-700 rounded-lg p-4'>
+          <div className='card-accent p-4'>
             <h3 className='font-semibold text-lg mb-3 text-gray-800 dark:text-white'>カテゴリ別学習バランス</h3>
             <div className='grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6'>
               {/* 円グラフ */}
@@ -337,7 +337,7 @@ export function AdvancedAnalysis() {
 
           {/* 成長分析グラフ */}
           {performanceMetrics.growthAnalysis.length > 0 && (
-            <div className='bg-gray-50 dark:bg-gray-700 rounded-lg p-4'>
+            <div className='card-accent p-4'>
               <h3 className='font-semibold text-lg mb-3 text-gray-800 dark:text-white'>週次成長分析</h3>
               <Suspense
                 fallback={
@@ -387,7 +387,7 @@ export function AdvancedAnalysis() {
       {activeTab === 'readiness' && (
         <div className='space-y-6'>
           {/* 試験設定 */}
-          <div className='bg-gray-50 dark:bg-gray-700 rounded-lg p-4'>
+          <div className='card-accent p-4'>
             <h3 className='font-semibold text-lg mb-3 text-gray-800 dark:text-white'>試験設定</h3>
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
               <div>
@@ -414,7 +414,7 @@ export function AdvancedAnalysis() {
             <button
               onClick={loadExamReadiness}
               disabled={!examDate || loading}
-              className='btn-primary mt-4'
+              className='btn-primary hover-lift click-shrink focus-ring interactive-disabled mt-4'
             >
               準備度を評価
             </button>
@@ -424,7 +424,7 @@ export function AdvancedAnalysis() {
           {examReadiness && !loading && (
             <div className='space-y-4'>
               {/* 総合評価 */}
-              <div className='bg-gray-50 dark:bg-gray-700 rounded-lg p-4'>
+              <div className='card-accent p-4'>
                 <h3 className='font-semibold text-lg mb-3 text-gray-800 dark:text-white'>総合評価</h3>
                 <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
                   <div className='text-center'>
@@ -441,15 +441,7 @@ export function AdvancedAnalysis() {
                   </div>
                   <div className='text-center'>
                     <div
-                      className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${
-                        examReadiness.overallReadiness === 'excellent'
-                          ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
-                          : examReadiness.overallReadiness === 'good'
-                            ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400'
-                            : examReadiness.overallReadiness === 'needs_improvement'
-                              ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
-                              : 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400'
-                      }`}
+                      className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${getReadinessColor(examReadiness.overallReadiness)}`}
                     >
                       {examReadiness.overallReadiness}
                     </div>
@@ -459,7 +451,7 @@ export function AdvancedAnalysis() {
               </div>
 
               {/* カテゴリ別準備度 */}
-              <div className='bg-gray-50 dark:bg-gray-700 rounded-lg p-4'>
+              <div className='card-accent p-4'>
                 <h3 className='font-semibold text-lg mb-3 text-gray-800 dark:text-white'>カテゴリ別準備度</h3>
                 <div className='space-y-2'>
                   {examReadiness?.categoryReadiness?.map((category, index) => (
@@ -479,7 +471,7 @@ export function AdvancedAnalysis() {
               </div>
 
               {/* 学習推奨 */}
-              <div className='bg-gray-50 dark:bg-gray-700 rounded-lg p-4'>
+              <div className='card-accent p-4'>
                 <h3 className='font-semibold text-lg mb-3 text-gray-800 dark:text-white'>学習推奨</h3>
                 <div className='space-y-2'>
                   {examReadiness?.studyRecommendations?.map((rec, index) => (
@@ -503,7 +495,7 @@ export function AdvancedAnalysis() {
       {activeTab === 'pattern' && learningPattern && !loading && (
         <div className='space-y-6'>
           {/* 推奨学習条件 */}
-          <div className='bg-gray-50 dark:bg-gray-700 rounded-lg p-4'>
+          <div className='card-accent p-4'>
             <h3 className='font-semibold text-lg mb-3 text-gray-800 dark:text-white'>推奨学習条件</h3>
             <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
               <div className='text-center'>
@@ -528,7 +520,7 @@ export function AdvancedAnalysis() {
           </div>
 
           {/* 時間帯別パフォーマンス */}
-          <div className='bg-gray-50 dark:bg-gray-700 rounded-lg p-4'>
+          <div className='card-accent p-4'>
             <h3 className='font-semibold text-lg mb-3 text-gray-800 dark:text-white'>時間帯別パフォーマンス</h3>
             <div className='space-y-2'>
               {learningPattern?.timePattern?.map((time, index) => (
@@ -554,7 +546,7 @@ export function AdvancedAnalysis() {
           </div>
 
           {/* 曜日別パフォーマンス */}
-          <div className='bg-gray-50 dark:bg-gray-700 rounded-lg p-4'>
+          <div className='card-accent p-4'>
             <h3 className='font-semibold text-lg mb-3 text-gray-800 dark:text-white'>曜日別パフォーマンス</h3>
             <div className='space-y-2'>
               {learningPattern?.frequencyPattern?.map((day, index) => (

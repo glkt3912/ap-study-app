@@ -33,25 +33,25 @@ export default function DiagnosticHub() {
       title: '🧪 総合診断',
       description: 'CSS・JavaScript・API接続の総合テスト',
       url: '/debug',
-      color: 'bg-blue-500 hover:bg-blue-600',
+      color: 'btn-primary hover-lift click-shrink focus-ring',
     },
     {
       title: '🎨 CSS専用テスト',
       description: 'Tailwind・カスタムCSS・ダークモードのテスト',
       url: '/css-test',
-      color: 'bg-purple-500 hover:bg-purple-600',
+      color: 'btn-secondary hover-lift click-shrink focus-ring',
     },
     {
       title: '🖥️ 環境チェック',
       description: 'ブラウザ・システム・パフォーマンス情報',
       url: '/env-check',
-      color: 'bg-green-500 hover:bg-green-600',
+      color: 'btn-success hover-lift click-shrink focus-ring',
     },
     {
       title: '🔌 API接続テスト',
       description: 'バックエンドAPI・レスポンス時間のテスト',
       url: '/api-test',
-      color: 'bg-orange-500 hover:bg-orange-600',
+      color: 'btn-warning hover-lift click-shrink focus-ring',
     },
   ];
 
@@ -81,7 +81,7 @@ export default function DiagnosticHub() {
             <button
               onClick={runPerformanceAnalysis}
               disabled={isAnalyzing}
-              className='px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400 transition-all duration-200'
+              className='btn-primary hover-lift click-shrink focus-ring interactive-disabled'
             >
               {isAnalyzing ? '分析中...' : '分析開始'}
             </button>
@@ -120,7 +120,7 @@ export default function DiagnosticHub() {
             <h3 className='text-lg font-semibold text-gray-900 dark:text-white'>🚨 エラー統計</h3>
             <button
               onClick={getErrorStatistics}
-              className='px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-all duration-200'
+              className='btn-error hover-lift click-shrink focus-ring'
             >
               統計取得
             </button>
@@ -155,7 +155,7 @@ export default function DiagnosticHub() {
         </div>
       </div>
 
-      <div className='mt-8 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg'>
+      <div className='mt-8 card-accent'>
         <h3 className='font-semibold text-gray-900 dark:text-white mb-3'>💡 診断ページの使い方</h3>
         <ul className='text-sm text-gray-600 dark:text-gray-300 space-y-2'>
           <li>
@@ -181,25 +181,25 @@ export default function DiagnosticHub() {
         <div className='flex flex-wrap gap-2'>
           <a
             href='/debug'
-            className='px-3 py-1 bg-yellow-200 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-200 rounded text-sm hover:bg-yellow-300 dark:hover:bg-yellow-700'
+            className='badge-warning text-sm hover-lift'
           >
             /debug
           </a>
           <a
             href='/css-test'
-            className='px-3 py-1 bg-yellow-200 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-200 rounded text-sm hover:bg-yellow-300 dark:hover:bg-yellow-700'
+            className='badge-warning text-sm hover-lift'
           >
             /css-test
           </a>
           <a
             href='/env-check'
-            className='px-3 py-1 bg-yellow-200 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-200 rounded text-sm hover:bg-yellow-300 dark:hover:bg-yellow-700'
+            className='badge-warning text-sm hover-lift'
           >
             /env-check
           </a>
           <a
             href='/api-test'
-            className='px-3 py-1 bg-yellow-200 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-200 rounded text-sm hover:bg-yellow-300 dark:hover:bg-yellow-700'
+            className='badge-warning text-sm hover-lift'
           >
             /api-test
           </a>

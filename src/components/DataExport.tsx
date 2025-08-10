@@ -165,23 +165,23 @@ export default function DataExport({ studyData }: DataExportProps) {
 
       {/* 学習統計表示 */}
       <div className='grid grid-cols-2 md:grid-cols-4 gap-4 mb-8'>
-        <div className='stats-card bg-blue-50 dark:bg-blue-900/20'>
+        <div className='metric-card hover-lift'>
           <div className='text-2xl font-bold text-blue-600 dark:text-blue-400'>
             {stats.completedDays}/{stats.totalDays}
           </div>
           <div className='text-sm text-blue-600 dark:text-blue-300'>完了日数</div>
         </div>
-        <div className='bg-green-50 dark:bg-green-900/20 p-4 rounded-lg'>
+        <div className='metric-card hover-lift'>
           <div className='text-2xl font-bold text-green-600 dark:text-green-400'>{stats.completionRate}%</div>
           <div className='text-sm text-green-600 dark:text-green-300'>完了率</div>
         </div>
-        <div className='bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg'>
+        <div className='metric-card hover-lift'>
           <div className='text-2xl font-bold text-purple-600 dark:text-purple-400'>
             {Math.round(stats.totalActualTime / 60)}h
           </div>
           <div className='text-sm text-purple-600 dark:text-purple-300'>学習時間</div>
         </div>
-        <div className='bg-orange-50 dark:bg-orange-900/20 p-4 rounded-lg'>
+        <div className='metric-card hover-lift'>
           <div className='text-2xl font-bold text-orange-600 dark:text-orange-400'>{stats.averageUnderstanding}/5</div>
           <div className='text-sm text-orange-600 dark:text-orange-300'>平均理解度</div>
         </div>
@@ -198,7 +198,7 @@ export default function DataExport({ studyData }: DataExportProps) {
             <button
               onClick={exportToJSON}
               disabled={isExporting}
-              className='flex items-center justify-center px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded-lg transition-all duration-200'
+              className='flex items-center justify-center btn-primary hover-lift click-shrink focus-ring interactive-disabled'
             >
               <span className='mr-2'>📄</span>
               JSON形式でエクスポート
@@ -207,7 +207,7 @@ export default function DataExport({ studyData }: DataExportProps) {
             <button
               onClick={exportToCSV}
               disabled={isExporting}
-              className='flex items-center justify-center px-6 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white rounded-lg transition-all duration-200'
+              className='flex items-center justify-center btn-success hover-lift click-shrink focus-ring interactive-disabled'
             >
               <span className='mr-2'>📊</span>
               CSV形式でエクスポート
@@ -222,7 +222,7 @@ export default function DataExport({ studyData }: DataExportProps) {
             <button
               onClick={() => exportQuizData('json')}
               disabled={isExporting}
-              className='flex items-center justify-center px-6 py-3 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 text-white rounded-lg transition-all duration-200'
+              className='flex items-center justify-center btn-secondary hover-lift click-shrink focus-ring interactive-disabled'
             >
               <span className='mr-2'>🧠</span>
               Quiz JSON エクスポート
@@ -231,7 +231,7 @@ export default function DataExport({ studyData }: DataExportProps) {
             <button
               onClick={() => exportQuizData('csv')}
               disabled={isExporting}
-              className='flex items-center justify-center px-6 py-3 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-400 text-white rounded-lg transition-all duration-200'
+              className='flex items-center justify-center btn-info hover-lift click-shrink focus-ring interactive-disabled'
             >
               <span className='mr-2'>📈</span>
               Quiz CSV エクスポート
@@ -243,7 +243,7 @@ export default function DataExport({ studyData }: DataExportProps) {
       </div>
 
       {/* 使用方法説明 */}
-      <div className='mt-8 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg'>
+      <div className='mt-8 card-accent'>
         <h4 className='font-semibold text-gray-900 dark:text-white mb-2'>💡 エクスポート機能について</h4>
         <ul className='text-sm text-gray-600 dark:text-gray-300 space-y-1'>
           <li>

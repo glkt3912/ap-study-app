@@ -32,12 +32,12 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
   if (!isOpen) return null;
 
   return (
-    <div className='fixed inset-0 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-70 flex items-center justify-center p-4 z-50'>
+    <div className='fixed inset-0 backdrop-blur-modal flex items-center justify-center p-4 z-modal'>
       <div className='relative'>
         {/* 閉じるボタン */}
         <button
           onClick={onClose}
-          className='absolute -top-2 -right-2 w-8 h-8 bg-slate-600 dark:bg-slate-700 text-white rounded-full flex items-center justify-center hover:bg-slate-700 dark:hover:bg-slate-600 z-10'
+          className='absolute -top-2 -right-2 w-8 h-8 btn-secondary rounded-full flex items-center justify-center hover-lift click-shrink focus-ring z-10'
           aria-label='閉じる'
         >
           ✕

@@ -409,7 +409,7 @@ export default function Analysis() {
             <button
               onClick={runAnalysis}
               disabled={isAnalyzing || studyLogs.length === 0}
-              className='px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 disabled:bg-gray-400 dark:disabled:bg-gray-600 disabled:cursor-not-allowed flex items-center space-x-2'
+              className='btn-primary hover-lift click-shrink focus-ring interactive-disabled flex items-center space-x-2'
             >
               {isAnalyzing ? (
                 <>
@@ -516,7 +516,7 @@ export default function Analysis() {
                       <span className='text-slate-600 dark:text-slate-300 text-xs sm:text-sm'>重点科目:</span>
                       <div className='flex flex-wrap gap-1 mt-1'>
                         {analysisResult?.studyRecommendation?.focusSubjects?.map((subject, index) => (
-                          <span key={index} className='px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded'>
+                          <span key={index} className='badge-info text-xs rounded'>
                             {subject}
                           </span>
                         ))}
@@ -546,7 +546,7 @@ export default function Analysis() {
               <button
                 onClick={generateMLAnalysis}
                 disabled={isGeneratingML}
-                className='px-4 py-2 bg-purple-600 dark:bg-purple-700 text-white rounded-lg hover:bg-purple-700 dark:hover:bg-purple-600 disabled:bg-gray-400 dark:disabled:bg-gray-600 disabled:cursor-not-allowed flex items-center space-x-2'
+                className='btn-secondary hover-lift click-shrink focus-ring interactive-disabled flex items-center space-x-2'
               >
                 {isGeneratingML ? (
                   <>
