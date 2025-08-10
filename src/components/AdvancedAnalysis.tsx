@@ -182,7 +182,7 @@ export function AdvancedAnalysis() {
       <h2 className='text-2xl font-bold text-gray-800 dark:text-white mb-6'>高度な学習分析</h2>
 
       {/* タブナビゲーション */}
-      <div className='flex overflow-x-auto border-b border-gray-200 dark:border-gray-700 mb-6 scrollbar-hide'>
+      <div className='flex overflow-x-auto border-b border-slate-200 dark:border-slate-700 mb-6 scrollbar-hide'>
         {[
           { key: 'performance', label: 'パフォーマンス指標', shortLabel: '指標' },
           { key: 'readiness', label: '試験準備度', shortLabel: '準備度' },
@@ -192,7 +192,7 @@ export function AdvancedAnalysis() {
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key as any)}
-            className={`flex-shrink-0 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
+            className={`flex-shrink-0 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium border-b-2 transition-all duration-200 whitespace-nowrap ${
               activeTab === tab.key
                 ? 'border-blue-500 text-blue-600 dark:border-blue-400 dark:text-blue-400'
                 : 'border-transparent text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-white'
@@ -598,7 +598,7 @@ export function AdvancedAnalysis() {
 
           {/* LearningEfficiencyDashboardコンポーネントを埋め込み */}
           <div className='bg-gray-50 dark:bg-gray-700 rounded-lg p-1'>
-            <div className='bg-white dark:bg-gray-800 rounded'>
+            <div className='card-primary rounded'>
               <Suspense
                 fallback={
                   <div className='h-96 flex items-center justify-center'>

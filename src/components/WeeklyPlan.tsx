@@ -62,7 +62,7 @@ export default function WeeklyPlan({ studyData, setStudyData }: WeeklyPlanProps)
               <button
                 key={week.weekNumber}
                 onClick={() => setSelectedWeek(week.weekNumber)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                   selectedWeek === week.weekNumber
                     ? 'bg-blue-600 text-white'
                     : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
@@ -102,7 +102,7 @@ export default function WeeklyPlan({ studyData, setStudyData }: WeeklyPlanProps)
                   return (
                     <div
                       key={dayIndex}
-                      className={`border rounded-lg p-4 transition-colors ${
+                      className={`border rounded-lg p-4 transition-all duration-200 ${
                         day.completed 
                           ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800' 
                           : 'bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-600'
@@ -115,7 +115,7 @@ export default function WeeklyPlan({ studyData, setStudyData }: WeeklyPlanProps)
                             <h4 className='text-lg font-semibold text-slate-900 dark:text-slate-100'>{day.subject}</h4>
                             <button
                               onClick={() => handleTaskComplete(weekIndex, dayIndex)}
-                              className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                              className={`px-3 py-1 rounded-full text-sm font-medium transition-all duration-200 ${
                                 day.completed
                                   ? 'bg-green-600 text-white'
                                   : 'bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-500'

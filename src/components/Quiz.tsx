@@ -252,7 +252,7 @@ export default function Quiz() {
         <div className='bg-white dark:bg-slate-800 rounded-lg shadow-lg p-8'>
           <div className='text-center'>
             <div className='loading-spinner-lg mx-auto'></div>
-            <p className='mt-4 text-gray-600 dark:text-gray-300'>読み込み中...</p>
+            <p className='mt-4 text-slate-600 dark:text-slate-300'>読み込み中...</p>
           </div>
         </div>
       </div>
@@ -290,23 +290,23 @@ export default function Quiz() {
             <div className='grid grid-cols-1 md:grid-cols-3 gap-6 mb-8'>
               <div className='bg-blue-50 p-4 rounded-lg'>
                 <div className='text-2xl font-bold text-blue-600'>{state.result.score}%</div>
-                <div className='text-sm text-gray-600 dark:text-gray-300'>正答率</div>
+                <div className='text-sm text-slate-600 dark:text-slate-300'>正答率</div>
               </div>
               <div className='bg-green-50 p-4 rounded-lg'>
                 <div className='text-2xl font-bold text-green-600'>
                   {state.result.correctAnswers}/{state.result.totalQuestions}
                 </div>
-                <div className='text-sm text-gray-600 dark:text-gray-300'>正解数</div>
+                <div className='text-sm text-slate-600 dark:text-slate-300'>正解数</div>
               </div>
               <div className='bg-purple-50 p-4 rounded-lg'>
                 <div className='text-2xl font-bold text-purple-600'>{state.result.avgTimePerQ}秒</div>
-                <div className='text-sm text-gray-600 dark:text-gray-300'>平均解答時間</div>
+                <div className='text-sm text-slate-600 dark:text-slate-300'>平均解答時間</div>
               </div>
             </div>
 
             {state.result.category && (
               <div className='mb-6'>
-                <span className='bg-gray-100 dark:bg-gray-700 px-3 py-1 rounded-full text-sm text-gray-600 dark:text-gray-300'>
+                <span className='bg-slate-100 dark:bg-slate-700 px-3 py-1 rounded-full text-sm text-slate-600 dark:text-slate-300'>
                   カテゴリ: {state.result.category}
                 </span>
               </div>
@@ -321,7 +321,7 @@ export default function Quiz() {
               </button>
               <button
                 onClick={() => window.location.reload()}
-                className='bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition-colors'
+                className='bg-slate-500 text-white px-6 py-2 rounded-lg hover:bg-slate-600 transition-all duration-200'
               >
                 ダッシュボードに戻る
               </button>
@@ -345,13 +345,13 @@ export default function Quiz() {
         <div className='bg-white dark:bg-slate-800 rounded-lg shadow-lg p-8'>
           {/* プログレスバー */}
           <div className='mb-6'>
-            <div className='flex justify-between text-sm text-gray-600 dark:text-gray-300 mb-2'>
+            <div className='flex justify-between text-sm text-slate-600 dark:text-slate-300 mb-2'>
               <span>
                 問題 {state.session.currentIndex + 1} / {state.session.questions.length}
               </span>
               <span>{Math.round(progress)}% 完了</span>
             </div>
-            <div className='w-full bg-gray-200 rounded-full h-2'>
+            <div className='w-full bg-slate-200 rounded-full h-2'>
               <div
                 className='bg-blue-600 h-2 rounded-full transition-all duration-300'
                 style={{ width: `${progress}%` }}
@@ -364,7 +364,7 @@ export default function Quiz() {
             <div className='flex flex-wrap gap-2 mb-4'>
               <span className='badge-info'>{currentQuestion.category}</span>
               {currentQuestion.subcategory && (
-                <span className='bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-1 rounded text-sm'>
+                <span className='bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 px-2 py-1 rounded text-sm'>
                   {currentQuestion.subcategory}
                 </span>
               )}
@@ -377,7 +377,7 @@ export default function Quiz() {
           {/* 問題文 */}
           <div className='mb-8'>
             <h3 className='text-xl font-semibold text-slate-900 dark:text-slate-100 mb-4'>問題 {currentQuestion.number}</h3>
-            <p className='text-gray-700 dark:text-gray-200 leading-relaxed whitespace-pre-wrap'>{currentQuestion.question}</p>
+            <p className='text-slate-700 dark:text-slate-200 leading-relaxed whitespace-pre-wrap'>{currentQuestion.question}</p>
           </div>
 
           {/* 選択肢 */}
@@ -393,7 +393,7 @@ export default function Quiz() {
                   className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
                     isSelected
                       ? 'border-blue-500 bg-blue-50 text-blue-900'
-                      : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                      : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
                   }`}
                 >
                   <span className='font-semibold mr-3'>{optionLabel}.</span>
@@ -408,10 +408,10 @@ export default function Quiz() {
             <button
               onClick={nextQuestion}
               disabled={!userAnswer || state.loading}
-              className={`px-8 py-3 rounded-lg font-semibold transition-colors ${
+              className={`px-8 py-3 rounded-lg font-semibold transition-all duration-200 ${
                 userAnswer && !state.loading
                   ? 'bg-blue-600 text-white hover:bg-blue-700'
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  : 'bg-slate-300 text-slate-500 cursor-not-allowed'
               }`}
             >
               {state.session.currentIndex < state.session.questions.length - 1 ? '次の問題' : '結果を見る'}
@@ -430,7 +430,7 @@ export default function Quiz() {
 
         <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
           {/* ランダム問題 */}
-          <div className='border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-lg p-6 hover:border-blue-400 transition-colors'>
+          <div className='interactive-card'>
             <h3 className='text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4'>ランダム問題</h3>
             <p className='text-slate-600 dark:text-slate-400 mb-6 text-sm'>全カテゴリからランダムに問題を出題します</p>
             <div className='space-y-3'>
@@ -450,7 +450,7 @@ export default function Quiz() {
           </div>
 
           {/* カテゴリ別問題 */}
-          <div className='border-2 border-dashed border-gray-300 rounded-lg p-6 hover:border-green-400 transition-colors'>
+          <div className='interactive-card hover:border-green-400 dark:hover:border-green-500'>
             <h3 className='text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4'>カテゴリ別問題</h3>
             <p className='text-slate-600 dark:text-slate-400 mb-6 text-sm'>特定の分野に集中して学習できます</p>
             <div className='space-y-2'>
@@ -458,11 +458,11 @@ export default function Quiz() {
                 <button
                   key={category.category}
                   onClick={() => startQuiz('category', Math.min(category.questionCount, 10), category.category)}
-                  className='w-full text-left bg-gray-50 hover:bg-gray-100 py-2 px-3 rounded-lg transition-colors'
+                  className='w-full text-left bg-slate-50 hover:bg-slate-100 py-2 px-3 rounded-lg transition-all duration-200'
                 >
                   <div className='flex justify-between items-center'>
                     <span className='text-sm font-medium'>{category.category}</span>
-                    <span className='text-xs text-gray-500'>{category.questionCount}問</span>
+                    <span className='text-xs text-slate-500'>{category.questionCount}問</span>
                   </div>
                 </button>
               ))}
@@ -482,7 +482,7 @@ export default function Quiz() {
       </div>
 
       {/* タブナビゲーション */}
-      <div className='flex overflow-x-auto border-b border-gray-200 mb-6 scrollbar-hide'>
+      <div className='flex overflow-x-auto border-b border-slate-200 mb-6 scrollbar-hide'>
         {[
           { key: 'quiz', label: '問題演習', shortLabel: '演習' },
           { key: 'progress', label: '学習進捗', shortLabel: '進捗' },
@@ -492,10 +492,10 @@ export default function Quiz() {
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key as any)}
-            className={`flex-shrink-0 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
+            className={`flex-shrink-0 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium border-b-2 transition-all duration-200 whitespace-nowrap ${
               activeTab === tab.key
                 ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700'
+                : 'border-transparent text-slate-500 hover:text-slate-700'
             }`}
           >
             <span className='hidden sm:inline'>{tab.label}</span>
@@ -508,24 +508,24 @@ export default function Quiz() {
       {activeTab === 'progress' && state.progress && (
         <div className='space-y-6'>
           {/* 全体進捗 */}
-          <div className='bg-gray-50 rounded-lg p-6'>
+          <div className='bg-slate-50 rounded-lg p-6'>
             <h3 className='text-lg font-semibold mb-4'>全体進捗</h3>
             <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
               <div className='text-center'>
                 <div className='text-2xl font-bold text-blue-600'>{state.progress.overall.totalQuestions}</div>
-                <div className='text-sm text-gray-600'>総問題数</div>
+                <div className='text-sm text-slate-600'>総問題数</div>
               </div>
               <div className='text-center'>
                 <div className='text-2xl font-bold text-green-600'>{state.progress.overall.answeredQuestions}</div>
-                <div className='text-sm text-gray-600'>回答済み問題数</div>
+                <div className='text-sm text-slate-600'>回答済み問題数</div>
               </div>
               <div className='text-center'>
                 <div className='text-2xl font-bold text-purple-600'>{state.progress.overall.progressRate}%</div>
-                <div className='text-sm text-gray-600'>進捗率</div>
+                <div className='text-sm text-slate-600'>進捗率</div>
               </div>
             </div>
             <div className='mt-4'>
-              <div className='w-full bg-gray-200 rounded-full h-2'>
+              <div className='w-full bg-slate-200 rounded-full h-2'>
                 <div
                   className='bg-blue-500 h-2 rounded-full transition-all duration-300'
                   style={{ width: `${state.progress.overall.progressRate}%` }}
@@ -535,20 +535,20 @@ export default function Quiz() {
           </div>
 
           {/* 最近の活動 */}
-          <div className='bg-gray-50 rounded-lg p-6'>
+          <div className='bg-slate-50 rounded-lg p-6'>
             <h3 className='text-lg font-semibold mb-4'>最近の学習活動</h3>
             <div className='space-y-3'>
               {state.progress.recentActivity.slice(0, 5).map(session => (
                 <div key={session.id} className='flex items-center justify-between p-3 bg-white rounded-lg'>
                   <div>
                     <div className='font-medium'>{session.category || 'ランダム問題'}</div>
-                    <div className='text-sm text-gray-600'>
+                    <div className='text-sm text-slate-600'>
                       {new Date(session.completedAt || session.startedAt).toLocaleDateString()}
                     </div>
                   </div>
                   <div className='text-right'>
                     <div className='font-bold text-lg text-green-600'>{session.score}点</div>
-                    <div className='text-sm text-gray-600'>
+                    <div className='text-sm text-slate-600'>
                       {session.correctAnswers}/{session.totalQuestions}問正解
                     </div>
                   </div>
@@ -572,7 +572,7 @@ export default function Quiz() {
                     <span className='font-medium'>{weak.category}</span>
                     <div className='text-right'>
                       <div className='text-sm text-red-600'>正答率: {Math.round(weak.accuracy_rate)}%</div>
-                      <div className='text-xs text-gray-600'>{weak.total_answers}問回答</div>
+                      <div className='text-xs text-slate-600'>{weak.total_answers}問回答</div>
                     </div>
                   </div>
                 ))}
@@ -589,7 +589,7 @@ export default function Quiz() {
                   推奨理由: {state.recommendations.reason === 'weak_category_focus' ? '苦手分野の強化' : '一般的な学習'}
                 </div>
                 {state.recommendations.weakCategories && (
-                  <div className='text-xs text-gray-600 mt-1'>
+                  <div className='text-xs text-slate-600 mt-1'>
                     重点カテゴリ: {state.recommendations.weakCategories.join(', ')}
                   </div>
                 )}
@@ -615,7 +615,7 @@ export default function Quiz() {
           {state.learningTrends ? (
             <>
               {/* 日別学習トレンド */}
-              <div className='bg-gray-50 rounded-lg p-6'>
+              <div className='bg-slate-50 rounded-lg p-6'>
                 <h3 className='text-lg font-semibold mb-4'>日別学習トレンド (過去30日)</h3>
                 <Suspense fallback={<div className='h-64 flex items-center justify-center'>グラフを読み込み中...</div>}>
                   <ResponsiveContainer width='100%' height={300}>
@@ -652,7 +652,7 @@ export default function Quiz() {
               </div>
 
               {/* 累積進捗 */}
-              <div className='bg-gray-50 rounded-lg p-6'>
+              <div className='bg-slate-50 rounded-lg p-6'>
                 <h3 className='text-lg font-semibold mb-4'>累積学習進捗</h3>
                 <Suspense fallback={<div className='h-64 flex items-center justify-center'>グラフを読み込み中...</div>}>
                   <ResponsiveContainer width='100%' height={300}>
@@ -683,18 +683,18 @@ export default function Quiz() {
 
               {/* カテゴリ別トレンド */}
               {state.learningTrends.categoryTrends.length > 0 && (
-                <div className='bg-gray-50 rounded-lg p-6'>
+                <div className='bg-slate-50 rounded-lg p-6'>
                   <h3 className='text-lg font-semibold mb-4'>カテゴリ別学習状況</h3>
                   <div className='space-y-3'>
                     {state.learningTrends.categoryTrends.map((category: any, index: number) => (
                       <div key={index} className='flex items-center justify-between p-3 bg-white rounded-lg'>
                         <span className='font-medium'>{category.category}</span>
                         <div className='flex items-center space-x-4'>
-                          <div className='text-sm text-gray-600'>{category.questions_attempted}問</div>
+                          <div className='text-sm text-slate-600'>{category.questions_attempted}問</div>
                           <div className='text-sm text-green-600'>
                             正答率: {Math.round(category.accuracy_rate * 100)}%
                           </div>
-                          <div className='w-20 bg-gray-200 rounded-full h-2'>
+                          <div className='w-20 bg-slate-200 rounded-full h-2'>
                             <div
                               className='bg-blue-500 h-2 rounded-full transition-all duration-300'
                               style={{ width: `${Math.min(category.accuracy_rate * 100, 100)}%` }}
@@ -708,8 +708,8 @@ export default function Quiz() {
               )}
             </>
           ) : (
-            <div className='bg-gray-50 rounded-lg p-6 text-center'>
-              <p className='text-gray-600 dark:text-gray-300'>学習データが不足しています。問題演習を行うとトレンドが表示されます。</p>
+            <div className='bg-slate-50 rounded-lg p-6 text-center'>
+              <p className='text-slate-600 dark:text-slate-300'>学習データが不足しています。問題演習を行うとトレンドが表示されます。</p>
             </div>
           )}
         </div>

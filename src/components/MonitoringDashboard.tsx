@@ -242,7 +242,7 @@ const MonitoringDashboard: React.FC = () => {
       case 'critical':
         return 'text-red-800 bg-red-100 border-red-300';
       default:
-        return 'text-gray-600 bg-gray-50 border-gray-200';
+        return 'text-slate-600 bg-slate-50 border-slate-200';
     }
   };
 
@@ -254,15 +254,15 @@ const MonitoringDashboard: React.FC = () => {
 
   if (isLoading && !metrics) {
     return (
-      <div className='min-h-screen bg-gray-50 dark:bg-gray-900 p-6'>
+      <div className='min-h-screen bg-slate-50 dark:bg-slate-900 p-6'>
         <div className='max-w-7xl mx-auto'>
           <div className='animate-pulse'>
-            <div className='h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-6'></div>
+            <div className='h-8 bg-slate-200 dark:bg-slate-700 rounded w-1/4 mb-6'></div>
             <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8'>
               {[...Array(4)].map((_, i) => (
-                <div key={i} className='bg-white dark:bg-gray-800 p-6 rounded-lg shadow'>
-                  <div className='h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mb-2'></div>
-                  <div className='h-8 bg-gray-200 dark:bg-gray-700 rounded w-3/4'></div>
+                <div key={i} className='card-primary p-6 rounded-lg shadow'>
+                  <div className='h-4 bg-slate-200 dark:bg-slate-700 rounded w-1/2 mb-2'></div>
+                  <div className='h-8 bg-slate-200 dark:bg-slate-700 rounded w-3/4'></div>
                 </div>
               ))}
             </div>
@@ -273,7 +273,7 @@ const MonitoringDashboard: React.FC = () => {
   }
 
   return (
-    <div className='min-h-screen bg-gray-50 dark:bg-gray-900 p-6'>
+    <div className='min-h-screen bg-slate-50 dark:bg-slate-900 p-6'>
       <div className='max-w-7xl mx-auto'>
         {/* ヘッダー */}
         <div className='flex justify-between items-center mb-6'>
@@ -294,7 +294,7 @@ const MonitoringDashboard: React.FC = () => {
               <select
                 value={refreshInterval}
                 onChange={e => setRefreshInterval(Number(e.target.value))}
-                className='text-sm border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-800'
+                className='text-sm border border-slate-300 dark:border-slate-600 rounded px-2 py-1 card-primary'
                 disabled={!autoRefresh}
               >
                 <option value={10}>10秒</option>
@@ -307,7 +307,7 @@ const MonitoringDashboard: React.FC = () => {
             <button
               onClick={refreshData}
               disabled={isLoading}
-              className='px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded transition-colors'
+              className='px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded transition-all duration-200'
             >
               {isLoading ? '更新中...' : '手動更新'}
             </button>
@@ -315,7 +315,7 @@ const MonitoringDashboard: React.FC = () => {
             {process.env.NODE_ENV === 'development' && (
               <button
                 onClick={resetMetrics}
-                className='px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded transition-colors'
+                className='px-4 py-2 bg-slate-600 hover:bg-slate-700 text-white rounded transition-all duration-200'
               >
                 メトリクスリセット
               </button>
@@ -342,7 +342,7 @@ const MonitoringDashboard: React.FC = () => {
         {/* システム概要 */}
         {metrics && health && (
           <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8'>
-            <div className='bg-white dark:bg-gray-800 p-6 rounded-lg shadow'>
+            <div className='card-primary p-6 rounded-lg shadow'>
               <div className='flex items-center justify-between'>
                 <div>
                   <p className='text-sm font-medium text-gray-600 dark:text-gray-400'>システム状態</p>
@@ -359,7 +359,7 @@ const MonitoringDashboard: React.FC = () => {
               <p className='text-xs text-gray-500 dark:text-gray-400 mt-2'>稼働時間: {formatUptime(health.uptime)}</p>
             </div>
 
-            <div className='bg-white dark:bg-gray-800 p-6 rounded-lg shadow'>
+            <div className='card-primary p-6 rounded-lg shadow'>
               <div className='flex items-center justify-between'>
                 <div>
                   <p className='text-sm font-medium text-gray-600 dark:text-gray-400'>リクエスト数</p>
@@ -380,7 +380,7 @@ const MonitoringDashboard: React.FC = () => {
               </p>
             </div>
 
-            <div className='bg-white dark:bg-gray-800 p-6 rounded-lg shadow'>
+            <div className='card-primary p-6 rounded-lg shadow'>
               <div className='flex items-center justify-between'>
                 <div>
                   <p className='text-sm font-medium text-gray-600 dark:text-gray-400'>平均応答時間</p>
@@ -407,7 +407,7 @@ const MonitoringDashboard: React.FC = () => {
               </p>
             </div>
 
-            <div className='bg-white dark:bg-gray-800 p-6 rounded-lg shadow'>
+            <div className='card-primary p-6 rounded-lg shadow'>
               <div className='flex items-center justify-between'>
                 <div>
                   <p className='text-sm font-medium text-gray-600 dark:text-gray-400'>メモリ使用量</p>
@@ -453,9 +453,9 @@ const MonitoringDashboard: React.FC = () => {
         {metrics && Object.keys(metrics.endpointAverages).length > 0 && (
           <div className='mb-8'>
             <h2 className='text-xl font-semibold text-gray-900 dark:text-white mb-4'>エンドポイント統計</h2>
-            <div className='bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden'>
+            <div className='card-primary rounded-lg shadow overflow-hidden'>
               <div className='overflow-x-auto'>
-                <table className='min-w-full divide-y divide-gray-200 dark:divide-gray-700'>
+                <table className='min-w-full divide-y divide-slate-200 dark:divide-slate-700'>
                   <thead className='bg-gray-50 dark:bg-gray-700'>
                     <tr>
                       <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider'>
@@ -472,7 +472,7 @@ const MonitoringDashboard: React.FC = () => {
                       </th>
                     </tr>
                   </thead>
-                  <tbody className='bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700'>
+                  <tbody className='card-primary divide-y divide-slate-200 dark:divide-slate-700'>
                     {Object.entries(metrics.endpointAverages)
                       .sort(([, a], [, b]) => b.count - a.count)
                       .slice(0, 10)
@@ -507,7 +507,7 @@ const MonitoringDashboard: React.FC = () => {
         {metrics && Object.keys(metrics.statusCodes).length > 0 && (
           <div>
             <h2 className='text-xl font-semibold text-gray-900 dark:text-white mb-4'>ステータスコード分布</h2>
-            <div className='bg-white dark:bg-gray-800 p-6 rounded-lg shadow'>
+            <div className='card-primary p-6 rounded-lg shadow'>
               <div className='grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4'>
                 {Object.entries(metrics.statusCodes)
                   .sort(([a], [b]) => Number(a) - Number(b))

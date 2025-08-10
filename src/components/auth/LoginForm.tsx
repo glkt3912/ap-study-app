@@ -35,8 +35,8 @@ export function LoginForm({ onModeChange }: LoginFormProps) {
   };
 
   return (
-    <div className='bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md w-full max-w-md mx-auto'>
-      <h2 className='text-2xl font-bold text-center mb-6 text-gray-900 dark:text-white'>ログイン</h2>
+    <div className='card-primary p-8 rounded-lg shadow-md w-full max-w-md mx-auto'>
+      <h2 className='text-2xl font-bold text-center mb-6 text-primary'>ログイン</h2>
 
       <form onSubmit={handleSubmit} className='space-y-4'>
         <div>
@@ -80,14 +80,14 @@ export function LoginForm({ onModeChange }: LoginFormProps) {
         <button
           type='submit'
           disabled={isLoading || !formData.email || !formData.password}
-          className='w-full bg-blue-600 dark:bg-blue-700 text-white py-2 px-4 rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 disabled:bg-gray-400 dark:disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors'
+          className='w-full bg-blue-600 dark:bg-blue-700 text-white py-2 px-4 rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 disabled:bg-slate-400 dark:disabled:bg-slate-600 disabled:cursor-not-allowed transition-all duration-200'
         >
           {isLoading ? 'ログイン中...' : 'ログイン'}
         </button>
       </form>
 
       <div className='mt-6 text-center'>
-        <p className='text-sm text-gray-600 dark:text-gray-300'>
+        <p className='text-sm text-secondary'>
           アカウントをお持ちでない方は{' '}
           <button
             onClick={() => onModeChange('signup')}
@@ -98,8 +98,8 @@ export function LoginForm({ onModeChange }: LoginFormProps) {
         </p>
       </div>
 
-      <div className='mt-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-md'>
-        <p className='text-xs text-gray-600 dark:text-gray-300 text-center'>開発環境用: test@example.com / test1234</p>
+      <div className='mt-4 p-3 bg-slate-50 dark:bg-slate-700 rounded-md'>
+        <p className='text-xs text-secondary text-center'>開発環境用: test@example.com / test1234</p>
       </div>
     </div>
   );

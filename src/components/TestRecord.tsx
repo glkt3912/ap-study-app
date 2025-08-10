@@ -289,7 +289,7 @@ export default function TestRecord() {
                 <button
                   type='submit'
                   disabled={isLoading}
-                  className='bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
+                  className='bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed'
                 >
                   {isLoading ? '保存中...' : '記録を追加'}
                 </button>
@@ -417,7 +417,7 @@ export default function TestRecord() {
                 <button
                   type='submit'
                   disabled={isLoading}
-                  className='bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
+                  className='bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed'
                 >
                   {isLoading ? '保存中...' : '記録を追加'}
                 </button>

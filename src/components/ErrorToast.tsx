@@ -48,7 +48,7 @@ function ErrorToast({ error, onClose, onAction: _onAction }: ErrorToastProps) {
       case ErrorSeverity.CRITICAL:
         return 'bg-red-50 border-red-200 text-red-800';
       default:
-        return 'bg-gray-50 border-gray-200 text-gray-800';
+        return 'bg-gray-50 border-slate-200 text-gray-800';
     }
   };
 
@@ -84,7 +84,7 @@ function ErrorToast({ error, onClose, onAction: _onAction }: ErrorToastProps) {
             <h4 className='text-sm font-semibold'>エラーが発生しました ({error.severity})</h4>
             <button
               onClick={handleClose}
-              className='text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors'
+              className='text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-all duration-200'
               aria-label='閉じる'
             >
               ✕
@@ -116,7 +116,7 @@ function ErrorToast({ error, onClose, onAction: _onAction }: ErrorToastProps) {
                     }
                     handleClose();
                   }}
-                  className='text-xs px-3 py-1 bg-white border border-current rounded hover:bg-gray-50 transition-colors'
+                  className='text-xs px-3 py-1 bg-white border border-current rounded hover:bg-gray-50 transition-all duration-200'
                 >
                   {recoveryAction.label}
                 </button>

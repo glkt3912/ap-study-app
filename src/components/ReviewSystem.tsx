@@ -142,7 +142,7 @@ export function ReviewSystem() {
                   <button
                     key={level}
                     onClick={() => setCurrentUnderstanding(level)}
-                    className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full text-xs sm:text-sm font-medium transition-colors ${
+                    className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 ${
                       currentUnderstanding === level
                         ? 'bg-blue-500 text-white'
                         : 'bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-500'
@@ -184,7 +184,7 @@ export function ReviewSystem() {
           {todayReviews.length > 0 && (
             <div className='space-y-3'>
               {todayReviews.map(item => (
-                <div key={item.id} className='border border-gray-200 rounded-lg p-3 sm:p-4'>
+                <div key={item.id} className='border border-slate-200 rounded-lg p-3 sm:p-4'>
                   <div className='flex flex-col sm:flex-row sm:items-center justify-between mb-2 space-y-2 sm:space-y-0'>
                     <h4 className='font-medium text-slate-900 dark:text-slate-100 text-sm sm:text-base'>{item.category}</h4>
                     <div className='flex items-center space-x-2'>

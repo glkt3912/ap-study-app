@@ -198,7 +198,7 @@ export default function DataExport({ studyData }: DataExportProps) {
             <button
               onClick={exportToJSON}
               disabled={isExporting}
-              className='flex items-center justify-center px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded-lg transition-colors'
+              className='flex items-center justify-center px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded-lg transition-all duration-200'
             >
               <span className='mr-2'>📄</span>
               JSON形式でエクスポート
@@ -207,7 +207,7 @@ export default function DataExport({ studyData }: DataExportProps) {
             <button
               onClick={exportToCSV}
               disabled={isExporting}
-              className='flex items-center justify-center px-6 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white rounded-lg transition-colors'
+              className='flex items-center justify-center px-6 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white rounded-lg transition-all duration-200'
             >
               <span className='mr-2'>📊</span>
               CSV形式でエクスポート
@@ -222,7 +222,7 @@ export default function DataExport({ studyData }: DataExportProps) {
             <button
               onClick={() => exportQuizData('json')}
               disabled={isExporting}
-              className='flex items-center justify-center px-6 py-3 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 text-white rounded-lg transition-colors'
+              className='flex items-center justify-center px-6 py-3 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 text-white rounded-lg transition-all duration-200'
             >
               <span className='mr-2'>🧠</span>
               Quiz JSON エクスポート
@@ -231,7 +231,7 @@ export default function DataExport({ studyData }: DataExportProps) {
             <button
               onClick={() => exportQuizData('csv')}
               disabled={isExporting}
-              className='flex items-center justify-center px-6 py-3 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-400 text-white rounded-lg transition-colors'
+              className='flex items-center justify-center px-6 py-3 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-400 text-white rounded-lg transition-all duration-200'
             >
               <span className='mr-2'>📈</span>
               Quiz CSV エクスポート

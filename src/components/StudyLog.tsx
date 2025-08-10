@@ -292,13 +292,13 @@ export default function StudyLog() {
                   value={topicInput}
                   onChange={e => setTopicInput(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addTopic())}
-                  className='flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500'
+                  className='flex-1 px-3 py-2 border border-slate-300 rounded-md focus:ring-blue-500 focus:border-blue-500'
                   placeholder='学習項目を入力 (例: SQL基礎)'
                 />
                 <button
                   type='button'
                   onClick={addTopic}
-                  className='px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors'
+                  className='px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-all duration-200'
                 >
                   追加
                 </button>

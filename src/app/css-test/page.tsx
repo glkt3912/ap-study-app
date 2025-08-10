@@ -144,7 +144,7 @@ export default function CSSTestPage() {
         <section className='mb-8'>
           <h2 className='text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-4'>🌙 ダークモードテスト</h2>
           <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-            <div className='bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 p-6 rounded-lg'>
+            <div className='bg-white dark:bg-gray-800 border border-slate-300 dark:border-slate-600 p-6 rounded-lg'>
               <h3 className='text-gray-900 dark:text-white font-bold mb-2'>背景切り替えテスト</h3>
               <p className='text-gray-600 dark:text-gray-300'>
                 ライトモード: 白背景・ダークテキスト
