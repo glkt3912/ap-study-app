@@ -22,11 +22,11 @@ export default function CSSTestPage() {
   }
 
   return (
-    <div className='min-h-screen bg-gray-50 dark:bg-gray-900 p-8'>
+    <div className='min-h-screen container-primary p-8'>
       <div className='max-w-6xl mx-auto'>
         <div className='flex justify-between items-center mb-8'>
           <h1 className='text-3xl font-bold text-gray-900 dark:text-white'>🎨 CSS専用テストページ</h1>
-          <button onClick={toggleDarkMode} className='px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600'>
+          <button onClick={toggleDarkMode} className='btn-primary hover-lift click-shrink focus-ring'>
             {isDarkMode ? '☀️ ライト' : '🌙 ダーク'}
           </button>
         </div>
@@ -188,7 +188,7 @@ export default function CSSTestPage() {
             </div>
 
             {/* トランジションテスト */}
-            <div className='bg-white dark:bg-gray-800 p-6 rounded-xl hover:bg-blue-500 hover:text-white transition-all duration-300 cursor-pointer'>
+            <div className='card-primary p-6 rounded-xl hover:btn-primary hover:text-white transition-all duration-300 cursor-pointer hover-lift'>
               <h3 className='font-bold mb-2'>Transition Test</h3>
               <p className='text-sm'>
                 hover:bg-blue-500
