@@ -186,7 +186,7 @@ export function LearningEfficiencyDashboard() {
           </div>
 
           {/* 推奨事項 */}
-          <div className='bg-slate-50 dark:bg-slate-700 rounded-lg p-6'>
+          <div className='card-accent p-6'>
             <h3 className='text-xl font-semibold text-gray-800 dark:text-white mb-4'>🎯 改善提案</h3>
             <div className='space-y-4'>
               {analysis?.recommendations?.map((rec, index) => (
@@ -208,7 +208,7 @@ export function LearningEfficiencyDashboard() {
           </div>
 
           {/* 時間帯別効率 */}
-          <div className='bg-slate-50 dark:bg-slate-700 rounded-lg p-6'>
+          <div className='card-accent p-6'>
             <h3 className='text-xl font-semibold text-gray-800 dark:text-white mb-4'>⏰ 時間帯別学習効率</h3>
             <div className='h-80'>
               <Suspense
@@ -249,7 +249,7 @@ export function LearningEfficiencyDashboard() {
           </div>
 
           {/* 分野別効率 */}
-          <div className='bg-slate-50 dark:bg-slate-700 rounded-lg p-6'>
+          <div className='card-accent p-6'>
             <h3 className='text-xl font-semibold text-gray-800 dark:text-white mb-4'>📚 分野別学習効率</h3>
             <div className='h-80'>
               <Suspense
@@ -292,7 +292,7 @@ export function LearningEfficiencyDashboard() {
           {/* 詳細数値 */}
           <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
             {/* 分野別詳細 */}
-            <div className='bg-slate-50 dark:bg-slate-700 rounded-lg p-6'>
+            <div className='card-accent p-6'>
               <h3 className='text-lg font-semibold text-gray-800 dark:text-white mb-4'>分野別詳細</h3>
               <div className='space-y-3'>
                 {analysis?.subjectEfficiency?.map((subject, index) => (
@@ -310,7 +310,7 @@ export function LearningEfficiencyDashboard() {
             </div>
 
             {/* 最適時間帯 */}
-            <div className='bg-slate-50 dark:bg-slate-700 rounded-lg p-6'>
+            <div className='card-accent p-6'>
               <h3 className='text-lg font-semibold text-gray-800 dark:text-white mb-4'>最適時間帯TOP5</h3>
               <div className='space-y-3'>
                 {analysis?.hourlyEfficiency
