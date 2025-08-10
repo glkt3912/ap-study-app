@@ -56,8 +56,8 @@ export class ErrorBoundary extends Component<Props, State> {
       }
 
       return (
-        <div className='min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900'>
-          <div className='max-w-md w-full bg-white dark:bg-slate-800 shadow-lg rounded-lg p-6'>
+        <div className='min-h-screen flex items-center justify-center container-primary z-modal-backdrop'>
+          <div className='max-w-md w-full card-primary p-6 shadow-strong hover-lift z-modal'>
             <div className='flex items-center mb-4'>
               <div className='flex-shrink-0'>
                 <svg className='h-8 w-8 text-red-500' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
@@ -79,11 +79,11 @@ export class ErrorBoundary extends Component<Props, State> {
             </div>
 
             {process.env.NODE_ENV === 'development' && this.state.error && (
-              <details className='mb-4'>
-                <summary className='cursor-pointer text-sm font-medium text-tertiary mb-2'>
+              <details className='mb-4 hover-lift'>
+                <summary className='cursor-pointer text-sm font-medium text-tertiary mb-2 click-shrink focus-ring'>
                   エラー詳細（開発環境）
                 </summary>
-                <div className='bg-slate-100 dark:bg-slate-700 p-3 rounded text-xs font-mono overflow-auto max-h-40'>
+                <div className='bg-slate-100 dark:bg-slate-700 p-3 rounded text-xs font-mono overflow-auto max-h-40 scrollbar-modern'>
                   <div className='mb-2'>
                     <strong>エラー:</strong> {this.state.error.message}
                   </div>
@@ -106,13 +106,13 @@ export class ErrorBoundary extends Component<Props, State> {
             <div className='flex space-x-3'>
               <button
                 onClick={() => window.location.reload()}
-                className='flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-all duration-200'
+                className='flex-1 btn-primary hover-lift click-shrink focus-ring'
               >
                 ページを再読み込み
               </button>
               <button
                 onClick={() => window.history.back()}
-                className='flex-1 btn-secondary'
+                className='flex-1 btn-secondary hover-lift click-shrink focus-ring'
               >
                 前のページに戻る
               </button>
