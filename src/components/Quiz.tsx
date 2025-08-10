@@ -430,7 +430,7 @@ export default function Quiz() {
 
         <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
           {/* ランダム問題 */}
-          <div className='border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-lg p-6 hover:border-blue-400 transition-colors'>
+          <div className='interactive-card'>
             <h3 className='text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4'>ランダム問題</h3>
             <p className='text-slate-600 dark:text-slate-400 mb-6 text-sm'>全カテゴリからランダムに問題を出題します</p>
             <div className='space-y-3'>
@@ -450,7 +450,7 @@ export default function Quiz() {
           </div>
 
           {/* カテゴリ別問題 */}
-          <div className='border-2 border-dashed border-gray-300 rounded-lg p-6 hover:border-green-400 transition-colors'>
+          <div className='interactive-card hover:border-green-400 dark:hover:border-green-500'>
             <h3 className='text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4'>カテゴリ別問題</h3>
             <p className='text-slate-600 dark:text-slate-400 mb-6 text-sm'>特定の分野に集中して学習できます</p>
             <div className='space-y-2'>

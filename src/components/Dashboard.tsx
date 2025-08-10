@@ -79,7 +79,7 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
   if (isLoading) {
     return (
       <div className='space-y-6'>
-        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6'>
+        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6'>
           <CardSkeleton />
           <CardSkeleton />
           <CardSkeleton />
@@ -115,7 +115,7 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
 
   return (
     <div className='space-y-6'>
-      <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6'>
+      <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6'>
         <div className='card-stats'>
           <div className='flex items-center'>
             <div className='p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex-shrink-0'>

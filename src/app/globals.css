@@ -2,6 +2,37 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  /* Brand Colors */
+  --color-primary: 37 99 235; /* blue-600 */
+  --color-primary-hover: 29 78 216; /* blue-700 */
+  --color-success: 34 197 94; /* green-500 */
+  --color-warning: 245 158 11; /* amber-500 */
+  --color-error: 239 68 68; /* red-500 */
+  
+  /* Theme Colors */
+  --color-background: 255 255 255; /* white */
+  --color-surface: 248 250 252; /* slate-50 */
+  --color-text-primary: 15 23 42; /* slate-900 */
+  --color-text-secondary: 71 85 105; /* slate-600 */
+  --color-border: 226 232 240; /* slate-200 */
+}
+
+.dark {
+  /* Dark Theme Colors */
+  --color-primary: 59 130 246; /* blue-500 */
+  --color-primary-hover: 37 99 235; /* blue-600 */
+  --color-success: 34 197 94; /* green-500 */
+  --color-warning: 245 158 11; /* amber-500 */
+  --color-error: 248 113 113; /* red-400 */
+  
+  --color-background: 30 41 59; /* slate-800 */
+  --color-surface: 51 65 85; /* slate-700 */
+  --color-text-primary: 248 250 252; /* slate-50 */
+  --color-text-secondary: 148 163 184; /* slate-400 */
+  --color-border: 71 85 105; /* slate-600 */
+}
+
 @layer components {
   /* Card Utilities */
   .card-primary {
@@ -18,11 +49,11 @@
 
   /* Button Utilities */
   .btn-primary {
-    @apply bg-blue-600 dark:bg-blue-700 text-white px-4 py-2 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 disabled:bg-gray-400 dark:disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors font-medium;
+    @apply bg-blue-600 dark:bg-blue-700 text-white px-4 py-2 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 disabled:bg-slate-400 dark:disabled:bg-slate-600 disabled:cursor-not-allowed transition-all duration-200 font-medium focus-ring hover:shadow-md active:scale-[0.98];
   }
 
   .btn-secondary {
-    @apply bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-4 py-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 border border-slate-300 dark:border-slate-600 transition-colors font-medium;
+    @apply bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-4 py-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 border border-slate-300 dark:border-slate-600 transition-all duration-200 font-medium focus-ring hover:shadow-sm active:scale-[0.98];
   }
 
   .btn-danger {
@@ -55,11 +86,11 @@
   }
 
   .text-tertiary {
-    @apply text-gray-600 dark:text-gray-300;
+    @apply text-slate-600 dark:text-slate-300;
   }
 
   .text-quaternary {
-    @apply text-gray-500 dark:text-gray-400;
+    @apply text-slate-500 dark:text-slate-400;
   }
 
   .heading-primary {
@@ -183,11 +214,16 @@
 
   /* Interactive Elements */
   .interactive-card {
-    @apply border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-lg p-6 hover:border-blue-400 dark:hover:border-blue-500 transition-colors cursor-pointer;
+    @apply border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-lg p-4 sm:p-6 hover:border-blue-400 dark:hover:border-blue-500 transition-all duration-200 cursor-pointer hover:shadow-md;
   }
 
   .focus-ring {
-    @apply focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-2 dark:focus:ring-offset-slate-800;
+    @apply focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-2 dark:focus:ring-offset-slate-800 focus:ring-opacity-50;
+  }
+
+  /* Enhanced focus states for accessibility */
+  .focus-visible-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:focus-visible:ring-blue-400 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-800;
   }
 
   /* Skeleton Loading */
