@@ -116,7 +116,7 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
   return (
     <div className='space-y-6'>
       <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6'>
-        <div className='card-stats'>
+        <div className='metric-card hover-lift'>
           <div className='flex items-center'>
             <div className='p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex-shrink-0'>
               <span className='text-xl sm:text-2xl'>📚</span>
@@ -133,7 +133,7 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
           </div>
         </div>
 
-        <div className='card-stats'>
+        <div className='metric-card hover-lift'>
           <div className='flex items-center'>
             <div className='p-2 bg-green-100 dark:bg-green-900/30 rounded-lg flex-shrink-0'>
               <span className='text-xl sm:text-2xl'>⏱️</span>
@@ -148,7 +148,7 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
           </div>
         </div>
 
-        <div className='card-stats'>
+        <div className='metric-card hover-lift'>
           <div className='flex items-center'>
             <div className='p-2 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex-shrink-0'>
               <span className='text-xl sm:text-2xl'>🎯</span>
@@ -163,7 +163,7 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
           </div>
         </div>
 
-        <div className='card-stats'>
+        <div className='metric-card hover-lift'>
           <div className='flex items-center'>
             <div className='p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex-shrink-0'>
               <span className='text-xl sm:text-2xl'>📅</span>
@@ -183,22 +183,22 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
           🤖 AI学習コーチ (新機能)
           ======================================== */}
       {user?.id && predictiveAnalysis && (
-        <div className='bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 rounded-lg shadow-md p-6'>
+        <div className='bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 rounded-lg shadow-moderate p-6 hover-lift z-content'>
           <div className='flex items-center justify-between mb-4'>
             <div className='flex items-center space-x-2'>
               <span className='text-2xl'>🤖</span>
               <h3 className='text-xl font-semibold text-slate-900 dark:text-white'>AI学習コーチ</h3>
             </div>
             <div className='text-right'>
-              <div className='text-3xl font-bold text-purple-600 dark:text-purple-400'>
+              <div className='metric-value text-purple-600 dark:text-purple-400'>
                 {predictiveAnalysis.examPassProbability}%
               </div>
-              <div className='text-sm text-purple-800 dark:text-purple-300'>合格予測確率</div>
+              <div className='metric-label text-purple-800 dark:text-purple-300'>合格予測確率</div>
             </div>
           </div>
 
           <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-            <div className='card-secondary p-4'>
+            <div className='card-secondary p-4 hover-lift click-shrink'>
               <div className='flex items-center space-x-2 mb-2'>
                 <span className='text-lg'>📈</span>
                 <h4 className='font-semibold text-slate-900 dark:text-white'>学習予測</h4>
@@ -215,7 +215,7 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
               </div>
             </div>
 
-            <div className='card-secondary p-4'>
+            <div className='card-secondary p-4 hover-lift click-shrink'>
               <div className='flex items-center space-x-2 mb-2'>
                 <span className='text-lg'>⚠️</span>
                 <h4 className='font-semibold text-slate-900 dark:text-white'>注意点</h4>
@@ -232,7 +232,7 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
               </div>
             </div>
 
-            <div className='card-secondary p-4'>
+            <div className='card-secondary p-4 hover-lift click-shrink'>
               <div className='flex items-center space-x-2 mb-2'>
                 <span className='text-lg'>✨</span>
                 <h4 className='font-semibold text-slate-900 dark:text-white'>強み</h4>
@@ -254,7 +254,7 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
           {personalizedRecommendations && 
             personalizedRecommendations.dailyStudyPlan && 
             personalizedRecommendations.dailyStudyPlan.length > 0 && (
-            <div className='mt-4 card-secondary p-4'>
+            <div className='mt-4 card-secondary p-4 hover-lift z-content'>
               <div className='flex items-center space-x-2 mb-3'>
                 <span className='text-lg'>📋</span>
                 <h4 className='font-semibold text-slate-900 dark:text-white'>今日の推奨アクション</h4>
@@ -266,12 +266,12 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
                       {plan.subjects.join(', ')}
                     </span>
                     <span
-                      className={`text-xs px-2 py-1 rounded-full ${
+                      className={`click-shrink ${
                         plan.priority === 'high'
-                          ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400'
+                          ? 'badge-error'
                           : plan.priority === 'medium'
-                            ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400'
-                            : 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400'
+                            ? 'badge-warning'
+                            : 'badge-success'
                       }`}
                     >
                       {plan.priority}
@@ -286,7 +286,7 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
           )}
 
           {isLoadingAI && (
-            <div className='mt-4 flex items-center justify-center py-4'>
+            <div className='mt-4 flex items-center justify-center py-4 z-loading'>
               <div className='loading-spinner-purple'></div>
               <span className='ml-2 text-sm loading-text'>AI分析中...</span>
             </div>
@@ -295,7 +295,7 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
       )}
 
       <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
-        <div className='card-primary'>
+        <div className='card-primary hover-lift z-content'>
           <div className='p-6 border-b border-slate-200 dark:border-slate-700'>
             <h3 className='text-lg font-semibold text-slate-900 dark:text-white'>今日の学習</h3>
           </div>
@@ -312,7 +312,7 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
                     {todayTask.topics.map((topic, index) => (
                       <span
                         key={index}
-                        className='px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 text-xs rounded-full'
+                        className='badge-info text-xs rounded-full'
                       >
                         {topic}
                       </span>
@@ -325,7 +325,7 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
                 </div>
                 <div className='w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2'>
                   <div
-                    className='bg-blue-600 dark:bg-blue-500 h-2 rounded-full'
+                    className='progress-fill-primary h-2 rounded-full'
                     style={{ width: todayTask.completed ? '100%' : '0%' }}
                   ></div>
                 </div>
@@ -354,7 +354,7 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
                     </div>
                     <div className='w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2'>
                       <div
-                        className='bg-green-600 dark:bg-green-500 h-2 rounded-full transition-all duration-300'
+                        className='progress-fill-success h-2 rounded-full transition-all duration-300'
                         style={{ width: `${weekProgress}%` }}
                       ></div>
                     </div>

@@ -207,7 +207,7 @@ export default function StudyLog() {
 
   return (
     <div className='space-y-6'>
-      <div className='bg-white dark:bg-slate-800 rounded-lg shadow-md'>
+      <div className='card-primary shadow-moderate hover-lift'>
         <div className='p-6 border-b border-slate-200 dark:border-slate-700'>
           <h2 className='text-xl font-semibold text-slate-900 dark:text-slate-100'>学習記録</h2>
           <p className='text-gray-600 dark:text-gray-300 mt-1'>日々の学習内容を記録して進捗を管理しましょう</p>
@@ -270,10 +270,10 @@ export default function StudyLog() {
                       key={rating}
                       type='button'
                       onClick={() => setNewLog({ ...newLog, understanding: rating })}
-                      className={`w-8 h-8 rounded-full text-sm ${
+                      className={`w-8 h-8 rounded-full text-sm click-shrink focus-ring ${
                         newLog.understanding >= rating
                           ? 'bg-yellow-400 text-white'
-                          : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+                          : 'bg-gray-200 text-gray-600 hover:bg-gray-300 hover-lift'
                       }`}
                     >
                       {rating}
@@ -292,13 +292,13 @@ export default function StudyLog() {
                   value={topicInput}
                   onChange={e => setTopicInput(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addTopic())}
-                  className='flex-1 px-3 py-2 border border-slate-300 rounded-md focus:ring-blue-500 focus:border-blue-500'
+                  className='flex-1 input-primary'
                   placeholder='学習項目を入力 (例: SQL基礎)'
                 />
                 <button
                   type='button'
                   onClick={addTopic}
-                  className='px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-all duration-200'
+                  className='btn-secondary hover-lift click-shrink focus-ring'
                 >
                   追加
                 </button>
@@ -339,14 +339,14 @@ export default function StudyLog() {
             <button
               type='submit'
               disabled={isLoading}
-              className='btn-primary disabled:opacity-50 disabled:cursor-not-allowed'
+              className='btn-primary hover-lift click-shrink focus-ring interactive-disabled'
             >
               {isLoading ? '保存中...' : '記録を追加'}
             </button>
           </form>
 
           {/* フィルター・ソートコントロール */}
-          <div className='bg-gray-50 rounded-lg p-4 mb-6'>
+          <div className='card-secondary p-4 mb-6 hover-lift'>
             <h3 className='text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4'>フィルター・ソート</h3>
             <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
               <div>
@@ -396,27 +396,27 @@ export default function StudyLog() {
             const filteredStats = getFilteredStats();
             return (
               <div className='grid grid-cols-1 md:grid-cols-4 gap-4 mb-6'>
-                <div className='bg-blue-50 rounded-lg p-4'>
-                  <div className='text-2xl font-bold text-blue-600'>{filteredStats.count}</div>
-                  <div className='text-sm text-blue-800'>記録数</div>
+                <div className='metric-card hover-lift'>
+                  <div className='metric-value text-blue-600'>{filteredStats.count}</div>
+                  <div className='metric-label text-blue-800'>記録数</div>
                 </div>
-                <div className='bg-green-50 rounded-lg p-4'>
-                  <div className='text-2xl font-bold text-green-600'>
+                <div className='metric-card hover-lift'>
+                  <div className='metric-value text-green-600'>
                     {Math.floor(filteredStats.totalTime / 60)}h {filteredStats.totalTime % 60}m
                   </div>
-                  <div className='text-sm text-green-800'>総学習時間</div>
+                  <div className='metric-label text-green-800'>総学習時間</div>
                 </div>
-                <div className='bg-yellow-50 rounded-lg p-4'>
-                  <div className='text-2xl font-bold text-yellow-600'>{filteredStats.avgUnderstanding.toFixed(1)}</div>
-                  <div className='text-sm text-yellow-800'>平均理解度</div>
+                <div className='metric-card hover-lift'>
+                  <div className='metric-value text-yellow-600'>{filteredStats.avgUnderstanding.toFixed(1)}</div>
+                  <div className='metric-label text-yellow-800'>平均理解度</div>
                 </div>
-                <div className='bg-purple-50 rounded-lg p-4'>
+                <div className='metric-card hover-lift'>
                   <div className='text-xl font-bold text-purple-600'>
                     {filteredStats.topSubjects.length > 0
                       ? filteredStats.topSubjects[0]?.subject.substring(0, 8)
                       : 'なし'}
                   </div>
-                  <div className='text-sm text-purple-800'>最多学習分野</div>
+                  <div className='metric-label text-purple-800'>最多学習分野</div>
                 </div>
               </div>
             );
@@ -433,7 +433,7 @@ export default function StudyLog() {
               ) : (
                 <div className='space-y-3'>
                   {filteredLogs.map((log, index) => (
-                    <div key={index} className='border rounded-lg p-4 bg-gray-50'>
+                    <div key={index} className='border rounded-lg p-4 card-accent'>
                       <div className='flex items-start justify-between mb-2'>
                         <div>
                           <h4 className='font-medium text-slate-900 dark:text-slate-100'>{log.subject}</h4>

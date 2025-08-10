@@ -248,8 +248,8 @@ export default function Quiz() {
   // ローディング中
   if (state.loading) {
     return (
-      <div className='max-w-4xl mx-auto p-6'>
-        <div className='bg-white dark:bg-slate-800 rounded-lg shadow-lg p-8'>
+      <div className='container-primary py-6'>
+        <div className='card-primary p-8 shadow-moderate'>
           <div className='text-center'>
             <div className='loading-spinner-lg mx-auto'></div>
             <p className='mt-4 text-slate-600 dark:text-slate-300'>読み込み中...</p>
@@ -262,14 +262,14 @@ export default function Quiz() {
   // エラー表示
   if (state.error) {
     return (
-      <div className='max-w-4xl mx-auto p-6'>
-        <div className='bg-white dark:bg-slate-800 rounded-lg shadow-lg p-8'>
+      <div className='container-primary py-6'>
+        <div className='card-primary p-8 shadow-moderate error-state'>
           <div className='text-center'>
             <div className='text-red-500 text-lg font-semibold mb-4'>エラー</div>
             <p className='text-slate-600 dark:text-slate-400 mb-6'>{state.error}</p>
             <button
               onClick={() => setState(prev => ({ ...prev, error: null }))}
-              className='btn-primary btn-large'
+              className='btn-primary btn-large hover-lift click-shrink focus-ring'
             >
               戻る
             </button>
@@ -282,23 +282,23 @@ export default function Quiz() {
   // 結果表示
   if (state.result) {
     return (
-      <div className='max-w-4xl mx-auto p-6'>
-        <div className='bg-white dark:bg-slate-800 rounded-lg shadow-lg p-8'>
+      <div className='container-primary py-6'>
+        <div className='card-primary p-8 shadow-moderate achievement-unlock'>
           <div className='text-center'>
             <h2 className='text-2xl font-bold text-slate-900 dark:text-slate-100 mb-6'>Quiz結果</h2>
 
             <div className='grid grid-cols-1 md:grid-cols-3 gap-6 mb-8'>
-              <div className='bg-blue-50 p-4 rounded-lg'>
+              <div className='metric-card hover-lift'>
                 <div className='text-2xl font-bold text-blue-600'>{state.result.score}%</div>
                 <div className='text-sm text-slate-600 dark:text-slate-300'>正答率</div>
               </div>
-              <div className='bg-green-50 p-4 rounded-lg'>
+              <div className='metric-card hover-lift'>
                 <div className='text-2xl font-bold text-green-600'>
                   {state.result.correctAnswers}/{state.result.totalQuestions}
                 </div>
                 <div className='text-sm text-slate-600 dark:text-slate-300'>正解数</div>
               </div>
-              <div className='bg-purple-50 p-4 rounded-lg'>
+              <div className='metric-card hover-lift'>
                 <div className='text-2xl font-bold text-purple-600'>{state.result.avgTimePerQ}秒</div>
                 <div className='text-sm text-slate-600 dark:text-slate-300'>平均解答時間</div>
               </div>
@@ -306,7 +306,7 @@ export default function Quiz() {
 
             {state.result.category && (
               <div className='mb-6'>
-                <span className='bg-slate-100 dark:bg-slate-700 px-3 py-1 rounded-full text-sm text-slate-600 dark:text-slate-300'>
+                <span className='badge-info px-3 py-1 rounded-full text-sm'>
                   カテゴリ: {state.result.category}
                 </span>
               </div>
@@ -315,13 +315,13 @@ export default function Quiz() {
             <div className='flex gap-4 justify-center'>
               <button
                 onClick={endQuiz}
-                className='btn-primary btn-large'
+                className='btn-primary btn-large hover-lift click-shrink focus-ring'
               >
                 新しいQuizを開始
               </button>
               <button
                 onClick={() => window.location.reload()}
-                className='bg-slate-500 text-white px-6 py-2 rounded-lg hover:bg-slate-600 transition-all duration-200'
+                className='btn-secondary btn-large hover-lift click-shrink focus-ring'
               >
                 ダッシュボードに戻る
               </button>
@@ -341,8 +341,8 @@ export default function Quiz() {
     const progress = ((state.session.currentIndex + 1) / state.session.questions.length) * 100;
 
     return (
-      <div className='max-w-4xl mx-auto p-6'>
-        <div className='bg-white dark:bg-slate-800 rounded-lg shadow-lg p-8'>
+      <div className='container-primary py-6'>
+        <div className='card-primary p-8 shadow-moderate hover-lift'>
           {/* プログレスバー */}
           <div className='mb-6'>
             <div className='flex justify-between text-sm text-slate-600 dark:text-slate-300 mb-2'>
@@ -351,10 +351,10 @@ export default function Quiz() {
               </span>
               <span>{Math.round(progress)}% 完了</span>
             </div>
-            <div className='w-full bg-slate-200 rounded-full h-2'>
+            <div className='progress-bar-animated'>
               <div
-                className='bg-blue-600 h-2 rounded-full transition-all duration-300'
-                style={{ width: `${progress}%` }}
+                className='progress-fill-animated'
+                style={{ '--progress-width': `${progress}%` } as React.CSSProperties}
               ></div>
             </div>
           </div>
@@ -364,7 +364,7 @@ export default function Quiz() {
             <div className='flex flex-wrap gap-2 mb-4'>
               <span className='badge-info'>{currentQuestion.category}</span>
               {currentQuestion.subcategory && (
-                <span className='bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 px-2 py-1 rounded text-sm'>
+                <span className='badge-info px-2 py-1 rounded text-sm'>
                   {currentQuestion.subcategory}
                 </span>
               )}
@@ -390,10 +390,10 @@ export default function Quiz() {
                 <button
                   key={index}
                   onClick={() => selectAnswer(optionLabel)}
-                  className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
+                  className={`quiz-card click-shrink focus-ring ${
                     isSelected
-                      ? 'border-blue-500 bg-blue-50 text-blue-900'
-                      : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                      ? 'border-primary bg-accent text-primary'
+                      : 'hover-lift click-shrink'
                   }`}
                 >
                   <span className='font-semibold mr-3'>{optionLabel}.</span>
@@ -408,10 +408,10 @@ export default function Quiz() {
             <button
               onClick={nextQuestion}
               disabled={!userAnswer || state.loading}
-              className={`px-8 py-3 rounded-lg font-semibold transition-all duration-200 ${
+              className={`btn-large font-semibold hover-lift click-shrink focus-ring ${
                 userAnswer && !state.loading
-                  ? 'bg-blue-600 text-white hover:bg-blue-700'
-                  : 'bg-slate-300 text-slate-500 cursor-not-allowed'
+                  ? 'btn-primary'
+                  : 'interactive-disabled'
               }`}
             >
               {state.session.currentIndex < state.session.questions.length - 1 ? '次の問題' : '結果を見る'}
@@ -424,25 +424,25 @@ export default function Quiz() {
 
   // Quiz開始画面
   return (
-    <div className='max-w-4xl mx-auto p-6'>
-      <div className='bg-white dark:bg-slate-800 rounded-lg shadow-lg p-8'>
+    <div className='container-primary py-6'>
+      <div className='card-primary p-8 shadow-moderate hover-lift'>
         <h2 className='text-2xl font-bold text-slate-900 dark:text-slate-100 mb-8 text-center'>応用情報技術者試験 過去問Quiz</h2>
 
         <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
           {/* ランダム問題 */}
-          <div className='interactive-card'>
+          <div className='interactive-card hover-lift'>
             <h3 className='text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4'>ランダム問題</h3>
             <p className='text-slate-600 dark:text-slate-400 mb-6 text-sm'>全カテゴリからランダムに問題を出題します</p>
             <div className='space-y-3'>
               <button
                 onClick={() => startQuiz('random', 5)}
-                className='w-full btn-primary'
+                className='w-full btn-primary hover-lift click-shrink focus-ring'
               >
                 5問チャレンジ
               </button>
               <button
                 onClick={() => startQuiz('random', 10)}
-                className='w-full btn-primary'
+                className='w-full btn-primary hover-lift click-shrink focus-ring'
               >
                 10問チャレンジ
               </button>
@@ -450,7 +450,7 @@ export default function Quiz() {
           </div>
 
           {/* カテゴリ別問題 */}
-          <div className='interactive-card hover:border-green-400 dark:hover:border-green-500'>
+          <div className='interactive-card hover-lift hover-glow-success'>
             <h3 className='text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4'>カテゴリ別問題</h3>
             <p className='text-slate-600 dark:text-slate-400 mb-6 text-sm'>特定の分野に集中して学習できます</p>
             <div className='space-y-2'>
@@ -458,7 +458,7 @@ export default function Quiz() {
                 <button
                   key={category.category}
                   onClick={() => startQuiz('category', Math.min(category.questionCount, 10), category.category)}
-                  className='w-full text-left bg-slate-50 hover:bg-slate-100 py-2 px-3 rounded-lg transition-all duration-200'
+                  className='w-full text-left card-secondary py-2 px-3 hover-lift click-shrink focus-ring'
                 >
                   <div className='flex justify-between items-center'>
                     <span className='text-sm font-medium'>{category.category}</span>
@@ -471,7 +471,7 @@ export default function Quiz() {
         </div>
 
         {/* 追加情報 */}
-        <div className='mt-8 p-4 bg-blue-50 rounded-lg'>
+        <div className='mt-8 card-accent'>
           <h4 className='font-semibold text-blue-800 mb-2'>📚 学習のポイント</h4>
           <ul className='text-sm text-blue-700 space-y-1'>
             <li>• IPA公式過去問から出題</li>
@@ -508,7 +508,7 @@ export default function Quiz() {
       {activeTab === 'progress' && state.progress && (
         <div className='space-y-6'>
           {/* 全体進捗 */}
-          <div className='bg-slate-50 rounded-lg p-6'>
+          <div className='card-accent p-6'>
             <h3 className='text-lg font-semibold mb-4'>全体進捗</h3>
             <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
               <div className='text-center'>
@@ -527,7 +527,7 @@ export default function Quiz() {
             <div className='mt-4'>
               <div className='w-full bg-slate-200 rounded-full h-2'>
                 <div
-                  className='bg-blue-500 h-2 rounded-full transition-all duration-300'
+                  className='progress-fill-animated h-2 rounded-full'
                   style={{ width: `${state.progress.overall.progressRate}%` }}
                 ></div>
               </div>
@@ -535,7 +535,7 @@ export default function Quiz() {
           </div>
 
           {/* 最近の活動 */}
-          <div className='bg-slate-50 rounded-lg p-6'>
+          <div className='card-accent p-6'>
             <h3 className='text-lg font-semibold mb-4'>最近の学習活動</h3>
             <div className='space-y-3'>
               {state.progress.recentActivity.slice(0, 5).map(session => (
@@ -615,7 +615,7 @@ export default function Quiz() {
           {state.learningTrends ? (
             <>
               {/* 日別学習トレンド */}
-              <div className='bg-slate-50 rounded-lg p-6'>
+              <div className='card-accent p-6'>
                 <h3 className='text-lg font-semibold mb-4'>日別学習トレンド (過去30日)</h3>
                 <Suspense fallback={<div className='h-64 flex items-center justify-center'>グラフを読み込み中...</div>}>
                   <ResponsiveContainer width='100%' height={300}>
@@ -652,7 +652,7 @@ export default function Quiz() {
               </div>
 
               {/* 累積進捗 */}
-              <div className='bg-slate-50 rounded-lg p-6'>
+              <div className='card-accent p-6'>
                 <h3 className='text-lg font-semibold mb-4'>累積学習進捗</h3>
                 <Suspense fallback={<div className='h-64 flex items-center justify-center'>グラフを読み込み中...</div>}>
                   <ResponsiveContainer width='100%' height={300}>
@@ -683,7 +683,7 @@ export default function Quiz() {
 
               {/* カテゴリ別トレンド */}
               {state.learningTrends.categoryTrends.length > 0 && (
-                <div className='bg-slate-50 rounded-lg p-6'>
+                <div className='card-accent p-6'>
                   <h3 className='text-lg font-semibold mb-4'>カテゴリ別学習状況</h3>
                   <div className='space-y-3'>
                     {state.learningTrends.categoryTrends.map((category: any, index: number) => (
@@ -696,7 +696,7 @@ export default function Quiz() {
                           </div>
                           <div className='w-20 bg-slate-200 rounded-full h-2'>
                             <div
-                              className='bg-blue-500 h-2 rounded-full transition-all duration-300'
+                              className='progress-fill-animated h-2 rounded-full'
                               style={{ width: `${Math.min(category.accuracy_rate * 100, 100)}%` }}
                             ></div>
                           </div>
