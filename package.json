@@ -41,6 +41,9 @@
     "node": "^22.17.1"
   },
   "devDependencies": {
+    "@tailwindcss/container-queries": "^0.1.1",
+    "@tailwindcss/forms": "^0.5.10",
+    "@tailwindcss/typography": "^0.5.16",
     "@testing-library/jest-dom": "^6.6.4",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
@@ -55,9 +58,10 @@
     "eslint": "^8.57.1",
     "eslint-config-next": "^15.4.5",
     "happy-dom": "^18.0.1",
-    "prettier": "^3.2.5",
     "postcss": "^8.5.6",
+    "prettier": "^3.2.5",
     "tailwindcss": "^3.4.6",
+    "tailwindcss-animate": "^1.0.7",
     "typescript": "^5.8.3",
     "vitest": "^3.2.4"
   }

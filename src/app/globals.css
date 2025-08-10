@@ -230,6 +230,162 @@
     @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:focus-visible:ring-blue-400 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-800;
   }
 
+  /* 高度なマイクロインタラクション */
+  .hover-lift {
+    @apply transform transition-all duration-200 hover:scale-105 hover:shadow-lg;
+  }
+
+  .hover-glow {
+    @apply transition-all duration-300 hover:shadow-glow;
+  }
+
+  .hover-glow-success {
+    @apply transition-all duration-300 hover:shadow-glow-green;
+  }
+
+  .hover-glow-error {
+    @apply transition-all duration-300 hover:shadow-glow-red;
+  }
+
+  .click-shrink {
+    @apply transform active:scale-95 transition-transform duration-75;
+  }
+
+  /* 学習アプリ固有のアニメーション */
+  .quiz-card {
+    @apply card-primary p-6 transition-all duration-300 hover:shadow-moderate cursor-pointer;
+  }
+
+  .quiz-card-correct {
+    @apply animate-correct-answer bg-success-50 dark:bg-success-900/20 border-success-500;
+  }
+
+  .quiz-card-incorrect {
+    @apply animate-wrong-answer bg-error-50 dark:bg-error-900/20 border-error-500;
+  }
+
+  .progress-bar-animated {
+    @apply progress-bar overflow-hidden relative;
+  }
+
+  .progress-fill-animated {
+    @apply progress-fill animate-progress-fill bg-gradient-to-r from-blue-500 to-blue-600;
+  }
+
+  /* Z-index管理ユーティリティ */
+  .z-base { z-index: 1; }
+  .z-content { z-index: 10; }
+  .z-sidebar { z-index: 30; }
+  .z-header { z-index: 40; }
+  .z-dropdown { z-index: 100; }
+  .z-sticky { z-index: 110; }
+  .z-fixed { z-index: 120; }
+  .z-overlay { z-index: 200; }
+  .z-modal-backdrop { z-index: 400; }
+  .z-modal { z-index: 410; }
+  .z-popover { z-index: 420; }
+  .z-tooltip { z-index: 430; }
+  .z-notification { z-index: 500; }
+  .z-toast { z-index: 510; }
+  .z-loading { z-index: 600; }
+  .z-debug { z-index: 9999; }
+
+  /* 高度なレイアウトユーティリティ */
+  .grid-auto-fit {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+  }
+
+  .grid-auto-fill {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+  }
+
+  /* アクセシビリティ強化 */
+  .sr-only-focusable:not(:focus):not(:focus-within) {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+  }
+
+  /* 高コントラストモード対応 */
+  @media (prefers-contrast: high) {
+    .high-contrast-border {
+      @apply border-2 border-black dark:border-white;
+    }
+
+    .high-contrast-text {
+      @apply text-black dark:text-white font-bold;
+    }
+
+    .high-contrast-bg {
+      @apply bg-white dark:bg-black;
+    }
+  }
+
+  /* 学習効率ダッシュボード専用 */
+  .metric-card {
+    @apply bg-white dark:bg-slate-800 rounded-lg p-6 border border-slate-200 dark:border-slate-700 transition-all duration-300 hover:shadow-moderate;
+  }
+
+  .metric-value {
+    @apply text-3xl font-bold text-slate-900 dark:text-slate-100;
+  }
+
+  .metric-label {
+    @apply text-sm text-slate-600 dark:text-slate-400 uppercase tracking-wide;
+  }
+
+  .trend-indicator {
+    @apply inline-flex items-center px-2 py-1 rounded-full text-sm font-medium;
+  }
+
+  .trend-up {
+    @apply trend-indicator bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300;
+  }
+
+  .trend-down {
+    @apply trend-indicator bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300;
+  }
+
+  .trend-neutral {
+    @apply trend-indicator bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-300;
+  }
+
+  /* モバイル最適化 */
+  @media (max-width: 640px) {
+    .mobile-stack {
+      @apply flex-col;
+    }
+
+    .mobile-full {
+      @apply w-full;
+    }
+
+    .mobile-hidden {
+      @apply hidden;
+    }
+  }
+
+  /* タブレット最適化 */
+  @media (min-width: 768px) and (max-width: 1024px) {
+    .tablet-grid {
+      @apply grid-cols-2;
+    }
+
+    .tablet-compact {
+      @apply px-4 py-2;
+    }
+  }
+
   /* Skeleton Loading */
   .skeleton {
     @apply animate-pulse bg-slate-200 dark:bg-slate-700 rounded;
@@ -245,6 +401,35 @@
 
   .skeleton-card {
     @apply skeleton h-32;
+  }
+
+  .skeleton-shimmer {
+    @apply skeleton relative overflow-hidden;
+  }
+
+  .skeleton-shimmer::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.6),
+      transparent
+    );
+    animation: shimmer 1.5s infinite;
+  }
+
+  @keyframes shimmer {
+    0% {
+      left: -100%;
+    }
+    100% {
+      left: 100%;
+    }
   }
 }
 
@@ -303,4 +488,119 @@
 
 .dark .scrollbar-modern::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(90deg, #3b82f6, #2563eb);
+}
+
+/* 高度なアクセシビリティとモーション設定 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .motion-reduce-friendly {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .skeleton-shimmer::after {
+    animation: none;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .motion-safe-animate {
+    animation: inherit;
+    transition: inherit;
+  }
+
+  /* 滑らかなスクロール */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* ページ遷移アニメーション */
+  .page-transition {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+}
+
+/* Focus管理の改善 */
+.focus-trap {
+  outline: none;
+}
+
+.focus-within-ring:focus-within {
+  @apply ring-2 ring-blue-500 dark:ring-blue-400 ring-offset-2 dark:ring-offset-slate-800;
+}
+
+/* ARIA States用のビジュアルフィードバック */
+[aria-expanded="true"] .expand-icon {
+  transform: rotate(180deg);
+}
+
+[aria-selected="true"] {
+  @apply bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700;
+}
+
+[aria-current="page"] {
+  @apply bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-semibold;
+}
+
+/* インタラクティブな要素の状態管理 */
+.interactive-disabled {
+  @apply opacity-50 cursor-not-allowed pointer-events-none;
+}
+
+.interactive-loading {
+  @apply opacity-75 cursor-wait;
+}
+
+/* コンテナクエリ対応 */
+@container (min-width: 400px) {
+  .container-responsive {
+    @apply grid-cols-2;
+  }
+}
+
+@container (min-width: 600px) {
+  .container-responsive {
+    @apply grid-cols-3;
+  }
+}
+
+/* 新しいCSS機能の活用 */
+.backdrop-blur-modern {
+  backdrop-filter: blur(12px) saturate(1.8);
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
+.dark .backdrop-blur-modern {
+  background-color: rgba(30, 41, 59, 0.8);
+}
+
+/* 学習アプリ固有のテーマ */
+.study-session-active {
+  @apply bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 border-2 border-green-200 dark:border-green-700;
+}
+
+.achievement-unlock {
+  @apply animate-bounce-subtle bg-gradient-to-r from-yellow-100 to-orange-100 dark:from-yellow-900/30 dark:to-orange-900/30 shadow-glow border-yellow-300 dark:border-yellow-600;
+}
+
+/* エラー状態の改善 */
+.error-state {
+  @apply border-2 border-red-300 dark:border-red-600 bg-red-50 dark:bg-red-900/20;
+}
+
+.error-state .input-primary {
+  @apply border-red-500 dark:border-red-400 focus:ring-red-500 dark:focus:ring-red-400;
+}
+
+/* 成功状態 */
+.success-state {
+  @apply border-2 border-green-300 dark:border-green-600 bg-green-50 dark:bg-green-900/20;
 }
