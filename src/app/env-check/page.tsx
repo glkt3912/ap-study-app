@@ -115,14 +115,14 @@ export default function EnvCheckPage() {
   }
 
   return (
-    <div className='min-h-screen bg-gray-50 dark:bg-gray-900 p-8'>
+    <div className='min-h-screen bg-slate-50 dark:bg-slate-900 p-8'>
       <div className='max-w-6xl mx-auto'>
-        <h1 className='text-3xl font-bold text-gray-900 dark:text-white mb-8'>🖥️ 環境チェック</h1>
+        <h1 className='text-3xl font-bold text-slate-900 dark:text-white mb-8'>🖥️ 環境チェック</h1>
 
         <div className='grid grid-cols-1 lg:grid-cols-2 gap-8'>
           {/* システム情報 */}
-          <div className='bg-white dark:bg-gray-800 rounded-lg shadow p-6'>
-            <h2 className='text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4'>💻 システム情報</h2>
+          <div className='card-primary rounded-lg shadow p-6'>
+            <h2 className='text-xl font-semibold text-slate-800 dark:text-slate-200 mb-4'>💻 システム情報</h2>
             <div className='space-y-3 text-sm'>
               <div className='flex justify-between'>
                 <span className='font-medium'>ブラウザ:</span>
@@ -160,8 +160,8 @@ export default function EnvCheckPage() {
           </div>
 
           {/* 開発環境情報 */}
-          <div className='bg-white dark:bg-gray-800 rounded-lg shadow p-6'>
-            <h2 className='text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4'>⚛️ 開発環境</h2>
+          <div className='card-primary rounded-lg shadow p-6'>
+            <h2 className='text-xl font-semibold text-slate-800 dark:text-slate-200 mb-4'>⚛️ 開発環境</h2>
             <div className='space-y-3 text-sm'>
               <div className='flex justify-between'>
                 <span className='font-medium'>Node.js:</span>
@@ -187,8 +187,8 @@ export default function EnvCheckPage() {
           </div>
 
           {/* パフォーマンス情報 */}
-          <div className='bg-white dark:bg-gray-800 rounded-lg shadow p-6'>
-            <h2 className='text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4'>⚡ パフォーマンス</h2>
+          <div className='card-primary rounded-lg shadow p-6'>
+            <h2 className='text-xl font-semibold text-slate-800 dark:text-slate-200 mb-4'>⚡ パフォーマンス</h2>
             <div className='space-y-3 text-sm'>
               <div className='flex justify-between'>
                 <span className='font-medium'>ページ読み込み時間:</span>
@@ -220,8 +220,8 @@ export default function EnvCheckPage() {
           </div>
 
           {/* ストレージテスト */}
-          <div className='bg-white dark:bg-gray-800 rounded-lg shadow p-6'>
-            <h2 className='text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4'>💾 ストレージテスト</h2>
+          <div className='card-primary rounded-lg shadow p-6'>
+            <h2 className='text-xl font-semibold text-slate-800 dark:text-slate-200 mb-4'>💾 ストレージテスト</h2>
             <div className='space-y-3 text-sm'>
               <div className='flex justify-between'>
                 <span className='font-medium'>LocalStorage:</span>
@@ -246,20 +246,20 @@ export default function EnvCheckPage() {
         </div>
 
         {/* 診断コマンド */}
-        <div className='mt-8 bg-gray-800 text-green-400 p-6 rounded-lg font-mono text-sm'>
+        <div className='mt-8 bg-slate-800 text-green-400 p-6 rounded-lg font-mono text-sm'>
           <h3 className='text-lg font-bold mb-4 text-green-300'>🔧 開発者向けコマンド</h3>
           <div className='space-y-2'>
             <div>
-              キャッシュクリア: <code className='bg-gray-700 px-2 py-1 rounded'>rm -rf .next && npm run build</code>
+              キャッシュクリア: <code className='bg-slate-700 px-2 py-1 rounded'>rm -rf .next && npm run build</code>
             </div>
             <div>
-              依存関係更新: <code className='bg-gray-700 px-2 py-1 rounded'>npm install</code>
+              依存関係更新: <code className='bg-slate-700 px-2 py-1 rounded'>npm install</code>
             </div>
             <div>
-              開発サーバー: <code className='bg-gray-700 px-2 py-1 rounded'>npm run dev</code>
+              開発サーバー: <code className='bg-slate-700 px-2 py-1 rounded'>npm run dev</code>
             </div>
             <div>
-              ビルドテスト: <code className='bg-gray-700 px-2 py-1 rounded'>npm run build</code>
+              ビルドテスト: <code className='bg-slate-700 px-2 py-1 rounded'>npm run build</code>
             </div>
           </div>
         </div>

@@ -199,7 +199,7 @@ export function LearningEfficiencyDashboard() {
                         <span className='text-sm font-medium px-2 py-1 rounded'>{rec.priority}</span>
                       </div>
                       <p className='text-sm mb-2'>{rec.description}</p>
-                      <div className='text-xs'>期待される改善: +{rec.expectedImprovement}%</div>
+                      <div className='text-xs sm:text-sm'>期待される改善: +{rec.expectedImprovement}%</div>
                     </div>
                   </div>
                 </div>

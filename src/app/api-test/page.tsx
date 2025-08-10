@@ -127,7 +127,7 @@ export default function ApiTestPage() {
       case 'pending':
         return 'text-yellow-600 dark:text-yellow-400';
       default:
-        return 'text-gray-600 dark:text-gray-400';
+        return 'text-slate-600 dark:text-slate-400';
     }
   };
 
@@ -150,14 +150,14 @@ export default function ApiTestPage() {
   }, [runAllTests]);
 
   return (
-    <div className='min-h-screen bg-gray-50 dark:bg-gray-900 p-8'>
+    <div className='min-h-screen bg-slate-50 dark:bg-slate-900 p-8'>
       <div className='max-w-6xl mx-auto'>
         <div className='flex justify-between items-center mb-8'>
-          <h1 className='text-3xl font-bold text-gray-900 dark:text-white'>🔌 API接続テスト</h1>
+          <h1 className='text-3xl font-bold text-slate-900 dark:text-white'>🔌 API接続テスト</h1>
           <button
             onClick={runAllTests}
             disabled={isRunning}
-            className='px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-gray-400 transition-all duration-200'
+            className='px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-slate-400 transition-all duration-200'
           >
             {isRunning ? '🔄 テスト中...' : '🚀 テスト実行'}
           </button>
@@ -176,21 +176,21 @@ export default function ApiTestPage() {
         {/* テスト結果 */}
         <div className='grid gap-6'>
           {tests.map((test, index) => (
-            <div key={test.endpoint} className='bg-white dark:bg-gray-800 rounded-lg shadow p-6'>
+            <div key={test.endpoint} className='card-primary rounded-lg shadow p-6'>
               <div className='flex items-center justify-between mb-4'>
                 <div className='flex items-center'>
                   <span className='text-2xl mr-3'>{getStatusIcon(test.status)}</span>
                   <div>
-                    <h3 className='text-lg font-semibold text-gray-900 dark:text-white'>
+                    <h3 className='text-lg font-semibold text-slate-900 dark:text-white'>
                       {apiEndpoints[index]?.name || test.endpoint}
                     </h3>
-                    <p className='text-sm text-gray-600 dark:text-gray-400'>{test.endpoint}</p>
+                    <p className='text-sm text-slate-600 dark:text-slate-400'>{test.endpoint}</p>
                   </div>
                 </div>
                 <div className='text-right'>
                   <div className={`font-bold ${getStatusColor(test.status)}`}>{test.status.toUpperCase()}</div>
                   {test.responseTime > 0 && (
-                    <div className='text-sm text-gray-600 dark:text-gray-400'>{test.responseTime}ms</div>
+                    <div className='text-sm text-slate-600 dark:text-slate-400'>{test.responseTime}ms</div>
                   )}
                 </div>
               </div>
@@ -198,7 +198,7 @@ export default function ApiTestPage() {
               {/* ステータスコード */}
               {test.statusCode && (
                 <div className='mb-2'>
-                  <span className='text-sm font-medium text-gray-700 dark:text-gray-300'>Status Code:</span>
+                  <span className='text-sm font-medium text-slate-700 dark:text-slate-300'>Status Code:</span>
                   <span
                     className={`ml-2 px-2 py-1 rounded text-xs font-bold ${
                       test.statusCode >= 200 && test.statusCode < 300
@@ -222,9 +222,9 @@ export default function ApiTestPage() {
               {/* レスポンスデータ */}
               {test.data && (
                 <div className='mt-4'>
-                  <h4 className='font-medium text-gray-700 dark:text-gray-300 mb-2'>レスポンスデータ:</h4>
-                  <pre className='bg-gray-100 dark:bg-gray-700 p-3 rounded text-xs overflow-x-auto'>
-                    <code className='text-gray-800 dark:text-gray-200'>
+                  <h4 className='font-medium text-slate-700 dark:text-slate-300 mb-2'>レスポンスデータ:</h4>
+                  <pre className='bg-slate-100 dark:bg-slate-700 p-3 rounded text-xs overflow-x-auto'>
+                    <code className='text-slate-800 dark:text-slate-200'>
                       {typeof test.data === 'string' ? test.data : JSON.stringify(test.data, null, 2)}
                     </code>
                   </pre>
@@ -234,17 +234,17 @@ export default function ApiTestPage() {
               {/* パフォーマンス評価 */}
               {test.responseTime > 0 && (
                 <div className='mt-3 flex items-center'>
-                  <span className='text-sm text-gray-600 dark:text-gray-400 mr-2'>Performance:</span>
+                  <span className='text-sm text-slate-600 dark:text-slate-400 mr-2'>Performance:</span>
                   {test.responseTime < 200 ? (
-                    <span className='px-2 py-1 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 rounded text-xs'>
+                    <span className='px-2 py-1 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 rounded text-xs sm:text-sm'>
                       🚀 高速
                     </span>
                   ) : test.responseTime < 1000 ? (
-                    <span className='px-2 py-1 bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 rounded text-xs'>
+                    <span className='px-2 py-1 bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 rounded text-xs sm:text-sm'>
                       ⚡ 普通
                     </span>
                   ) : (
-                    <span className='px-2 py-1 bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 rounded text-xs'>
+                    <span className='px-2 py-1 bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 rounded text-xs sm:text-sm'>
                       🐌 低速
                     </span>
                   )}
@@ -256,11 +256,11 @@ export default function ApiTestPage() {
 
         {/* 診断情報 */}
         <div className='mt-8 bg-gray-100 dark:bg-gray-800 rounded-lg p-6'>
-          <h2 className='text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4'>📊 API診断ガイド</h2>
+          <h2 className='text-xl font-semibold text-slate-800 dark:text-slate-200 mb-4'>📊 API診断ガイド</h2>
           <div className='grid grid-cols-1 md:grid-cols-2 gap-6 text-sm'>
             <div>
               <h3 className='font-bold text-green-600 dark:text-green-400 mb-2'>✅ 正常パターン</h3>
-              <ul className='space-y-1 text-gray-700 dark:text-gray-300'>
+              <ul className='space-y-1 text-slate-700 dark:text-slate-300'>
                 <li>• Status Code: 200-299</li>
                 <li>• Response Time: &lt;200ms (高速)</li>
                 <li>• Data: JSON形式で返却</li>
@@ -269,7 +269,7 @@ export default function ApiTestPage() {
             </div>
             <div>
               <h3 className='font-bold text-red-600 dark:text-red-400 mb-2'>❌ 問題パターン</h3>
-              <ul className='space-y-1 text-gray-700 dark:text-gray-300'>
+              <ul className='space-y-1 text-slate-700 dark:text-slate-300'>
                 <li>• Status Code: 404 (Not Found)</li>
                 <li>• Status Code: 500 (Server Error)</li>
                 <li>• Response Time: &gt;2000ms</li>
@@ -283,7 +283,7 @@ export default function ApiTestPage() {
         <div className='mt-8 text-center'>
           <button
             onClick={() => window.history.back()}
-            className='px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-all duration-200'
+            className='px-6 py-3 bg-slate-500 text-white rounded-lg hover:bg-slate-600 transition-all duration-200'
           >
             ← 前のページに戻る
           </button>

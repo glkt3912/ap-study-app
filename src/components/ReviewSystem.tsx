@@ -184,7 +184,7 @@ export function ReviewSystem() {
           {todayReviews.length > 0 && (
             <div className='space-y-3'>
               {todayReviews.map(item => (
-                <div key={item.id} className='border border-gray-200 rounded-lg p-3 sm:p-4'>
+                <div key={item.id} className='border border-slate-200 rounded-lg p-3 sm:p-4'>
                   <div className='flex flex-col sm:flex-row sm:items-center justify-between mb-2 space-y-2 sm:space-y-0'>
                     <h4 className='font-medium text-slate-900 dark:text-slate-100 text-sm sm:text-base'>{item.category}</h4>
                     <div className='flex items-center space-x-2'>

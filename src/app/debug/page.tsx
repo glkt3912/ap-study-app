@@ -56,13 +56,13 @@ export default function DebugPage() {
   }
 
   return (
-    <div className='min-h-screen bg-gray-50 dark:bg-gray-900 p-8'>
+    <div className='min-h-screen bg-slate-50 dark:bg-slate-900 p-8'>
       <div className='max-w-4xl mx-auto'>
-        <h1 className='text-3xl font-bold text-gray-900 dark:text-white mb-8'>🧪 診断ページ</h1>
+        <h1 className='text-3xl font-bold text-slate-900 dark:text-white mb-8'>🧪 診断ページ</h1>
 
         {/* CSS テスト */}
         <section className='mb-8'>
-          <h2 className='text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-4'>🎨 CSS・スタイリングテスト</h2>
+          <h2 className='text-2xl font-semibold text-slate-800 dark:text-slate-200 mb-4'>🎨 CSS・スタイリングテスト</h2>
           <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
             {/* インラインスタイル */}
             <div
@@ -101,8 +101,8 @@ export default function DebugPage() {
             </div>
 
             {/* ダークモードテスト */}
-            <div className='bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 p-5 rounded-lg'>
-              <span className='text-gray-900 dark:text-white font-bold'>
+            <div className='card-primary border-2 border-slate-300 dark:border-slate-600 p-5 rounded-lg'>
+              <span className='text-slate-900 dark:text-white font-bold'>
                 🌙 ダークモードテスト
                 <br />
                 背景色が切り替わればダークモード正常
@@ -120,8 +120,8 @@ export default function DebugPage() {
 
         {/* JavaScript テスト */}
         <section className='mb-8'>
-          <h2 className='text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-4'>⚡ JavaScript動作テスト</h2>
-          <div className='bg-white dark:bg-gray-800 p-6 rounded-lg shadow'>
+          <h2 className='text-2xl font-semibold text-slate-800 dark:text-slate-200 mb-4'>⚡ JavaScript動作テスト</h2>
+          <div className='card-primary p-6 rounded-lg shadow'>
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mb-4'>
               <div>
                 <strong>基本演算:</strong> {jsTest}
@@ -143,8 +143,8 @@ export default function DebugPage() {
 
         {/* 環境情報 */}
         <section className='mb-8'>
-          <h2 className='text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-4'>🖥️ 環境情報</h2>
-          <div className='bg-white dark:bg-gray-800 p-6 rounded-lg shadow'>
+          <h2 className='text-2xl font-semibold text-slate-800 dark:text-slate-200 mb-4'>🖥️ 環境情報</h2>
+          <div className='card-primary p-6 rounded-lg shadow'>
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4 text-sm'>
               <div>
                 <strong>URL:</strong> {window.location.href}
@@ -170,7 +170,7 @@ export default function DebugPage() {
 
         {/* 診断結果 */}
         <section>
-          <h2 className='text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-4'>📊 診断結果</h2>
+          <h2 className='text-2xl font-semibold text-slate-800 dark:text-slate-200 mb-4'>📊 診断結果</h2>
           <div className='bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded-lg p-6'>
             <h3 className='font-bold text-yellow-800 dark:text-yellow-200 mb-2'>💡 使用方法</h3>
             <ul className='text-sm text-yellow-700 dark:text-yellow-300 space-y-1'>

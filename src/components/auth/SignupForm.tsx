@@ -66,7 +66,7 @@ export function SignupForm({ onModeChange }: SignupFormProps) {
             name='name'
             value={formData.name}
             onChange={handleChange}
-            className='w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400'
+            className='w-full px-3 py-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400'
             placeholder='お名前'
           />
         </div>
@@ -82,7 +82,7 @@ export function SignupForm({ onModeChange }: SignupFormProps) {
             value={formData.email}
             onChange={handleChange}
             required
-            className='w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400'
+            className='w-full px-3 py-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400'
             placeholder='email@example.com'
           />
         </div>
@@ -98,7 +98,7 @@ export function SignupForm({ onModeChange }: SignupFormProps) {
             value={formData.password}
             onChange={handleChange}
             required
-            className='w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400'
+            className='w-full px-3 py-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400'
             placeholder='8文字以上のパスワード'
           />
         </div>
@@ -114,7 +114,7 @@ export function SignupForm({ onModeChange }: SignupFormProps) {
             value={formData.confirmPassword}
             onChange={handleChange}
             required
-            className='w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400'
+            className='w-full px-3 py-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400'
             placeholder='パスワードを再入力'
           />
         </div>

@@ -182,7 +182,7 @@ export function AdvancedAnalysis() {
       <h2 className='text-2xl font-bold text-gray-800 dark:text-white mb-6'>高度な学習分析</h2>
 
       {/* タブナビゲーション */}
-      <div className='flex overflow-x-auto border-b border-gray-200 dark:border-gray-700 mb-6 scrollbar-hide'>
+      <div className='flex overflow-x-auto border-b border-slate-200 dark:border-slate-700 mb-6 scrollbar-hide'>
         {[
           { key: 'performance', label: 'パフォーマンス指標', shortLabel: '指標' },
           { key: 'readiness', label: '試験準備度', shortLabel: '準備度' },

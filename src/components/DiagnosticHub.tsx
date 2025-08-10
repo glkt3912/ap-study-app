@@ -104,7 +104,7 @@ export default function DiagnosticHub() {
                 </span>
               </div>
               <div className='text-sm text-gray-600 dark:text-gray-400'>{performanceResults.summary}</div>
-              <div className='text-xs'>
+              <div className='text-xs sm:text-sm'>
                 ボトルネック: {performanceResults.bottlenecks.length}件 | 提案: {performanceResults.suggestions.length}
                 件
               </div>

@@ -455,7 +455,7 @@ const MonitoringDashboard: React.FC = () => {
             <h2 className='text-xl font-semibold text-gray-900 dark:text-white mb-4'>エンドポイント統計</h2>
             <div className='card-primary rounded-lg shadow overflow-hidden'>
               <div className='overflow-x-auto'>
-                <table className='min-w-full divide-y divide-gray-200 dark:divide-gray-700'>
+                <table className='min-w-full divide-y divide-slate-200 dark:divide-slate-700'>
                   <thead className='bg-gray-50 dark:bg-gray-700'>
                     <tr>
                       <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider'>
@@ -472,7 +472,7 @@ const MonitoringDashboard: React.FC = () => {
                       </th>
                     </tr>
                   </thead>
-                  <tbody className='card-primary divide-y divide-gray-200 dark:divide-gray-700'>
+                  <tbody className='card-primary divide-y divide-slate-200 dark:divide-slate-700'>
                     {Object.entries(metrics.endpointAverages)
                       .sort(([, a], [, b]) => b.count - a.count)
                       .slice(0, 10)

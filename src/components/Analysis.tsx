@@ -307,9 +307,9 @@ export default function Analysis() {
     return (
       <div className='space-y-6'>
         <div className='card-primary'>
-          <div className='p-6 border-b border-gray-200 dark:border-gray-700'>
-            <h2 className='text-xl font-semibold text-gray-900 dark:text-white'>学習分析</h2>
-            <p className='text-gray-600 dark:text-gray-300 mt-1'>
+          <div className='p-6 border-b border-slate-200 dark:border-slate-700'>
+            <h2 className='text-xl font-semibold text-slate-900 dark:text-white'>学習分析</h2>
+            <p className='text-slate-600 dark:text-slate-300 mt-1'>
               学習データを分析して効率的な学習方法を見つけましょう
             </p>
           </div>
@@ -335,9 +335,9 @@ export default function Analysis() {
   return (
     <div className='space-y-6'>
       <div className='card-primary rounded-lg shadow-md'>
-        <div className='p-6 border-b border-gray-200 dark:border-gray-700'>
-          <h2 className='text-xl font-semibold text-gray-900 dark:text-white'>学習分析</h2>
-          <p className='text-gray-600 dark:text-gray-300 mt-1'>学習データを分析して効率的な学習方法を見つけましょう</p>
+        <div className='p-6 border-b border-slate-200 dark:border-slate-700'>
+          <h2 className='text-xl font-semibold text-slate-900 dark:text-white'>学習分析</h2>
+          <p className='text-slate-600 dark:text-slate-300 mt-1'>学習データを分析して効率的な学習方法を見つけましょう</p>
         </div>
 
         <div className='p-6'>
@@ -403,8 +403,8 @@ export default function Analysis() {
           {/* 分析実行ボタン */}
           <div className='mb-6 flex justify-between items-center'>
             <div>
-              <h3 className='text-lg font-semibold text-gray-900 dark:text-white'>AI学習分析</h3>
-              <p className='text-sm text-gray-600 dark:text-gray-300'>学習データを分析して個別の改善提案を生成します</p>
+              <h3 className='text-lg font-semibold text-slate-900 dark:text-white'>AI学習分析</h3>
+              <p className='text-sm text-slate-600 dark:text-slate-300'>学習データを分析して個別の改善提案を生成します</p>
             </div>
             <button
               onClick={runAnalysis}
@@ -429,7 +429,7 @@ export default function Analysis() {
           {analysisResult && (
             <div className='bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg p-6 mb-8'>
               <div className='flex items-center justify-between mb-4'>
-                <h3 className='text-xl font-semibold text-gray-900 dark:text-white'>AI学習分析結果</h3>
+                <h3 className='text-xl font-semibold text-slate-900 dark:text-white'>AI学習分析結果</h3>
                 <div className='flex items-center space-x-2'>
                   <span className='text-2xl font-bold text-indigo-600 dark:text-indigo-400'>
                     {analysisResult?.overallScore || 0}
@@ -441,25 +441,25 @@ export default function Analysis() {
               <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
                 {/* 学習パターン */}
                 <div className='card-secondary rounded-lg p-4'>
-                  <h4 className='font-semibold text-gray-900 dark:text-white mb-3'>学習パターン</h4>
+                  <h4 className='font-semibold text-slate-900 dark:text-white mb-3'>学習パターン</h4>
                   <div className='space-y-2 text-sm'>
                     <div className='flex justify-between'>
-                      <span className='text-gray-600 dark:text-gray-300'>総学習時間:</span>
+                      <span className='text-slate-600 dark:text-slate-300'>総学習時間:</span>
                       <span className='font-medium'>
                         {Math.floor((analysisResult?.studyPattern?.totalStudyTime || 0) / 60)}h{' '}
                         {(analysisResult?.studyPattern?.totalStudyTime || 0) % 60}m
                       </span>
                     </div>
                     <div className='flex justify-between'>
-                      <span className='text-gray-600 dark:text-gray-300'>平均学習時間:</span>
+                      <span className='text-slate-600 dark:text-slate-300'>平均学習時間:</span>
                       <span className='font-medium'>{analysisResult?.studyPattern?.averageStudyTime || 0}分/日</span>
                     </div>
                     <div className='flex justify-between'>
-                      <span className='text-gray-600 dark:text-gray-300'>学習頻度:</span>
+                      <span className='text-slate-600 dark:text-slate-300'>学習頻度:</span>
                       <span className='font-medium'>{analysisResult?.studyPattern?.studyFrequency || 0}日/週</span>
                     </div>
                     <div className='flex justify-between'>
-                      <span className='text-gray-600 dark:text-gray-300'>継続性:</span>
+                      <span className='text-slate-600 dark:text-slate-300'>継続性:</span>
                       <span className='font-medium'>{analysisResult?.studyPattern?.consistencyScore || 0}%</span>
                     </div>
                   </div>
@@ -467,11 +467,11 @@ export default function Analysis() {
 
                 {/* 弱点分析 */}
                 <div className='card-secondary rounded-lg p-4'>
-                  <h4 className='font-semibold text-gray-900 dark:text-white mb-3'>弱点分析</h4>
+                  <h4 className='font-semibold text-slate-900 dark:text-white mb-3'>弱点分析</h4>
                   <div className='space-y-2'>
                     {analysisResult?.weaknessAnalysis?.weakSubjects?.slice(0, 3)?.map((subject, index) => (
                       <div key={index} className='flex items-center justify-between'>
-                        <span className='text-sm text-gray-600 dark:text-gray-300 truncate'>{subject.subject}</span>
+                        <span className='text-sm text-slate-600 dark:text-slate-300 truncate'>{subject.subject}</span>
                         <div className='flex items-center space-x-2'>
                           <div className='w-8 h-2 bg-slate-200 dark:bg-slate-700 rounded'>
                             <div
@@ -499,21 +499,21 @@ export default function Analysis() {
 
                 {/* 学習推奨 */}
                 <div className='card-secondary rounded-lg p-4'>
-                  <h4 className='font-semibold text-gray-900 dark:text-white mb-3'>学習推奨</h4>
+                  <h4 className='font-semibold text-slate-900 dark:text-white mb-3'>学習推奨</h4>
                   <div className='space-y-2 text-sm'>
                     <div className='flex justify-between'>
-                      <span className='text-gray-600 dark:text-gray-300'>推奨学習時間:</span>
+                      <span className='text-slate-600 dark:text-slate-300'>推奨学習時間:</span>
                       <span className='font-medium'>{analysisResult?.studyRecommendation?.dailyStudyTime || 0}分/日</span>
                     </div>
                     <div className='flex justify-between'>
-                      <span className='text-gray-600 dark:text-gray-300'>週間目標:</span>
+                      <span className='text-slate-600 dark:text-slate-300'>週間目標:</span>
                       <span className='font-medium'>
                         {Math.floor((analysisResult?.studyRecommendation?.weeklyGoal || 0) / 60)}h{' '}
                         {(analysisResult?.studyRecommendation?.weeklyGoal || 0) % 60}m
                       </span>
                     </div>
                     <div className='mt-3'>
-                      <span className='text-gray-600 dark:text-gray-300 text-xs'>重点科目:</span>
+                      <span className='text-slate-600 dark:text-slate-300 text-xs sm:text-sm'>重点科目:</span>
                       <div className='flex flex-wrap gap-1 mt-1'>
                         {analysisResult?.studyRecommendation?.focusSubjects?.map((subject, index) => (
                           <span key={index} className='px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded'>
@@ -540,8 +540,8 @@ export default function Analysis() {
           {user?.id && (
             <div className='mb-6 flex justify-between items-center'>
               <div>
-                <h3 className='text-lg font-semibold text-gray-900 dark:text-white'>🤖 ML学習効率分析</h3>
-                <p className='text-sm text-gray-600 dark:text-gray-300'>機械学習による高度な学習効率分析と予測</p>
+                <h3 className='text-lg font-semibold text-slate-900 dark:text-white'>🤖 ML学習効率分析</h3>
+                <p className='text-sm text-slate-600 dark:text-slate-300'>機械学習による高度な学習効率分析と予測</p>
               </div>
               <button
                 onClick={generateMLAnalysis}
@@ -574,7 +574,7 @@ export default function Analysis() {
           {predictiveAnalysis && (
             <div className='bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-lg p-6 mb-8'>
               <div className='flex items-center justify-between mb-4'>
-                <h3 className='text-xl font-semibold text-gray-900 dark:text-white'>🔮 予測分析結果</h3>
+                <h3 className='text-xl font-semibold text-slate-900 dark:text-white'>🔮 予測分析結果</h3>
                 <div className='flex items-center space-x-2'>
                   <span className='text-3xl font-bold text-purple-600 dark:text-purple-400'>
                     {predictiveAnalysis.examPassProbability}%
@@ -585,18 +585,18 @@ export default function Analysis() {
 
               <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
                 <div className='card-secondary rounded-lg p-4'>
-                  <h4 className='font-semibold text-gray-900 dark:text-white mb-3'>📈 学習予測</h4>
+                  <h4 className='font-semibold text-slate-900 dark:text-white mb-3'>📈 学習予測</h4>
                   <div className='space-y-2 text-sm'>
                     <div className='flex justify-between'>
-                      <span className='text-gray-600 dark:text-gray-300'>推奨学習時間:</span>
+                      <span className='text-slate-600 dark:text-slate-300'>推奨学習時間:</span>
                       <span className='font-medium'>{predictiveAnalysis.recommendedStudyHours}時間</span>
                     </div>
                     <div className='flex justify-between'>
-                      <span className='text-gray-600 dark:text-gray-300'>合格まで:</span>
+                      <span className='text-slate-600 dark:text-slate-300'>合格まで:</span>
                       <span className='font-medium'>{predictiveAnalysis.timeToReadiness}日</span>
                     </div>
                     <div className='flex justify-between'>
-                      <span className='text-gray-600 dark:text-gray-300'>信頼区間:</span>
+                      <span className='text-slate-600 dark:text-slate-300'>信頼区間:</span>
                       <span className='font-medium'>
                         {predictiveAnalysis.confidenceInterval.lower}% - {predictiveAnalysis.confidenceInterval.upper}%
                       </span>
@@ -605,7 +605,7 @@ export default function Analysis() {
                 </div>
 
                 <div className='card-secondary rounded-lg p-4'>
-                  <h4 className='font-semibold text-gray-900 dark:text-white mb-3'>⚠️ リスク要因</h4>
+                  <h4 className='font-semibold text-slate-900 dark:text-white mb-3'>⚠️ リスク要因</h4>
                   <div className='space-y-1'>
                     {predictiveAnalysis.riskFactors.slice(0, 3).map((factor, index) => (
                       <div
@@ -619,7 +619,7 @@ export default function Analysis() {
                 </div>
 
                 <div className='card-secondary rounded-lg p-4'>
-                  <h4 className='font-semibold text-gray-900 dark:text-white mb-3'>✨ 成功要因</h4>
+                  <h4 className='font-semibold text-slate-900 dark:text-white mb-3'>✨ 成功要因</h4>
                   <div className='space-y-1'>
                     {predictiveAnalysis.successFactors.slice(0, 3).map((factor, index) => (
                       <div
@@ -638,16 +638,16 @@ export default function Analysis() {
           {/* パーソナライズド推奨 */}
           {personalizedRecommendations && (
             <div className='bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-lg p-6 mb-8'>
-              <h3 className='text-xl font-semibold text-gray-900 dark:text-white mb-4'>🎯 パーソナライズド推奨</h3>
+              <h3 className='text-xl font-semibold text-slate-900 dark:text-white mb-4'>🎯 パーソナライズド推奨</h3>
 
               <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
                 <div>
-                  <h4 className='font-semibold text-gray-900 dark:text-white mb-3'>📅 今週の学習計画</h4>
+                  <h4 className='font-semibold text-slate-900 dark:text-white mb-3'>📅 今週の学習計画</h4>
                   <div className='space-y-2'>
                     {personalizedRecommendations.dailyStudyPlan.slice(0, 3).map((day, index) => (
                       <div key={index} className='card-secondary rounded-lg p-3'>
                         <div className='flex justify-between items-center mb-2'>
-                          <span className='text-sm font-medium text-gray-900 dark:text-white'>
+                          <span className='text-sm font-medium text-slate-900 dark:text-white'>
                             {new Date(day.date).toLocaleDateString('ja-JP', {
                               weekday: 'short',
                               month: 'short',
@@ -666,7 +666,7 @@ export default function Analysis() {
                             {day.priority}
                           </span>
                         </div>
-                        <div className='text-xs text-gray-600 dark:text-gray-300'>
+                        <div className='text-xs text-slate-600 dark:text-slate-300'>
                           {day.subjects.join(', ')} ({day.estimatedTime}分)
                         </div>
                       </div>
@@ -675,15 +675,15 @@ export default function Analysis() {
                 </div>
 
                 <div>
-                  <h4 className='font-semibold text-gray-900 dark:text-white mb-3'>🏆 優先科目</h4>
+                  <h4 className='font-semibold text-slate-900 dark:text-white mb-3'>🏆 優先科目</h4>
                   <div className='space-y-2'>
                     {personalizedRecommendations.prioritySubjects.slice(0, 4).map((subject, index) => (
                       <div key={index} className='card-secondary rounded-lg p-3'>
                         <div className='flex justify-between items-center'>
-                          <span className='text-sm font-medium text-gray-900 dark:text-white'>{subject.subject}</span>
+                          <span className='text-sm font-medium text-slate-900 dark:text-white'>{subject.subject}</span>
                           <span className='text-xs text-gray-500 dark:text-gray-400'>{subject.recommendedTime}分</span>
                         </div>
-                        <div className='text-xs text-gray-600 dark:text-gray-300 mt-1'>{subject.reason}</div>
+                        <div className='text-xs text-slate-600 dark:text-slate-300 mt-1'>{subject.reason}</div>
                       </div>
                     ))}
                   </div>
@@ -693,8 +693,8 @@ export default function Analysis() {
               {/* 学習パス最適化 */}
               {personalizedRecommendations.learningPathOptimization && (
                 <div className='mt-4 card-secondary rounded-lg p-4'>
-                  <h4 className='font-semibold text-gray-900 dark:text-white mb-2'>🛤️ 学習パス最適化</h4>
-                  <div className='text-sm text-gray-600 dark:text-gray-300'>
+                  <h4 className='font-semibold text-slate-900 dark:text-white mb-2'>🛤️ 学習パス最適化</h4>
+                  <div className='text-sm text-slate-600 dark:text-slate-300'>
                     <p>
                       <strong>現在のパス:</strong> {personalizedRecommendations.learningPathOptimization.currentPath}
                     </p>
@@ -714,13 +714,13 @@ export default function Analysis() {
           {/* 高度な弱点分析 */}
           {advancedWeakPoints && (
             <div className='bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20 rounded-lg p-6 mb-8'>
-              <h3 className='text-xl font-semibold text-gray-900 dark:text-white mb-4'>🎯 AI弱点分析</h3>
+              <h3 className='text-xl font-semibold text-slate-900 dark:text-white mb-4'>🎯 AI弱点分析</h3>
 
               <div className='space-y-4'>
                 {advancedWeakPoints.criticalWeakPoints.slice(0, 3).map((weakness, index) => (
                   <div key={index} className='card-secondary rounded-lg p-4'>
                     <div className='flex justify-between items-start mb-2'>
-                      <h4 className='font-semibold text-gray-900 dark:text-white'>{weakness.subject}</h4>
+                      <h4 className='font-semibold text-slate-900 dark:text-white'>{weakness.subject}</h4>
                       <span
                         className={`text-xs px-2 py-1 rounded-full ${
                           weakness.severity === 'critical'
@@ -733,7 +733,7 @@ export default function Analysis() {
                         {weakness.severity}
                       </span>
                     </div>
-                    <div className='text-sm text-gray-600 dark:text-gray-300 mb-2'>
+                    <div className='text-sm text-slate-600 dark:text-slate-300 mb-2'>
                       正答率: {((weakness.accuracy || 0) * 100).toFixed(1)}% | 学習時間: {weakness.timeSpent || 0}分
                     </div>
                     <div className='text-xs text-gray-500 dark:text-gray-400'>
@@ -777,13 +777,13 @@ export default function Analysis() {
           <div className='grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8'>
             {/* 週別学習時間 */}
             <div className='card-secondary p-4'>
-              <h3 className='text-lg font-semibold text-gray-900 dark:text-white mb-4'>週別学習時間推移</h3>
+              <h3 className='text-lg font-semibold text-slate-900 dark:text-white mb-4'>週別学習時間推移</h3>
               <ProgressChart data={weeklyData} />
             </div>
 
             {/* 科目別学習時間 */}
             <div className='card-secondary p-4'>
-              <h3 className='text-lg font-semibold text-gray-900 dark:text-white mb-4'>科目別学習時間</h3>
+              <h3 className='text-lg font-semibold text-slate-900 dark:text-white mb-4'>科目別学習時間</h3>
               <StudyTimeChart data={subjectData} />
             </div>
           </div>
@@ -792,7 +792,7 @@ export default function Analysis() {
           <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
             {/* 理解度レーダーチャート */}
             <div className='card-secondary p-4'>
-              <h3 className='text-lg font-semibold text-gray-900 dark:text-white mb-4'>分野別理解度</h3>
+              <h3 className='text-lg font-semibold text-slate-900 dark:text-white mb-4'>分野別理解度</h3>
               {understandingData.length > 0 ? (
                 <UnderstandingRadarChart data={understandingData} />
               ) : (
@@ -804,7 +804,7 @@ export default function Analysis() {
 
             {/* 改善提案 */}
             <div className='card-secondary p-4'>
-              <h3 className='text-lg font-semibold text-gray-900 dark:text-white mb-4'>学習改善提案</h3>
+              <h3 className='text-lg font-semibold text-slate-900 dark:text-white mb-4'>学習改善提案</h3>
               <div className='space-y-4'>
                 {understandingData.length > 0 && (
                   <>

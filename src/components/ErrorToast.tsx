@@ -48,7 +48,7 @@ function ErrorToast({ error, onClose, onAction: _onAction }: ErrorToastProps) {
       case ErrorSeverity.CRITICAL:
         return 'bg-red-50 border-red-200 text-red-800';
       default:
-        return 'bg-gray-50 border-gray-200 text-gray-800';
+        return 'bg-gray-50 border-slate-200 text-gray-800';
     }
   };
 
