@@ -12,7 +12,7 @@ const mockApi = {
 };
 
 vi.mock('@/lib/api', () => ({
-  api: mockApi,
+  apiClient: mockApi,
 }));
 
 describe('ExamConfigModal', () => {

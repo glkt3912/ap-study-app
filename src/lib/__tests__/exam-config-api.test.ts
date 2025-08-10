@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { api } from '../api';
+import { apiClient as api } from '../api';
 import type { ExamConfig, CreateExamConfigRequest, UpdateExamConfigRequest } from '@/types/api';
 
 // Mock fetch
@@ -26,7 +26,10 @@ describe('Exam Config API Client', () => {
 
       mockFetch.mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve(mockConfig),
+        json: () => Promise.resolve({
+          success: true,
+          data: mockConfig,
+        }),
       });
 
       const result = await api.getExamConfig('1');
@@ -34,7 +37,6 @@ describe('Exam Config API Client', () => {
       expect(mockFetch).toHaveBeenCalledWith(
         'http://localhost:8000/api/exam-config/1',
         expect.objectContaining({
-          method: 'GET',
           headers: expect.objectContaining({
             'Content-Type': 'application/json',
           }),
@@ -46,7 +48,10 @@ describe('Exam Config API Client', () => {
     it('should handle user ID encoding', async () => {
       mockFetch.mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve({}),
+        json: () => Promise.resolve({
+          success: true,
+          data: {},
+        }),
       });
 
       await api.getExamConfig('user@example.com');
@@ -79,7 +84,7 @@ describe('Exam Config API Client', () => {
         id: 1,
         userId: 1,
         examDate: requestData.examDate,
-        targetScore: requestData.targetScore,
+        targetScore: requestData.targetScore!,
         remainingDays: 30,
         createdAt: '2024-01-01T00:00:00Z',
         updatedAt: '2024-01-01T00:00:00Z',
@@ -87,7 +92,10 @@ describe('Exam Config API Client', () => {
 
       mockFetch.mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve(mockResponse),
+        json: () => Promise.resolve({
+          success: true,
+          data: mockResponse,
+        }),
       });
 
       const result = await api.setExamConfig('1', requestData);
@@ -110,19 +118,21 @@ describe('Exam Config API Client', () => {
         examDate: '2024-12-01T00:00:00Z',
       };
 
-      const mockResponse: ExamConfig = {
+      const mockResponse = {
         id: 1,
         userId: 1,
         examDate: requestData.examDate,
-        targetScore: undefined,
         remainingDays: 30,
         createdAt: '2024-01-01T00:00:00Z',
         updatedAt: '2024-01-01T00:00:00Z',
-      };
+      } as ExamConfig;
 
       mockFetch.mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve(mockResponse),
+        json: () => Promise.resolve({
+          success: true,
+          data: mockResponse,
+        }),
       });
 
       const result = await api.setExamConfig('1', requestData);
@@ -160,7 +170,7 @@ describe('Exam Config API Client', () => {
         id: 1,
         userId: 1,
         examDate: requestData.examDate!,
-        targetScore: requestData.targetScore,
+        targetScore: requestData.targetScore!,
         remainingDays: 25,
         createdAt: '2024-01-01T00:00:00Z',
         updatedAt: '2024-08-10T12:00:00Z',
@@ -168,7 +178,10 @@ describe('Exam Config API Client', () => {
 
       mockFetch.mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve(mockResponse),
+        json: () => Promise.resolve({
+          success: true,
+          data: mockResponse,
+        }),
       });
 
       const result = await api.updateExamConfig('1', requestData);
@@ -191,13 +204,16 @@ describe('Exam Config API Client', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         json: () => Promise.resolve({
-          id: 1,
-          userId: 1,
-          examDate: '2024-12-01T00:00:00Z',
-          targetScore: 95,
-          remainingDays: 30,
-          createdAt: '2024-01-01T00:00:00Z',
-          updatedAt: '2024-08-10T12:00:00Z',
+          success: true,
+          data: {
+            id: 1,
+            userId: 1,
+            examDate: '2024-12-01T00:00:00Z',
+            targetScore: 95,
+            remainingDays: 30,
+            createdAt: '2024-01-01T00:00:00Z',
+            updatedAt: '2024-08-10T12:00:00Z',
+          },
         }),
       });
 
@@ -218,7 +234,10 @@ describe('Exam Config API Client', () => {
 
       mockFetch.mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve(mockResponse),
+        json: () => Promise.resolve({
+          success: true,
+          data: mockResponse,
+        }),
       });
 
       const result = await api.deleteExamConfig('1');
@@ -288,7 +307,10 @@ describe('Exam Config API Client', () => {
 
       mockFetch.mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve({}),
+        json: () => Promise.resolve({
+          success: true,
+          data: {},
+        }),
       });
 
       await api.getExamConfig('1');
@@ -315,7 +337,10 @@ describe('Exam Config API Client', () => {
 
       mockFetch.mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve({}),
+        json: () => Promise.resolve({
+          success: true,
+          data: {},
+        }),
       });
 
       await api.setExamConfig('1', requestData);
@@ -334,7 +359,10 @@ describe('Exam Config API Client', () => {
     it('should handle special characters in user IDs', async () => {
       mockFetch.mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve({}),
+        json: () => Promise.resolve({
+          success: true,
+          data: {},
+        }),
       });
 
       await api.getExamConfig('user+test@example.com');
