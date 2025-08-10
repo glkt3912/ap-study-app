@@ -116,7 +116,7 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
   return (
     <div className='space-y-6'>
       <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6'>
-        <div className='bg-white dark:bg-slate-800 rounded-lg shadow-md p-4 sm:p-6'>
+        <div className='card-stats'>
           <div className='flex items-center'>
             <div className='p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex-shrink-0'>
               <span className='text-xl sm:text-2xl'>📚</span>
@@ -133,7 +133,7 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
           </div>
         </div>
 
-        <div className='bg-white dark:bg-slate-800 rounded-lg shadow-md p-4 sm:p-6'>
+        <div className='card-stats'>
           <div className='flex items-center'>
             <div className='p-2 bg-green-100 dark:bg-green-900/30 rounded-lg flex-shrink-0'>
               <span className='text-xl sm:text-2xl'>⏱️</span>
@@ -148,7 +148,7 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
           </div>
         </div>
 
-        <div className='bg-white dark:bg-slate-800 rounded-lg shadow-md p-4 sm:p-6'>
+        <div className='card-stats'>
           <div className='flex items-center'>
             <div className='p-2 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex-shrink-0'>
               <span className='text-xl sm:text-2xl'>🎯</span>
@@ -163,7 +163,7 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
           </div>
         </div>
 
-        <div className='bg-white dark:bg-slate-800 rounded-lg shadow-md p-4 sm:p-6'>
+        <div className='card-stats'>
           <div className='flex items-center'>
             <div className='p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex-shrink-0'>
               <span className='text-xl sm:text-2xl'>📅</span>
@@ -198,7 +198,7 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
           </div>
 
           <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-            <div className='bg-white dark:bg-gray-700 rounded-lg p-4'>
+            <div className='card-secondary p-4'>
               <div className='flex items-center space-x-2 mb-2'>
                 <span className='text-lg'>📈</span>
                 <h4 className='font-semibold text-gray-900 dark:text-white'>学習予測</h4>
@@ -215,7 +215,7 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
               </div>
             </div>
 
-            <div className='bg-white dark:bg-gray-700 rounded-lg p-4'>
+            <div className='card-secondary p-4'>
               <div className='flex items-center space-x-2 mb-2'>
                 <span className='text-lg'>⚠️</span>
                 <h4 className='font-semibold text-gray-900 dark:text-white'>注意点</h4>
@@ -232,7 +232,7 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
               </div>
             </div>
 
-            <div className='bg-white dark:bg-gray-700 rounded-lg p-4'>
+            <div className='card-secondary p-4'>
               <div className='flex items-center space-x-2 mb-2'>
                 <span className='text-lg'>✨</span>
                 <h4 className='font-semibold text-gray-900 dark:text-white'>強み</h4>
@@ -254,7 +254,7 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
           {personalizedRecommendations && 
             personalizedRecommendations.dailyStudyPlan && 
             personalizedRecommendations.dailyStudyPlan.length > 0 && (
-            <div className='mt-4 bg-white dark:bg-gray-700 rounded-lg p-4'>
+            <div className='mt-4 card-secondary p-4'>
               <div className='flex items-center space-x-2 mb-3'>
                 <span className='text-lg'>📋</span>
                 <h4 className='font-semibold text-gray-900 dark:text-white'>今日の推奨アクション</h4>
@@ -295,7 +295,7 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
       )}
 
       <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
-        <div className='bg-white dark:bg-gray-800 rounded-lg shadow-md'>
+        <div className='card-primary'>
           <div className='p-6 border-b border-gray-200 dark:border-gray-700'>
             <h3 className='text-lg font-semibold text-gray-900 dark:text-white'>今日の学習</h3>
           </div>
@@ -336,7 +336,7 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
           </div>
         </div>
 
-        <div className='bg-white dark:bg-gray-800 rounded-lg shadow-md'>
+        <div className='card-primary'>
           <div className='p-6 border-b border-gray-200 dark:border-gray-700'>
             <h3 className='text-lg font-semibold text-gray-900 dark:text-white'>週別進捗</h3>
           </div>
@@ -366,7 +366,7 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
         </div>
       </div>
 
-      <div className='bg-white dark:bg-gray-800 rounded-lg shadow-md'>
+      <div className='card-primary'>
         <div className='p-6 border-b border-gray-200 dark:border-gray-700'>
           <h3 className='text-lg font-semibold text-gray-900 dark:text-white'>学習フェーズ別進捗</h3>
         </div>

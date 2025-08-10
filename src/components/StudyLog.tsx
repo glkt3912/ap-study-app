@@ -215,7 +215,7 @@ export default function StudyLog() {
 
         <div className='p-6'>
           {error && (
-            <div className='mb-4 p-4 bg-red-50 border border-red-200 rounded-md'>
+            <div className='mb-4 alert-error'>
               <p className='text-red-600 text-sm'>{error}</p>
             </div>
           )}
@@ -307,7 +307,7 @@ export default function StudyLog() {
                 {newLog.topics.map((topic, index) => (
                   <span
                     key={index}
-                    className='inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800'
+                    className='inline-flex items-center badge-info'
                   >
                     {topic}
                     <button
@@ -339,7 +339,7 @@ export default function StudyLog() {
             <button
               type='submit'
               disabled={isLoading}
-              className='bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
+              className='btn-primary disabled:opacity-50 disabled:cursor-not-allowed'
             >
               {isLoading ? '保存中...' : '記録を追加'}
             </button>
