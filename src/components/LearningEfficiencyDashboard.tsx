@@ -92,7 +92,7 @@ export function LearningEfficiencyDashboard() {
       case 'low':
         return 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-700';
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600';
+        return 'bg-slate-100 text-slate-800 border-slate-200 dark:bg-slate-700 dark:text-slate-300 dark:border-slate-600';
     }
   };
 
@@ -126,7 +126,7 @@ export function LearningEfficiencyDashboard() {
     })) || [];
 
   return (
-    <div className='bg-white dark:bg-gray-800 rounded-lg shadow-md p-6'>
+    <div className='card-primary rounded-lg shadow-md p-6'>
       <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6'>
         <h2 className='text-2xl font-bold text-gray-800 dark:text-white mb-4 sm:mb-0'>学習効率分析ダッシュボード</h2>
         <div className='flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4'>
@@ -186,7 +186,7 @@ export function LearningEfficiencyDashboard() {
           </div>
 
           {/* 推奨事項 */}
-          <div className='bg-gray-50 dark:bg-gray-700 rounded-lg p-6'>
+          <div className='bg-slate-50 dark:bg-slate-700 rounded-lg p-6'>
             <h3 className='text-xl font-semibold text-gray-800 dark:text-white mb-4'>🎯 改善提案</h3>
             <div className='space-y-4'>
               {analysis?.recommendations?.map((rec, index) => (
@@ -208,7 +208,7 @@ export function LearningEfficiencyDashboard() {
           </div>
 
           {/* 時間帯別効率 */}
-          <div className='bg-gray-50 dark:bg-gray-700 rounded-lg p-6'>
+          <div className='bg-slate-50 dark:bg-slate-700 rounded-lg p-6'>
             <h3 className='text-xl font-semibold text-gray-800 dark:text-white mb-4'>⏰ 時間帯別学習効率</h3>
             <div className='h-80'>
               <Suspense
@@ -249,7 +249,7 @@ export function LearningEfficiencyDashboard() {
           </div>
 
           {/* 分野別効率 */}
-          <div className='bg-gray-50 dark:bg-gray-700 rounded-lg p-6'>
+          <div className='bg-slate-50 dark:bg-slate-700 rounded-lg p-6'>
             <h3 className='text-xl font-semibold text-gray-800 dark:text-white mb-4'>📚 分野別学習効率</h3>
             <div className='h-80'>
               <Suspense
@@ -292,11 +292,11 @@ export function LearningEfficiencyDashboard() {
           {/* 詳細数値 */}
           <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
             {/* 分野別詳細 */}
-            <div className='bg-gray-50 dark:bg-gray-700 rounded-lg p-6'>
+            <div className='bg-slate-50 dark:bg-slate-700 rounded-lg p-6'>
               <h3 className='text-lg font-semibold text-gray-800 dark:text-white mb-4'>分野別詳細</h3>
               <div className='space-y-3'>
                 {analysis?.subjectEfficiency?.map((subject, index) => (
-                  <div key={index} className='bg-white dark:bg-gray-800 rounded p-3'>
+                  <div key={index} className='card-primary rounded p-3'>
                     <div className='font-medium text-gray-800 dark:text-gray-200 mb-2'>{subject.subject}</div>
                     <div className='grid grid-cols-2 gap-2 text-sm text-gray-600 dark:text-gray-300'>
                       <span>学習時間: {Math.round(subject.totalStudyTime)}分</span>
@@ -310,7 +310,7 @@ export function LearningEfficiencyDashboard() {
             </div>
 
             {/* 最適時間帯 */}
-            <div className='bg-gray-50 dark:bg-gray-700 rounded-lg p-6'>
+            <div className='bg-slate-50 dark:bg-slate-700 rounded-lg p-6'>
               <h3 className='text-lg font-semibold text-gray-800 dark:text-white mb-4'>最適時間帯TOP5</h3>
               <div className='space-y-3'>
                 {analysis?.hourlyEfficiency
@@ -318,7 +318,7 @@ export function LearningEfficiencyDashboard() {
                   ?.sort((a, b) => b.efficiencyScore - a.efficiencyScore)
                   ?.slice(0, 5)
                   ?.map((hour, index) => (
-                    <div key={index} className='bg-white dark:bg-gray-800 rounded p-3'>
+                    <div key={index} className='card-primary rounded p-3'>
                       <div className='flex items-center justify-between'>
                         <span className='font-medium text-gray-800 dark:text-gray-200'>
                           {hour.hour}:00 - {hour.hour + 1}:00

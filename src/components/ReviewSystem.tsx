@@ -142,7 +142,7 @@ export function ReviewSystem() {
                   <button
                     key={level}
                     onClick={() => setCurrentUnderstanding(level)}
-                    className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full text-xs sm:text-sm font-medium transition-colors ${
+                    className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 ${
                       currentUnderstanding === level
                         ? 'bg-blue-500 text-white'
                         : 'bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-500'

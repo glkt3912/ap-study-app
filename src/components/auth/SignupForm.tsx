@@ -128,7 +128,7 @@ export function SignupForm({ onModeChange }: SignupFormProps) {
         <button
           type='submit'
           disabled={isLoading || !formData.email || !formData.password}
-          className='w-full bg-green-600 dark:bg-green-700 text-white py-2 px-4 rounded-md hover:bg-green-700 dark:hover:bg-green-600 disabled:bg-gray-400 dark:disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors'
+          className='w-full bg-green-600 dark:bg-green-700 text-white py-2 px-4 rounded-md hover:bg-green-700 dark:hover:bg-green-600 disabled:bg-gray-400 dark:disabled:bg-gray-600 disabled:cursor-not-allowed transition-all duration-200'
         >
           {isLoading ? 'アカウント作成中...' : 'アカウント作成'}
         </button>

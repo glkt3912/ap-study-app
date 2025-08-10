@@ -334,7 +334,7 @@ export default function Analysis() {
 
   return (
     <div className='space-y-6'>
-      <div className='bg-white dark:bg-gray-800 rounded-lg shadow-md'>
+      <div className='card-primary rounded-lg shadow-md'>
         <div className='p-6 border-b border-gray-200 dark:border-gray-700'>
           <h2 className='text-xl font-semibold text-gray-900 dark:text-white'>学習分析</h2>
           <p className='text-gray-600 dark:text-gray-300 mt-1'>学習データを分析して効率的な学習方法を見つけましょう</p>
@@ -440,7 +440,7 @@ export default function Analysis() {
 
               <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
                 {/* 学習パターン */}
-                <div className='bg-white dark:bg-gray-700 rounded-lg p-4'>
+                <div className='card-secondary rounded-lg p-4'>
                   <h4 className='font-semibold text-gray-900 dark:text-white mb-3'>学習パターン</h4>
                   <div className='space-y-2 text-sm'>
                     <div className='flex justify-between'>
@@ -466,7 +466,7 @@ export default function Analysis() {
                 </div>
 
                 {/* 弱点分析 */}
-                <div className='bg-white dark:bg-gray-700 rounded-lg p-4'>
+                <div className='card-secondary rounded-lg p-4'>
                   <h4 className='font-semibold text-gray-900 dark:text-white mb-3'>弱点分析</h4>
                   <div className='space-y-2'>
                     {analysisResult?.weaknessAnalysis?.weakSubjects?.slice(0, 3)?.map((subject, index) => (
@@ -498,7 +498,7 @@ export default function Analysis() {
                 </div>
 
                 {/* 学習推奨 */}
-                <div className='bg-white dark:bg-gray-700 rounded-lg p-4'>
+                <div className='card-secondary rounded-lg p-4'>
                   <h4 className='font-semibold text-gray-900 dark:text-white mb-3'>学習推奨</h4>
                   <div className='space-y-2 text-sm'>
                     <div className='flex justify-between'>
@@ -584,7 +584,7 @@ export default function Analysis() {
               </div>
 
               <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
-                <div className='bg-white dark:bg-gray-700 rounded-lg p-4'>
+                <div className='card-secondary rounded-lg p-4'>
                   <h4 className='font-semibold text-gray-900 dark:text-white mb-3'>📈 学習予測</h4>
                   <div className='space-y-2 text-sm'>
                     <div className='flex justify-between'>
@@ -604,7 +604,7 @@ export default function Analysis() {
                   </div>
                 </div>
 
-                <div className='bg-white dark:bg-gray-700 rounded-lg p-4'>
+                <div className='card-secondary rounded-lg p-4'>
                   <h4 className='font-semibold text-gray-900 dark:text-white mb-3'>⚠️ リスク要因</h4>
                   <div className='space-y-1'>
                     {predictiveAnalysis.riskFactors.slice(0, 3).map((factor, index) => (
@@ -618,7 +618,7 @@ export default function Analysis() {
                   </div>
                 </div>
 
-                <div className='bg-white dark:bg-gray-700 rounded-lg p-4'>
+                <div className='card-secondary rounded-lg p-4'>
                   <h4 className='font-semibold text-gray-900 dark:text-white mb-3'>✨ 成功要因</h4>
                   <div className='space-y-1'>
                     {predictiveAnalysis.successFactors.slice(0, 3).map((factor, index) => (
@@ -645,7 +645,7 @@ export default function Analysis() {
                   <h4 className='font-semibold text-gray-900 dark:text-white mb-3'>📅 今週の学習計画</h4>
                   <div className='space-y-2'>
                     {personalizedRecommendations.dailyStudyPlan.slice(0, 3).map((day, index) => (
-                      <div key={index} className='bg-white dark:bg-gray-700 rounded-lg p-3'>
+                      <div key={index} className='card-secondary rounded-lg p-3'>
                         <div className='flex justify-between items-center mb-2'>
                           <span className='text-sm font-medium text-gray-900 dark:text-white'>
                             {new Date(day.date).toLocaleDateString('ja-JP', {
@@ -678,7 +678,7 @@ export default function Analysis() {
                   <h4 className='font-semibold text-gray-900 dark:text-white mb-3'>🏆 優先科目</h4>
                   <div className='space-y-2'>
                     {personalizedRecommendations.prioritySubjects.slice(0, 4).map((subject, index) => (
-                      <div key={index} className='bg-white dark:bg-gray-700 rounded-lg p-3'>
+                      <div key={index} className='card-secondary rounded-lg p-3'>
                         <div className='flex justify-between items-center'>
                           <span className='text-sm font-medium text-gray-900 dark:text-white'>{subject.subject}</span>
                           <span className='text-xs text-gray-500 dark:text-gray-400'>{subject.recommendedTime}分</span>
@@ -692,7 +692,7 @@ export default function Analysis() {
 
               {/* 学習パス最適化 */}
               {personalizedRecommendations.learningPathOptimization && (
-                <div className='mt-4 bg-white dark:bg-gray-700 rounded-lg p-4'>
+                <div className='mt-4 card-secondary rounded-lg p-4'>
                   <h4 className='font-semibold text-gray-900 dark:text-white mb-2'>🛤️ 学習パス最適化</h4>
                   <div className='text-sm text-gray-600 dark:text-gray-300'>
                     <p>
@@ -718,7 +718,7 @@ export default function Analysis() {
 
               <div className='space-y-4'>
                 {advancedWeakPoints.criticalWeakPoints.slice(0, 3).map((weakness, index) => (
-                  <div key={index} className='bg-white dark:bg-gray-700 rounded-lg p-4'>
+                  <div key={index} className='card-secondary rounded-lg p-4'>
                     <div className='flex justify-between items-start mb-2'>
                       <h4 className='font-semibold text-gray-900 dark:text-white'>{weakness.subject}</h4>
                       <span

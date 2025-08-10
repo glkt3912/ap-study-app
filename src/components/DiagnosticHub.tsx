@@ -64,7 +64,7 @@ export default function DiagnosticHub() {
           <Link
             key={index}
             href={page.url}
-            className={`${page.color} text-white p-6 rounded-lg transition-colors block`}
+            className={`${page.color} text-white p-6 rounded-lg transition-all duration-200 block`}
           >
             <h3 className='text-xl font-bold mb-2'>{page.title}</h3>
             <p className='text-sm opacity-90'>{page.description}</p>
@@ -75,13 +75,13 @@ export default function DiagnosticHub() {
       {/* 監視・パフォーマンスダッシュボード */}
       <div className='mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6'>
         {/* パフォーマンス分析 */}
-        <div className='bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6'>
+        <div className='card-primary border border-slate-200 dark:border-slate-700 rounded-lg p-6'>
           <div className='flex items-center justify-between mb-4'>
             <h3 className='text-lg font-semibold text-gray-900 dark:text-white'>📊 パフォーマンス分析</h3>
             <button
               onClick={runPerformanceAnalysis}
               disabled={isAnalyzing}
-              className='px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400 transition-colors'
+              className='px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400 transition-all duration-200'
             >
               {isAnalyzing ? '分析中...' : '分析開始'}
             </button>
@@ -115,12 +115,12 @@ export default function DiagnosticHub() {
         </div>
 
         {/* エラー統計 */}
-        <div className='bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6'>
+        <div className='card-primary border border-slate-200 dark:border-slate-700 rounded-lg p-6'>
           <div className='flex items-center justify-between mb-4'>
             <h3 className='text-lg font-semibold text-gray-900 dark:text-white'>🚨 エラー統計</h3>
             <button
               onClick={getErrorStatistics}
-              className='px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors'
+              className='px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-all duration-200'
             >
               統計取得
             </button>

@@ -119,7 +119,7 @@ export default function ClientHome() {
   };
 
   return (
-    <div className='min-h-screen bg-slate-100 dark:bg-slate-900 transition-colors duration-200'>
+    <div className='min-h-screen bg-slate-100 dark:bg-slate-900 transition-all duration-200 duration-200'>
       <header className='bg-white dark:bg-slate-800 shadow-sm border-b border-slate-200 dark:border-slate-700'>
         <div className='container-primary py-3 sm:py-4'>
           <div className='flex justify-between items-center'>

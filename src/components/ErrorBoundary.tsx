@@ -106,13 +106,13 @@ export class ErrorBoundary extends Component<Props, State> {
             <div className='flex space-x-3'>
               <button
                 onClick={() => window.location.reload()}
-                className='flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors'
+                className='flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-all duration-200'
               >
                 ページを再読み込み
               </button>
               <button
                 onClick={() => window.history.back()}
-                className='flex-1 bg-gray-300 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-200 font-medium py-2 px-4 rounded-md transition-colors'
+                className='flex-1 bg-gray-300 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-200 font-medium py-2 px-4 rounded-md transition-all duration-200'
               >
                 前のページに戻る
               </button>

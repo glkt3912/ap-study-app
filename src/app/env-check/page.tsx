@@ -268,7 +268,7 @@ export default function EnvCheckPage() {
         <div className='mt-8 text-center'>
           <button
             onClick={() => window.history.back()}
-            className='px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors'
+            className='px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all duration-200'
           >
             ← 前のページに戻る
           </button>
