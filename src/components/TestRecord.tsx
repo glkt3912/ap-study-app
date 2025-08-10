@@ -158,27 +158,27 @@ export default function TestRecord() {
       <div className='bg-white dark:bg-slate-800 rounded-lg shadow-md'>
         <div className='p-6 border-b border-slate-200 dark:border-slate-700'>
           <h2 className='text-xl font-semibold text-slate-900 dark:text-slate-100'>問題演習記録</h2>
-          <p className='text-gray-600 mt-1'>午前・午後問題の演習結果を記録して弱点を把握しましょう</p>
+          <p className='text-secondary mt-1'>午前・午後問題の演習結果を記録して弱点を把握しましょう</p>
         </div>
 
-        <div className='border-b border-gray-200'>
+        <div className='border-b border-slate-200 dark:border-slate-700'>
           <nav className='-mb-px flex'>
             <button
               onClick={() => setActiveTab('morning')}
-              className={`py-4 px-6 text-sm font-medium border-b-2 transition-colors ${
+              className={`nav-tab ${
                 activeTab === 'morning'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'nav-tab-active'
+                  : 'nav-tab-inactive'
               }`}
             >
               午前問題
             </button>
             <button
               onClick={() => setActiveTab('afternoon')}
-              className={`py-4 px-6 text-sm font-medium border-b-2 transition-colors ${
+              className={`nav-tab ${
                 activeTab === 'afternoon'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'nav-tab-active'
+                  : 'nav-tab-inactive'
               }`}
             >
               午後問題
@@ -218,7 +218,7 @@ export default function TestRecord() {
                       type='date'
                       value={newMorningTest.date}
                       onChange={e => setNewMorningTest({ ...newMorningTest, date: e.target.value })}
-                      className='w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500'
+                      className='input-primary'
                     />
                   </div>
                   <div>
@@ -226,7 +226,7 @@ export default function TestRecord() {
                     <select
                       value={newMorningTest.category}
                       onChange={e => setNewMorningTest({ ...newMorningTest, category: e.target.value })}
-                      className='w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500'
+                      className='input-primary'
                       required
                     >
                       <option value=''>分野を選択</option>
@@ -245,7 +245,7 @@ export default function TestRecord() {
                       onChange={e =>
                         setNewMorningTest({ ...newMorningTest, totalQuestions: parseInt(e.target.value) || 0 })
                       }
-                      className='w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500'
+                      className='input-primary'
                       min='1'
                       required
                     />
@@ -258,7 +258,7 @@ export default function TestRecord() {
                       onChange={e =>
                         setNewMorningTest({ ...newMorningTest, correctAnswers: parseInt(e.target.value) || 0 })
                       }
-                      className='w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500'
+                      className='input-primary'
                       min='0'
                       max={newMorningTest.totalQuestions}
                       required
@@ -270,7 +270,7 @@ export default function TestRecord() {
                       type='number'
                       value={newMorningTest.timeSpent}
                       onChange={e => setNewMorningTest({ ...newMorningTest, timeSpent: parseInt(e.target.value) || 0 })}
-                      className='w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500'
+                      className='input-primary'
                       min='1'
                       required
                     />
@@ -282,7 +282,7 @@ export default function TestRecord() {
                     value={newMorningTest.memo || ''}
                     onChange={e => setNewMorningTest({ ...newMorningTest, memo: e.target.value })}
                     rows={3}
-                    className='w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500'
+                    className='input-primary'
                     placeholder='演習内容や感想を記録してください'
                   />
                 </div>
@@ -298,7 +298,7 @@ export default function TestRecord() {
               <div className='space-y-4 mt-8'>
                 <h3 className='text-lg font-semibold text-slate-900 dark:text-slate-100'>演習履歴</h3>
                 {morningTests.length === 0 ? (
-                  <p className='text-gray-500 text-center py-8'>まだ演習記録がありません</p>
+                  <p className='text-gray-500 dark:text-gray-400 text-center py-8'>まだ演習記録がありません</p>
                 ) : (
                   <div className='space-y-3'>
                     {morningTests.map(test => (
@@ -358,7 +358,7 @@ export default function TestRecord() {
                       type='date'
                       value={newAfternoonTest.date}
                       onChange={e => setNewAfternoonTest({ ...newAfternoonTest, date: e.target.value })}
-                      className='w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500'
+                      className='input-primary'
                       required
                     />
                   </div>
@@ -367,7 +367,7 @@ export default function TestRecord() {
                     <select
                       value={newAfternoonTest.category}
                       onChange={e => setNewAfternoonTest({ ...newAfternoonTest, category: e.target.value })}
-                      className='w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500'
+                      className='input-primary'
                       required
                     >
                       <option value=''>分野を選択</option>
@@ -384,7 +384,7 @@ export default function TestRecord() {
                       type='number'
                       value={newAfternoonTest.score}
                       onChange={e => setNewAfternoonTest({ ...newAfternoonTest, score: parseInt(e.target.value) || 0 })}
-                      className='w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500'
+                      className='input-primary'
                       min='0'
                       max='100'
                       required
@@ -398,7 +398,7 @@ export default function TestRecord() {
                       onChange={e =>
                         setNewAfternoonTest({ ...newAfternoonTest, timeSpent: parseInt(e.target.value) || 0 })
                       }
-                      className='w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500'
+                      className='input-primary'
                       min='1'
                       required
                     />
@@ -410,7 +410,7 @@ export default function TestRecord() {
                     value={newAfternoonTest.memo || ''}
                     onChange={e => setNewAfternoonTest({ ...newAfternoonTest, memo: e.target.value })}
                     rows={3}
-                    className='w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500'
+                    className='input-primary'
                     placeholder='問題内容や解答のポイントを記録してください'
                   />
                 </div>
@@ -426,7 +426,7 @@ export default function TestRecord() {
               <div className='space-y-4 mt-8'>
                 <h3 className='text-lg font-semibold text-slate-900 dark:text-slate-100'>演習履歴</h3>
                 {afternoonTests.length === 0 ? (
-                  <p className='text-gray-500 text-center py-8'>まだ演習記録がありません</p>
+                  <p className='text-gray-500 dark:text-gray-400 text-center py-8'>まだ演習記録がありません</p>
                 ) : (
                   <div className='space-y-3'>
                     {afternoonTests.map(test => (

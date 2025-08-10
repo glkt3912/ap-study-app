@@ -178,7 +178,7 @@ export function AdvancedAnalysis() {
   const dayNames = ['日', '月', '火', '水', '木', '金', '土'];
 
   return (
-    <div className='bg-white dark:bg-gray-800 rounded-lg shadow-md p-6'>
+    <div className='card-primary p-6'>
       <h2 className='text-2xl font-bold text-gray-800 dark:text-white mb-6'>高度な学習分析</h2>
 
       {/* タブナビゲーション */}
@@ -212,7 +212,7 @@ export function AdvancedAnalysis() {
 
       {loading && (
         <div className='flex justify-center items-center py-8'>
-          <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500'></div>
+          <div className='loading-spinner'></div>
           <span className='ml-2 text-gray-600 dark:text-gray-300'>読み込み中...</span>
         </div>
       )}
@@ -396,25 +396,25 @@ export function AdvancedAnalysis() {
                   type='date'
                   value={examDate}
                   onChange={e => setExamDate(e.target.value)}
-                  className='w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white'
+                  className='input-primary'
                 />
               </div>
               <div>
-                <label className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1'>目標点数</label>
+                <label className='label-primary'>目標点数</label>
                 <input
                   type='number'
                   value={targetScore}
                   onChange={e => setTargetScore(parseInt(e.target.value))}
                   min='0'
                   max='100'
-                  className='w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white'
+                  className='input-primary'
                 />
               </div>
             </div>
             <button
               onClick={loadExamReadiness}
               disabled={!examDate || loading}
-              className='mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed'
+              className='btn-primary mt-4'
             >
               準備度を評価
             </button>
@@ -602,7 +602,7 @@ export function AdvancedAnalysis() {
               <Suspense
                 fallback={
                   <div className='h-96 flex items-center justify-center'>
-                    <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500'></div>
+                    <div className='loading-spinner'></div>
                     <span className='ml-3 text-gray-600 dark:text-gray-300'>学習効率分析を読み込み中...</span>
                   </div>
                 }

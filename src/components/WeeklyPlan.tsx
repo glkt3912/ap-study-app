@@ -80,7 +80,7 @@ export default function WeeklyPlan({ studyData, setStudyData }: WeeklyPlanProps)
                   第{selectedWeekData.weekNumber}週: {selectedWeekData.title}
                 </h3>
                 <div className='flex items-center space-x-4 mb-4'>
-                  <span className='text-sm px-3 py-1 bg-blue-100 text-blue-800 rounded-full'>
+                  <span className='badge-info'>
                     {selectedWeekData.phase}
                   </span>
                 </div>
@@ -128,7 +128,7 @@ export default function WeeklyPlan({ studyData, setStudyData }: WeeklyPlanProps)
                             {day.topics.map((topic, topicIndex) => (
                               <span
                                 key={topicIndex}
-                                className='px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full'
+                                className='badge-info'
                               >
                                 {topic}
                               </span>

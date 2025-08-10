@@ -251,7 +251,7 @@ export default function Quiz() {
       <div className='max-w-4xl mx-auto p-6'>
         <div className='bg-white dark:bg-slate-800 rounded-lg shadow-lg p-8'>
           <div className='text-center'>
-            <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto'></div>
+            <div className='loading-spinner-lg mx-auto'></div>
             <p className='mt-4 text-gray-600 dark:text-gray-300'>読み込み中...</p>
           </div>
         </div>
@@ -377,7 +377,7 @@ export default function Quiz() {
           {/* 問題文 */}
           <div className='mb-8'>
             <h3 className='text-xl font-semibold text-slate-900 dark:text-slate-100 mb-4'>問題 {currentQuestion.number}</h3>
-            <p className='text-gray-700 leading-relaxed whitespace-pre-wrap'>{currentQuestion.question}</p>
+            <p className='text-gray-700 dark:text-gray-200 leading-relaxed whitespace-pre-wrap'>{currentQuestion.question}</p>
           </div>
 
           {/* 選択肢 */}
@@ -709,7 +709,7 @@ export default function Quiz() {
             </>
           ) : (
             <div className='bg-gray-50 rounded-lg p-6 text-center'>
-              <p className='text-gray-600'>学習データが不足しています。問題演習を行うとトレンドが表示されます。</p>
+              <p className='text-gray-600 dark:text-gray-300'>学習データが不足しています。問題演習を行うとトレンドが表示されます。</p>
             </div>
           )}
         </div>

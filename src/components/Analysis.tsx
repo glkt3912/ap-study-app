@@ -306,7 +306,7 @@ export default function Analysis() {
   if (isLoading) {
     return (
       <div className='space-y-6'>
-        <div className='bg-white dark:bg-gray-800 rounded-lg shadow-md'>
+        <div className='card-primary'>
           <div className='p-6 border-b border-gray-200 dark:border-gray-700'>
             <h2 className='text-xl font-semibold text-gray-900 dark:text-white'>学習分析</h2>
             <p className='text-gray-600 dark:text-gray-300 mt-1'>
@@ -315,9 +315,9 @@ export default function Analysis() {
           </div>
           <div className='p-6'>
             <div className='animate-pulse'>
-              <div className='h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-4'></div>
-              <div className='h-64 bg-gray-200 dark:bg-gray-700 rounded mb-6'></div>
-              <div className='h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2'></div>
+              <div className='h-4 bg-slate-200 dark:bg-slate-700 rounded w-3/4 mb-4'></div>
+              <div className='h-64 bg-slate-200 dark:bg-slate-700 rounded mb-6'></div>
+              <div className='h-4 bg-slate-200 dark:bg-slate-700 rounded w-1/2'></div>
             </div>
           </div>
         </div>
@@ -413,7 +413,7 @@ export default function Analysis() {
             >
               {isAnalyzing ? (
                 <>
-                  <div className='animate-spin rounded-full h-4 w-4 border-b-2 border-white'></div>
+                  <div className='loading-spinner-white'></div>
                   <span>分析中...</span>
                 </>
               ) : (
@@ -473,7 +473,7 @@ export default function Analysis() {
                       <div key={index} className='flex items-center justify-between'>
                         <span className='text-sm text-gray-600 dark:text-gray-300 truncate'>{subject.subject}</span>
                         <div className='flex items-center space-x-2'>
-                          <div className='w-8 h-2 bg-gray-200 rounded'>
+                          <div className='w-8 h-2 bg-slate-200 dark:bg-slate-700 rounded'>
                             <div
                               className={`h-2 rounded ${
                                 subject.understanding < 2
@@ -550,7 +550,7 @@ export default function Analysis() {
               >
                 {isGeneratingML ? (
                   <>
-                    <div className='animate-spin rounded-full h-4 w-4 border-b-2 border-white'></div>
+                    <div className='loading-spinner-white'></div>
                     <span>分析中...</span>
                   </>
                 ) : (
@@ -776,13 +776,13 @@ export default function Analysis() {
           {/* チャートエリア */}
           <div className='grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8'>
             {/* 週別学習時間 */}
-            <div className='bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4'>
+            <div className='card-secondary p-4'>
               <h3 className='text-lg font-semibold text-gray-900 dark:text-white mb-4'>週別学習時間推移</h3>
               <ProgressChart data={weeklyData} />
             </div>
 
             {/* 科目別学習時間 */}
-            <div className='bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4'>
+            <div className='card-secondary p-4'>
               <h3 className='text-lg font-semibold text-gray-900 dark:text-white mb-4'>科目別学習時間</h3>
               <StudyTimeChart data={subjectData} />
             </div>
@@ -791,7 +791,7 @@ export default function Analysis() {
           {/* 理解度分析 */}
           <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
             {/* 理解度レーダーチャート */}
-            <div className='bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4'>
+            <div className='card-secondary p-4'>
               <h3 className='text-lg font-semibold text-gray-900 dark:text-white mb-4'>分野別理解度</h3>
               {understandingData.length > 0 ? (
                 <UnderstandingRadarChart data={understandingData} />
@@ -803,7 +803,7 @@ export default function Analysis() {
             </div>
 
             {/* 改善提案 */}
-            <div className='bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4'>
+            <div className='card-secondary p-4'>
               <h3 className='text-lg font-semibold text-gray-900 dark:text-white mb-4'>学習改善提案</h3>
               <div className='space-y-4'>
                 {understandingData.length > 0 && (

@@ -54,6 +54,14 @@
     @apply text-slate-500 dark:text-slate-500;
   }
 
+  .text-tertiary {
+    @apply text-gray-600 dark:text-gray-300;
+  }
+
+  .text-quaternary {
+    @apply text-gray-500 dark:text-gray-400;
+  }
+
   .heading-primary {
     @apply text-xl sm:text-2xl font-bold text-slate-900 dark:text-slate-100;
   }
@@ -106,8 +114,28 @@
     @apply animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 dark:border-blue-400;
   }
 
+  .loading-spinner-sm {
+    @apply animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 dark:border-blue-400;
+  }
+
+  .loading-spinner-md {
+    @apply animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 dark:border-blue-400;
+  }
+
+  .loading-spinner-lg {
+    @apply animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 dark:border-blue-400;
+  }
+
+  .loading-spinner-white {
+    @apply animate-spin rounded-full h-4 w-4 border-b-2 border-white;
+  }
+
+  .loading-spinner-purple {
+    @apply animate-spin rounded-full h-6 w-6 border-b-2 border-purple-600 dark:border-purple-400;
+  }
+
   .loading-text {
-    @apply text-gray-600 dark:text-gray-300;
+    @apply text-tertiary;
   }
 
   /* Navigation */
@@ -138,6 +166,45 @@
 
   .alert-success {
     @apply bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 text-green-700 dark:text-green-300 rounded-md p-4;
+  }
+
+  /* Stats and Progress */
+  .stats-card {
+    @apply bg-white dark:bg-slate-800 rounded-lg shadow-sm p-4 border border-slate-200 dark:border-slate-700;
+  }
+
+  .progress-bar {
+    @apply w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2;
+  }
+
+  .progress-fill {
+    @apply h-2 rounded-full transition-all duration-300;
+  }
+
+  /* Interactive Elements */
+  .interactive-card {
+    @apply border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-lg p-6 hover:border-blue-400 dark:hover:border-blue-500 transition-colors cursor-pointer;
+  }
+
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-2 dark:focus:ring-offset-slate-800;
+  }
+
+  /* Skeleton Loading */
+  .skeleton {
+    @apply animate-pulse bg-slate-200 dark:bg-slate-700 rounded;
+  }
+
+  .skeleton-text {
+    @apply skeleton h-4;
+  }
+
+  .skeleton-title {
+    @apply skeleton h-6;
+  }
+
+  .skeleton-card {
+    @apply skeleton h-32;
   }
 }
 

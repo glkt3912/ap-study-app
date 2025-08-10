@@ -210,7 +210,7 @@ export default function StudyLog() {
       <div className='bg-white dark:bg-slate-800 rounded-lg shadow-md'>
         <div className='p-6 border-b border-slate-200 dark:border-slate-700'>
           <h2 className='text-xl font-semibold text-slate-900 dark:text-slate-100'>学習記録</h2>
-          <p className='text-gray-600 mt-1'>日々の学習内容を記録して進捗を管理しましょう</p>
+          <p className='text-gray-600 dark:text-gray-300 mt-1'>日々の学習内容を記録して進捗を管理しましょう</p>
         </div>
 
         <div className='p-6'>
@@ -223,22 +223,22 @@ export default function StudyLog() {
           <form onSubmit={handleSubmit} className='space-y-4 mb-8'>
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
               <div>
-                <label className='block text-sm font-medium text-gray-700 mb-1'>日付</label>
+                <label className='label-primary'>日付</label>
                 <input
                   type='date'
                   value={newLog.date}
                   onChange={e => setNewLog({ ...newLog, date: e.target.value })}
-                  className='w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500'
+                  className='input-primary'
                   required
                 />
               </div>
 
               <div>
-                <label className='block text-sm font-medium text-gray-700 mb-1'>科目</label>
+                <label className='label-primary'>科目</label>
                 <select
                   value={newLog.subject}
                   onChange={e => setNewLog({ ...newLog, subject: e.target.value })}
-                  className='w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500'
+                  className='input-primary'
                   required
                 >
                   <option value=''>科目を選択</option>
@@ -251,19 +251,19 @@ export default function StudyLog() {
               </div>
 
               <div>
-                <label className='block text-sm font-medium text-gray-700 mb-1'>学習時間 (分)</label>
+                <label className='label-primary'>学習時間 (分)</label>
                 <input
                   type='number'
                   value={newLog.studyTime}
                   onChange={e => setNewLog({ ...newLog, studyTime: parseInt(e.target.value) || 0 })}
-                  className='w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500'
+                  className='input-primary'
                   min='1'
                   required
                 />
               </div>
 
               <div>
-                <label className='block text-sm font-medium text-gray-700 mb-1'>理解度 (1-5)</label>
+                <label className='label-primary'>理解度 (1-5)</label>
                 <div className='flex space-x-2 pt-2'>
                   {[1, 2, 3, 4, 5].map(rating => (
                     <button
@@ -285,7 +285,7 @@ export default function StudyLog() {
 
             {/* 学習項目入力 */}
             <div>
-              <label className='block text-sm font-medium text-gray-700 mb-1'>学習項目</label>
+              <label className='label-primary'>学習項目</label>
               <div className='flex space-x-2 mb-2'>
                 <input
                   type='text'
@@ -326,12 +326,12 @@ export default function StudyLog() {
             </div>
 
             <div>
-              <label className='block text-sm font-medium text-gray-700 mb-1'>メモ</label>
+              <label className='label-primary'>メモ</label>
               <textarea
                 value={newLog.memo}
                 onChange={e => setNewLog({ ...newLog, memo: e.target.value })}
                 rows={3}
-                className='w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500'
+                className='input-primary'
                 placeholder='学習内容や感想を記録してください'
               />
             </div>
@@ -350,11 +350,11 @@ export default function StudyLog() {
             <h3 className='text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4'>フィルター・ソート</h3>
             <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
               <div>
-                <label className='block text-sm font-medium text-gray-700 mb-1'>科目</label>
+                <label className='label-primary'>科目</label>
                 <select
                   value={selectedSubject}
                   onChange={e => setSelectedSubject(e.target.value)}
-                  className='w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500'
+                  className='input-primary'
                 >
                   <option value=''>すべての科目</option>
                   {subjects.map(subject => (
@@ -365,11 +365,11 @@ export default function StudyLog() {
                 </select>
               </div>
               <div>
-                <label className='block text-sm font-medium text-gray-700 mb-1'>期間</label>
+                <label className='label-primary'>期間</label>
                 <select
                   value={selectedDateRange}
                   onChange={e => setSelectedDateRange(e.target.value as 'all' | 'week' | 'month')}
-                  className='w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500'
+                  className='input-primary'
                 >
                   <option value='all'>すべての期間</option>
                   <option value='week'>過去1週間</option>
@@ -377,11 +377,11 @@ export default function StudyLog() {
                 </select>
               </div>
               <div>
-                <label className='block text-sm font-medium text-gray-700 mb-1'>並び順</label>
+                <label className='label-primary'>並び順</label>
                 <select
                   value={sortBy}
                   onChange={e => setSortBy(e.target.value as 'date' | 'subject' | 'time' | 'understanding')}
-                  className='w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500'
+                  className='input-primary'
                 >
                   <option value='date'>日付順</option>
                   <option value='subject'>科目順</option>
@@ -427,7 +427,7 @@ export default function StudyLog() {
             {(() => {
               const filteredLogs = getFilteredLogs();
               return filteredLogs.length === 0 ? (
-                <p className='text-gray-500 text-center py-8'>
+                <p className='text-gray-500 dark:text-gray-400 text-center py-8'>
                   {logs.length === 0 ? 'まだ学習記録がありません' : '条件に合う記録がありません'}
                 </p>
               ) : (

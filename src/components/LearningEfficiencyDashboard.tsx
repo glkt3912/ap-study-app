@@ -135,20 +135,20 @@ export function LearningEfficiencyDashboard() {
               type='date'
               value={dateRange.startDate}
               onChange={e => setDateRange(prev => ({ ...prev, startDate: e.target.value }))}
-              className='px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white'
+              className='input-primary text-sm'
             />
             <span className='text-gray-500 dark:text-gray-400'>〜</span>
             <input
               type='date'
               value={dateRange.endDate}
               onChange={e => setDateRange(prev => ({ ...prev, endDate: e.target.value }))}
-              className='px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white'
+              className='input-primary text-sm'
             />
           </div>
           <button
             onClick={generateAnalysis}
             disabled={loading}
-            className='px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed text-sm'
+            className='btn-primary text-sm'
           >
             {loading ? '分析中...' : '分析実行'}
           </button>
@@ -166,8 +166,8 @@ export function LearningEfficiencyDashboard() {
 
       {loading && (
         <div className='flex justify-center items-center py-12'>
-          <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500'></div>
-          <span className='ml-3 text-gray-600 dark:text-gray-300'>学習効率を分析中...</span>
+          <div className='loading-spinner'></div>
+          <span className='ml-3 loading-text'>学習効率を分析中...</span>
         </div>
       )}
 

@@ -287,8 +287,8 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
 
           {isLoadingAI && (
             <div className='mt-4 flex items-center justify-center py-4'>
-              <div className='animate-spin rounded-full h-6 w-6 border-b-2 border-purple-600'></div>
-              <span className='ml-2 text-sm text-gray-600 dark:text-gray-300'>AI分析中...</span>
+              <div className='loading-spinner-purple'></div>
+              <span className='ml-2 text-sm loading-text'>AI分析中...</span>
             </div>
           )}
         </div>
