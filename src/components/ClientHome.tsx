@@ -120,7 +120,7 @@ export default function ClientHome() {
 
   return (
     <div className='min-h-screen bg-slate-100 dark:bg-slate-900 transition-all duration-200'>
-      <header className='bg-white dark:bg-slate-800 shadow-sm border-b border-slate-200 dark:border-slate-700'>
+      <header className='card-primary shadow-gentle border-b border-slate-200 dark:border-slate-700 z-header'>
         <div className='container-primary py-3 sm:py-4'>
           <div className='flex justify-between items-center'>
             <div>
@@ -141,7 +141,7 @@ export default function ClientHome() {
                   <span className='text-sm text-secondary'>{user.name || user.email}</span>
                   <button
                     onClick={logout}
-                    className='btn-secondary btn-small'
+                    className='btn-secondary btn-small hover-lift click-shrink focus-ring'
                   >
                     ログアウト
                   </button>
@@ -149,7 +149,7 @@ export default function ClientHome() {
               ) : (
                 <button
                   onClick={() => setShowAuthModal(true)}
-                  className='btn-primary btn-small'
+                  className='btn-primary btn-small hover-lift click-shrink focus-ring'
                   disabled={authLoading}
                 >
                   {authLoading ? '読み込み中...' : 'ログイン'}
@@ -161,7 +161,7 @@ export default function ClientHome() {
         </div>
       </header>
 
-      <nav className='bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700'>
+      <nav className='card-primary border-b border-slate-200 dark:border-slate-700 z-header backdrop-blur-modern'>
         <div className='container-primary relative'>
           {/* スクロール可能なタブナビゲーション */}
           <div className='overflow-x-auto scrollbar-modern relative'>
@@ -170,7 +170,7 @@ export default function ClientHome() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`nav-tab ${
+                  className={`nav-tab hover-lift click-shrink focus-ring ${
                     activeTab === tab.id
                       ? 'nav-tab-active'
                       : 'nav-tab-inactive'
@@ -187,7 +187,7 @@ export default function ClientHome() {
           </div>
 
           {/* スクロールヒント - 小画面のみ表示 */}
-          <div className='md:hidden bg-slate-50/80 dark:bg-slate-700/30 px-4 py-1 text-xs text-center text-muted backdrop-blur-sm'>
+          <div className='md:hidden card-accent/80 px-4 py-1 text-xs text-center text-muted backdrop-blur-sm'>
             ← スワイプでスクロール →
           </div>
         </div>
@@ -195,7 +195,7 @@ export default function ClientHome() {
 
       <main className='container-primary section-padding'>
         {error && (
-          <div className='mb-4 alert-warning'>
+          <div className='mb-4 alert-warning hover-lift'>
             <div className='flex'>
               <div className='flex-shrink-0'>
                 <span className='text-yellow-400'>⚠️</span>
@@ -213,7 +213,9 @@ export default function ClientHome() {
             <span className='ml-3 loading-text'>データを読み込み中...</span>
           </div>
         ) : (
-          renderContent()
+          <div className='motion-safe-animate'>
+            {renderContent()}
+          </div>
         )}
       </main>
 
