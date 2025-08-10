@@ -72,6 +72,26 @@ export interface TestStats {
   }[];
 }
 
+export interface ExamConfig {
+  id: number;
+  userId: number;
+  examDate: string;
+  targetScore?: number;
+  remainingDays?: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateExamConfigRequest {
+  examDate: string;
+  targetScore?: number;
+}
+
+export interface UpdateExamConfigRequest {
+  examDate?: string;
+  targetScore?: number;
+}
+
 export interface ApiResponse<T> {
   success: boolean;
   data: T;
@@ -604,6 +624,31 @@ class ApiClient {
     };
   }> {
     return this.request('/api/analysis/learning-pattern');
+  }
+
+  // 試験設定API
+  async getExamConfig(userId: string): Promise<ExamConfig> {
+    return this.request(`/api/exam-config/${encodeURIComponent(userId)}`);
+  }
+
+  async setExamConfig(userId: string, config: CreateExamConfigRequest): Promise<ExamConfig> {
+    return this.request(`/api/exam-config/${encodeURIComponent(userId)}`, {
+      method: 'POST',
+      body: JSON.stringify(config),
+    });
+  }
+
+  async updateExamConfig(userId: string, config: UpdateExamConfigRequest): Promise<ExamConfig> {
+    return this.request(`/api/exam-config/${encodeURIComponent(userId)}`, {
+      method: 'POST',
+      body: JSON.stringify(config),
+    });
+  }
+
+  async deleteExamConfig(userId: string): Promise<{ message: string }> {
+    return this.request(`/api/exam-config/${encodeURIComponent(userId)}`, {
+      method: 'DELETE',
+    });
   }
 
   // 復習システムAPI
