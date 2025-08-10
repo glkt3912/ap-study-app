@@ -17,6 +17,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { studyPlanData } from '@/data/studyPlan';
 import { apiClient } from '@/lib/api';
 import { errorHandler } from '@/lib/error-handler';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 export default function ClientHome() {
   const { isAuthenticated, user, isLoading: authLoading, logout } = useAuth();
@@ -131,6 +132,9 @@ export default function ClientHome() {
               </p>
             </div>
             <div className='flex items-center space-x-3'>
+              {/* ダークモード切替ボタン */}
+              <ThemeToggle />
+              
               {/* 認証状態表示・ログインボタン */}
               {isAuthenticated && user ? (
                 <div className='flex items-center space-x-3'>
