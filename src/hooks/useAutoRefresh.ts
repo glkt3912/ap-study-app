@@ -30,9 +30,6 @@ export function useAutoRefresh() {
         
         if (data.success) {
           console.log('[AutoRefresh] Token refreshed successfully');
-          
-          // 新しいトークンでまた75%時点でリフレッシュをスケジュール
-          scheduleRefresh();
           return true;
         }
       }
@@ -59,7 +56,10 @@ export function useAutoRefresh() {
       
       const success = await refreshToken();
       
-      if (!success) {
+      if (success) {
+        // 成功時は再スケジュール
+        scheduleRefresh();
+      } else {
         console.warn('[AutoRefresh] Failed to refresh token, logging out...');
         logout();
       }

@@ -53,6 +53,7 @@ describe('useAutoRefresh Hook', () => {
   describe('Token Refresh Scheduling', () => {
     it('should schedule token refresh when authenticated', async () => {
       // Arrange
+      vi.stubEnv('NODE_ENV', 'development');
       const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 
       // Act
@@ -63,6 +64,8 @@ describe('useAutoRefresh Hook', () => {
         expect.stringContaining('[AutoRefresh] Scheduled token refresh in')
       );
 
+      // Cleanup
+      vi.unstubAllEnvs();
       consoleSpy.mockRestore();
     });
 
@@ -87,8 +90,13 @@ describe('useAutoRefresh Hook', () => {
     });
 
     it('should refresh token after 90 minutes (75% of 2 hours)', async () => {
-      // Arrange
+      // Arrange - Mock failed refresh to prevent infinite loop
+      (fetch as any).mockResolvedValue({
+        ok: false,
+        status: 401,
+      });
       const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+      const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
       // Act
       renderHook(() => useAutoRefresh());
@@ -116,25 +124,45 @@ describe('useAutoRefresh Hook', () => {
       );
 
       consoleSpy.mockRestore();
+      consoleWarnSpy.mockRestore();
     });
 
     it('should reschedule refresh after successful token refresh', async () => {
-      // Arrange
+      // Arrange - Only one successful refresh, then fail to prevent infinite loop
+      let callCount = 0;
+      (fetch as any).mockImplementation(() => {
+        callCount++;
+        if (callCount === 1) {
+          return Promise.resolve({
+            ok: true,
+            json: () => Promise.resolve({
+              success: true,
+              data: { token: 'new-token' }
+            })
+          });
+        } else {
+          return Promise.resolve({
+            ok: false,
+            status: 401,
+          });
+        }
+      });
+      
+      vi.stubEnv('NODE_ENV', 'development');
       const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 
       // Act
       renderHook(() => useAutoRefresh());
 
-      // Fast forward to refresh time
+      // Fast forward to first refresh time
       vi.advanceTimersByTime(5400000);
       await vi.runAllTimersAsync();
 
       // Assert - should log successful refresh and reschedule
       expect(consoleSpy).toHaveBeenCalledWith('[AutoRefresh] Token refreshed successfully');
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('[AutoRefresh] Scheduled token refresh in')
-      );
+      expect(consoleSpy).toHaveBeenCalledWith('[AutoRefresh] Scheduled token refresh in 90 minutes');
 
+      vi.unstubAllEnvs();
       consoleSpy.mockRestore();
     });
   });
@@ -260,6 +288,12 @@ describe('useAutoRefresh Hook', () => {
 
   describe('Timer Management', () => {
     it('should clear existing timer when rescheduling', async () => {
+      // Arrange - Mock failed refresh to prevent infinite loop
+      (fetch as any).mockResolvedValue({
+        ok: false,
+        status: 401,
+      });
+
       // Act
       const { result } = renderHook(() => useAutoRefresh());
 
@@ -320,7 +354,7 @@ describe('useAutoRefresh Hook', () => {
   describe('Development Mode Logging', () => {
     it('should log refresh timing in development mode', () => {
       // Arrange
-      process.env.NODE_ENV = 'development';
+      vi.stubEnv('NODE_ENV', 'development');
       const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 
       // Act
@@ -329,12 +363,14 @@ describe('useAutoRefresh Hook', () => {
       // Assert
       expect(consoleSpy).toHaveBeenCalledWith('[AutoRefresh] Scheduled token refresh in 90 minutes');
 
+      // Cleanup
+      vi.unstubAllEnvs();
       consoleSpy.mockRestore();
     });
 
     it('should not log refresh timing in production mode', () => {
       // Arrange
-      process.env.NODE_ENV = 'production';
+      vi.stubEnv('NODE_ENV', 'production');
       const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 
       // Act
@@ -343,6 +379,8 @@ describe('useAutoRefresh Hook', () => {
       // Assert - should still log some messages but not the timing one
       expect(consoleSpy).not.toHaveBeenCalledWith('[AutoRefresh] Scheduled token refresh in 90 minutes');
 
+      // Cleanup
+      vi.unstubAllEnvs();
       consoleSpy.mockRestore();
     });
   });

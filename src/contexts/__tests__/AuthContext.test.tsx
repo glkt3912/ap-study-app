@@ -605,13 +605,9 @@ describe('AuthContext', () => {
 
   describe('Error Handling', () => {
     it('should clear error on successful operations', async () => {
-      const { result } = renderHook(() => useAuth(), {
-        wrapper: AuthProvider,
-      });
-
-      // Set initial error by failing login
+      // Set up initial mocks for AuthProvider initialization
       (fetch as any)
-        .mockResolvedValueOnce({ ok: false, status: 401 }) // Cookie check fails
+        .mockResolvedValueOnce({ ok: false, status: 401 }) // Initial cookie check fails
         .mockResolvedValueOnce({ // Login fails
           ok: false,
           status: 401,
@@ -620,6 +616,10 @@ describe('AuthContext', () => {
             message: 'Invalid credentials',
           }),
         });
+
+      const { result } = renderHook(() => useAuth(), {
+        wrapper: AuthProvider,
+      });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
