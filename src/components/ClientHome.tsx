@@ -1,16 +1,9 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import Dashboard from '@/components/Dashboard';
-import WeeklyPlan from '@/components/WeeklyPlan';
-import StudyLog from '@/components/StudyLog';
-import TestRecord from '@/components/TestRecord';
-import Analysis from '@/components/Analysis';
-import Quiz from '@/components/Quiz';
-import DataExport from '@/components/DataExport';
-import DiagnosticHub from '@/components/DiagnosticHub';
-import { AdvancedAnalysis } from '@/components/AdvancedAnalysis';
-import { ReviewSystem } from '@/components/ReviewSystem';
+import { AppHeader } from '@/components/AppHeader';
+import { AppNavigation } from '@/components/AppNavigation';
+import { AppMainContent } from '@/components/AppMainContent';
 import { AuthModal } from '@/components/auth';
 import { ErrorToastManager } from '@/components/ErrorToast';
 import { ExamConfigModal } from '@/components/ExamConfigModal';
@@ -18,7 +11,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { studyPlanData } from '@/data/studyPlan';
 import { apiClient, type ExamConfig } from '@/lib/api';
 import { errorHandler } from '@/lib/error-handler';
-import { ThemeToggle } from '@/components/ThemeToggle';
 
 export default function ClientHome() {
   const { isAuthenticated, user, userId, isLoading: authLoading, logout } = useAuth();
@@ -50,6 +42,12 @@ export default function ClientHome() {
 
   // 試験設定を読み込む
   const loadExamConfig = useCallback(async () => {
+    // 有効なユーザーIDがない場合はスキップ
+    if (!userId || userId === 0) {
+      setExamConfig(null);
+      return;
+    }
+
     try {
       const config = await apiClient.getExamConfig(userId.toString());
       setExamConfig(config);
@@ -63,11 +61,6 @@ export default function ClientHome() {
   const handleExamConfigSave = (savedConfig: ExamConfig) => {
     setExamConfig(savedConfig);
     setIsExamConfigModalOpen(false);
-  };
-
-  // 残り日数計算
-  const calculateRemainingDays = (examDate: string): number => {
-    return Math.ceil((new Date(examDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
   };
 
   // バックエンドからデータを取得
@@ -130,165 +123,54 @@ export default function ClientHome() {
     fetchStudyData();
   }, [user?.id, loadExamConfig]);
 
-  const renderContent = () => {
-    switch (activeTab) {
-      case 'dashboard':
-        return <Dashboard studyData={studyData} />;
-      case 'plan':
-        return <WeeklyPlan studyData={studyData} setStudyData={setStudyData} />;
-      case 'log':
-        return <StudyLog />;
-      case 'test':
-        return <TestRecord />;
-      case 'quiz':
-        return <Quiz />;
-      case 'analysis':
-        return <Analysis />;
-      case 'advanced':
-        return <AdvancedAnalysis />;
-      case 'review':
-        return <ReviewSystem />;
-      case 'export':
-        return <DataExport studyData={studyData} />;
-      case 'debug':
-        return <DiagnosticHub />;
-      default:
-        return <Dashboard studyData={studyData} />;
+  // イベントハンドラー
+  const handleExamConfigClick = () => {
+    if (isAuthenticated && userId && userId !== 0) {
+      setIsExamConfigModalOpen(true);
+    } else {
+      setShowAuthModal(true);
     }
   };
 
   return (
-    <div className='min-h-screen bg-slate-100 dark:bg-slate-900 transition-all duration-200'>
-      <header className='card-primary shadow-gentle border-b border-slate-200 dark:border-slate-700 z-header'>
-        <div className='container-primary py-3 sm:py-4'>
-          <div className='flex justify-between items-center'>
-            <div>
-              <h1 className='heading-primary'>
-                応用情報技術者試験 学習管理
-              </h1>
-              <p className='text-sm sm:text-base text-secondary mt-1'>
-                {examConfig ? (
-                  <span>
-                    試験まで残り: 
-                    <span className='font-semibold text-blue-600 dark:text-blue-400 ml-1'>
-                      {calculateRemainingDays(examConfig.examDate)}日
-                    </span>
-                    <span className='text-xs text-gray-500 ml-2'>
-                      ({new Date(examConfig.examDate).toLocaleDateString('ja-JP')})
-                    </span>
-                  </span>
-                ) : (
-                  <span className='text-orange-600 dark:text-orange-400'>
-                    試験日未設定 - 
-                    <button
-                      onClick={() => setIsExamConfigModalOpen(true)}
-                      className='ml-1 underline hover:no-underline font-semibold'
-                    >
-                      今すぐ設定
-                    </button>
-                  </span>
-                )}
-              </p>
-            </div>
-            <div className='flex items-center space-x-3'>
-              {/* ダークモード切替ボタン */}
-              <ThemeToggle />
-              
-              {/* 認証状態表示・ログインボタン */}
-              {isAuthenticated && user ? (
-                <div className='flex items-center space-x-3'>
-                  <span className='text-sm text-secondary'>{user.name || user.email}</span>
-                  <button
-                    onClick={logout}
-                    className='btn-secondary btn-small hover-lift click-shrink focus-ring'
-                  >
-                    ログアウト
-                  </button>
-                </div>
-              ) : (
-                <button
-                  onClick={() => setShowAuthModal(true)}
-                  className='btn-primary btn-small hover-lift click-shrink focus-ring'
-                  disabled={authLoading}
-                >
-                  {authLoading ? '読み込み中...' : 'ログイン'}
-                </button>
-              )}
+    <div className='app-container'>
+      <AppHeader
+        isAuthenticated={isAuthenticated}
+        user={user}
+        authLoading={authLoading}
+        examConfig={examConfig}
+        onLoginClick={() => setShowAuthModal(true)}
+        onExamConfigClick={handleExamConfigClick}
+        onLogout={logout}
+      />
 
-            </div>
-          </div>
-        </div>
-      </header>
+      <AppNavigation
+        tabs={tabs}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+      />
 
-      <nav className='card-primary border-b border-slate-200 dark:border-slate-700 z-header backdrop-blur-modern'>
-        <div className='container-primary relative'>
-          {/* スクロール可能なタブナビゲーション */}
-          <div className='overflow-x-auto scrollbar-modern relative'>
-            <div className='flex min-w-max px-2'>
-              {tabs.map(tab => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`nav-tab hover-lift click-shrink focus-ring ${
-                    activeTab === tab.id
-                      ? 'nav-tab-active'
-                      : 'nav-tab-inactive'
-                  }`}
-                >
-                  <span className='mr-2'>{tab.icon}</span>
-                  {tab.name}
-                  {activeTab === tab.id && (
-                    <div className='absolute inset-0 bg-gradient-to-r from-blue-50/50 to-blue-100/50 dark:from-blue-900/20 dark:to-blue-800/20 rounded-t-lg -z-10' />
-                  )}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* スクロールヒント - 小画面のみ表示 */}
-          <div className='md:hidden card-accent/80 px-4 py-1 text-xs text-center text-muted backdrop-blur-sm'>
-            ← スワイプでスクロール →
-          </div>
-        </div>
-      </nav>
-
-      <main className='container-primary section-padding'>
-        {error && (
-          <div className='mb-4 alert-warning hover-lift'>
-            <div className='flex'>
-              <div className='flex-shrink-0'>
-                <span className='text-yellow-400'>⚠️</span>
-              </div>
-              <div className='ml-3'>
-                <p className='text-sm'>{error}</p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {loading ? (
-          <div className='flex items-center justify-center py-12'>
-            <div className='loading-spinner'></div>
-            <span className='ml-3 loading-text'>データを読み込み中...</span>
-          </div>
-        ) : (
-          <div className='motion-safe-animate'>
-            {renderContent()}
-          </div>
-        )}
-      </main>
+      <AppMainContent
+        activeTab={activeTab}
+        studyData={studyData}
+        setStudyData={setStudyData}
+        loading={loading}
+        error={error}
+      />
 
       {/* 認証モーダル */}
       <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
 
       {/* 試験設定モーダル */}
-      <ExamConfigModal
-        isOpen={isExamConfigModalOpen}
-        onClose={() => setIsExamConfigModalOpen(false)}
-        onSave={handleExamConfigSave}
-        userId={userId.toString()}
-        {...(examConfig && { initialConfig: examConfig })}
-      />
+      {isAuthenticated && userId && userId !== 0 && (
+        <ExamConfigModal
+          isOpen={isExamConfigModalOpen}
+          onClose={() => setIsExamConfigModalOpen(false)}
+          onSave={handleExamConfigSave}
+          userId={userId.toString()}
+          {...(examConfig && { initialConfig: examConfig })}
+        />
+      )}
 
       {/* エラートースト管理 */}
       <ErrorToastManager />

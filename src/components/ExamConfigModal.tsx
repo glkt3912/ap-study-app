@@ -18,7 +18,7 @@ export function ExamConfigModal({ isOpen, onClose, onSave, userId, initialConfig
   const [error, setError] = useState('');
 
   const loadExistingConfig = useCallback(async () => {
-    if (!userId) return;
+    if (!userId || userId === '0') return;
     
     try {
       setLoading(true);
@@ -54,6 +54,11 @@ export function ExamConfigModal({ isOpen, onClose, onSave, userId, initialConfig
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    if (!userId || userId === '0') {
+      setError('ユーザーが認証されていません。ログインしてください。');
+      return;
+    }
 
     if (!examDate) {
       setError('試験日を入力してください');
@@ -91,6 +96,11 @@ export function ExamConfigModal({ isOpen, onClose, onSave, userId, initialConfig
 
   const handleDelete = async () => {
     if (!initialConfig || !confirm('試験設定を削除してもよろしいですか？')) return;
+
+    if (!userId || userId === '0') {
+      setError('ユーザーが認証されていません。ログインしてください。');
+      return;
+    }
 
     try {
       setLoading(true);

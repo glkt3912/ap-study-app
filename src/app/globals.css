@@ -47,6 +47,10 @@
     @apply bg-white dark:bg-slate-800 rounded-lg shadow-md p-4 sm:p-6 border border-slate-200 dark:border-slate-700;
   }
 
+  .card-accent {
+    @apply bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-700;
+  }
+
   /* Button Utilities */
   .btn-primary {
     @apply bg-blue-600 dark:bg-blue-700 text-white px-4 py-2 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 disabled:bg-slate-400 dark:disabled:bg-slate-600 disabled:cursor-not-allowed transition-all duration-200 font-medium focus-ring hover:shadow-md active:scale-[0.98];
@@ -608,4 +612,30 @@
 /* 成功状態 */
 .success-state {
   @apply border-2 border-green-300 dark:border-green-600 bg-green-50 dark:bg-green-900/20;
+}
+
+/* アプリケーション固有のレイアウトクラス */
+.app-header {
+  @apply card-primary shadow-gentle border-b border-slate-200 dark:border-slate-700 z-header;
+}
+
+.app-navigation {
+  @apply card-primary border-b border-slate-200 dark:border-slate-700 z-header backdrop-blur-modern;
+}
+
+.app-main-content {
+  @apply container-primary section-padding min-h-[50vh];
+}
+
+.app-loading-state {
+  @apply flex flex-col sm:flex-row items-center justify-center py-12;
+}
+
+/* アプリケーション固有のコンテナクラス */
+.app-container {
+  @apply min-h-screen bg-slate-100 dark:bg-slate-900 transition-all duration-200;
+}
+
+.app-modal-container {
+  @apply fixed inset-0 z-modal;
 }
