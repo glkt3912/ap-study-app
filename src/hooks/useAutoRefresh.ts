@@ -8,7 +8,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 /**
  * 自動トークンリフレッシュフック
  * 
- * JWTトークンの有効期限（2時間）の90%時点（1時間48分）で自動リフレッシュを実行
+ * JWTトークンの有効期限（2時間）の75%時点（1時間30分）で自動リフレッシュを実行
  */
 export function useAutoRefresh() {
   const { token, isAuthenticated, logout } = useAuth();
@@ -31,7 +31,7 @@ export function useAutoRefresh() {
         if (data.success) {
           console.log('[AutoRefresh] Token refreshed successfully');
           
-          // 新しいトークンでまた90%時点でリフレッシュをスケジュール
+          // 新しいトークンでまた75%時点でリフレッシュをスケジュール
           scheduleRefresh();
           return true;
         }
@@ -51,8 +51,8 @@ export function useAutoRefresh() {
       clearTimeout(refreshTimeoutRef.current);
     }
 
-    // 2時間の90% = 1時間48分 = 6480秒 = 6,480,000ミリ秒
-    const REFRESH_INTERVAL = 6480000;
+    // 2時間の75% = 1時間30分 = 5400秒 = 5,400,000ミリ秒
+    const REFRESH_INTERVAL = 5400000;
 
     refreshTimeoutRef.current = setTimeout(async () => {
       console.log('[AutoRefresh] Attempting to refresh token...');

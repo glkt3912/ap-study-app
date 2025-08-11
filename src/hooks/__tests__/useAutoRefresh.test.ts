@@ -86,7 +86,7 @@ describe('useAutoRefresh Hook', () => {
       consoleSpy.mockRestore();
     });
 
-    it('should refresh token after 108 minutes (90% of 2 hours)', async () => {
+    it('should refresh token after 90 minutes (75% of 2 hours)', async () => {
       // Arrange
       const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 
@@ -94,7 +94,7 @@ describe('useAutoRefresh Hook', () => {
       renderHook(() => useAutoRefresh());
 
       // Fast forward to just before refresh time
-      vi.advanceTimersByTime(6480000 - 1000); // 108 minutes - 1 second
+      vi.advanceTimersByTime(5400000 - 1000); // 90 minutes - 1 second
       expect(fetch).not.toHaveBeenCalled();
 
       // Fast forward to refresh time
@@ -126,7 +126,7 @@ describe('useAutoRefresh Hook', () => {
       renderHook(() => useAutoRefresh());
 
       // Fast forward to refresh time
-      vi.advanceTimersByTime(6480000);
+      vi.advanceTimersByTime(5400000);
       await vi.runAllTimersAsync();
 
       // Assert - should log successful refresh and reschedule
@@ -228,7 +228,7 @@ describe('useAutoRefresh Hook', () => {
       renderHook(() => useAutoRefresh());
 
       // Fast forward to refresh time
-      vi.advanceTimersByTime(6480000);
+      vi.advanceTimersByTime(5400000);
       await vi.runAllTimersAsync();
 
       // Assert
@@ -247,7 +247,7 @@ describe('useAutoRefresh Hook', () => {
       renderHook(() => useAutoRefresh());
 
       // Fast forward to refresh time
-      vi.advanceTimersByTime(6480000);
+      vi.advanceTimersByTime(5400000);
       await vi.runAllTimersAsync();
 
       // Assert
@@ -274,7 +274,7 @@ describe('useAutoRefresh Hook', () => {
       });
 
       // Fast forward to first refresh time
-      vi.advanceTimersByTime(6480000);
+      vi.advanceTimersByTime(5400000);
       await vi.runAllTimersAsync();
 
       // Assert - should only have one refresh call
@@ -289,7 +289,7 @@ describe('useAutoRefresh Hook', () => {
       unmount();
 
       // Fast forward past refresh time
-      vi.advanceTimersByTime(6480000);
+      vi.advanceTimersByTime(5400000);
 
       // Assert - should not call refresh after unmount
       expect(fetch).not.toHaveBeenCalled();
@@ -310,7 +310,7 @@ describe('useAutoRefresh Hook', () => {
       rerender();
 
       // Fast forward past refresh time
-      vi.advanceTimersByTime(6480000);
+      vi.advanceTimersByTime(5400000);
 
       // Assert - should not call refresh when not authenticated
       expect(fetch).not.toHaveBeenCalled();
@@ -327,7 +327,7 @@ describe('useAutoRefresh Hook', () => {
       renderHook(() => useAutoRefresh());
 
       // Assert
-      expect(consoleSpy).toHaveBeenCalledWith('[AutoRefresh] Scheduled token refresh in 108 minutes');
+      expect(consoleSpy).toHaveBeenCalledWith('[AutoRefresh] Scheduled token refresh in 90 minutes');
 
       consoleSpy.mockRestore();
     });
@@ -341,7 +341,7 @@ describe('useAutoRefresh Hook', () => {
       renderHook(() => useAutoRefresh());
 
       // Assert - should still log some messages but not the timing one
-      expect(consoleSpy).not.toHaveBeenCalledWith('[AutoRefresh] Scheduled token refresh in 108 minutes');
+      expect(consoleSpy).not.toHaveBeenCalledWith('[AutoRefresh] Scheduled token refresh in 90 minutes');
 
       consoleSpy.mockRestore();
     });
