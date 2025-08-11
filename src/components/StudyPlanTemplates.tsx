@@ -356,7 +356,7 @@ export default function StudyPlanTemplates({
                   </label>
                   <input
                     type="text"
-                    value={customization.title || ''}
+                    value={customization?.title || ''}
                     onChange={(e) => handleCustomizationChange('title', e.target.value)}
                     className="w-full px-3 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-600 dark:text-white"
                     placeholder="カスタムプラン名"
@@ -372,7 +372,7 @@ export default function StudyPlanTemplates({
                       type="number"
                       min="30"
                       max="365"
-                      value={customization.studyPeriodDays || selectedTemplate.defaultPeriodDays}
+                      value={customization?.studyPeriodDays || selectedTemplate.defaultPeriodDays}
                       onChange={(e) => handleCustomizationChange('studyPeriodDays', parseInt(e.target.value))}
                       className="w-full px-3 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-600 dark:text-white"
                     />
@@ -386,7 +386,7 @@ export default function StudyPlanTemplates({
                       type="number"
                       min="5"
                       max="70"
-                      value={customization.weeklyStudyHours || selectedTemplate.defaultWeeklyHours}
+                      value={customization?.weeklyStudyHours || selectedTemplate.defaultWeeklyHours}
                       onChange={(e) => handleCustomizationChange('weeklyStudyHours', parseInt(e.target.value))}
                       className="w-full px-3 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-600 dark:text-white"
                     />
@@ -401,7 +401,7 @@ export default function StudyPlanTemplates({
                       min="1"
                       max="10"
                       step="0.5"
-                      value={customization.dailyStudyHours || Math.ceil(selectedTemplate.defaultWeeklyHours / 7)}
+                      value={customization?.dailyStudyHours || Math.ceil(selectedTemplate.defaultWeeklyHours / 7)}
                       onChange={(e) => handleCustomizationChange('dailyStudyHours', parseFloat(e.target.value))}
                       className="w-full px-3 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-600 dark:text-white"
                     />
@@ -414,7 +414,7 @@ export default function StudyPlanTemplates({
                       学習スタイル
                     </label>
                     <select
-                      value={customization.learningStyle || 'visual'}
+                      value={customization?.learningStyle || 'visual'}
                       onChange={(e) => handleCustomizationChange('learningStyle', e.target.value)}
                       className="w-full px-3 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-600 dark:text-white"
                     >
@@ -430,7 +430,7 @@ export default function StudyPlanTemplates({
                       難易度設定
                     </label>
                     <select
-                      value={customization.difficultyPreference || (selectedTemplate.difficulty === 'beginner' ? 'easy' : selectedTemplate.difficulty === 'advanced' ? 'hard' : 'medium')}
+                      value={customization?.difficultyPreference || (selectedTemplate.difficulty === 'beginner' ? 'easy' : selectedTemplate.difficulty === 'advanced' ? 'hard' : 'medium')}
                       onChange={(e) => handleCustomizationChange('difficultyPreference', e.target.value)}
                       className="w-full px-3 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-600 dark:text-white"
                     >
