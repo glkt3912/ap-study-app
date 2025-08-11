@@ -109,21 +109,3 @@ export type SubmitAnswerRequest = {
 };
 export type CreateMorningTestRequest = Omit<MorningTest, 'id' | 'accuracy'>;
 export type CreateAfternoonTestRequest = Omit<AfternoonTest, 'id'>;
-
-// Exam Configuration types
-export interface ExamConfig {
-  id: number;
-  userId: number;
-  examDate: string;
-  targetScore?: number;
-  remainingDays?: number;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export type CreateExamConfigRequest = {
-  examDate: string;
-  targetScore?: number;
-};
-
-export type UpdateExamConfigRequest = Partial<CreateExamConfigRequest>;

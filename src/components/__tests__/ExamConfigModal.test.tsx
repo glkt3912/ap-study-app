@@ -2,18 +2,19 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ExamConfigModal } from '../ExamConfigModal';
 import type { ExamConfig } from '@/types/api';
+import { apiClient } from '@/lib/api';
 
 // Mock API
-const mockApi = {
-  getExamConfig: vi.fn(),
-  setExamConfig: vi.fn(),
-  updateExamConfig: vi.fn(),
-  deleteExamConfig: vi.fn(),
-};
-
 vi.mock('@/lib/api', () => ({
-  apiClient: mockApi,
+  apiClient: {
+    getExamConfig: vi.fn(),
+    setExamConfig: vi.fn(),
+    updateExamConfig: vi.fn(),
+    deleteExamConfig: vi.fn(),
+  },
 }));
+
+const mockApiClient = apiClient as any;
 
 describe('ExamConfigModal', () => {
   const mockProps = {
@@ -52,7 +53,7 @@ describe('ExamConfigModal', () => {
       updatedAt: '2024-01-01T00:00:00Z',
     };
 
-    mockApi.getExamConfig.mockResolvedValue(mockConfig);
+    mockApiClient.getExamConfig.mockResolvedValue(mockConfig);
 
     render(<ExamConfigModal {...mockProps} />);
 
@@ -63,8 +64,8 @@ describe('ExamConfigModal', () => {
   });
 
   it('should handle form submission for new config', async () => {
-    mockApi.getExamConfig.mockRejectedValue(new Error('Not found'));
-    mockApi.setExamConfig.mockResolvedValue({
+    mockApiClient.getExamConfig.mockRejectedValue(new Error('Not found'));
+    mockApiClient.setExamConfig.mockResolvedValue({
       id: 1,
       userId: 1,
       examDate: '2024-12-01T00:00:00Z',
@@ -88,7 +89,7 @@ describe('ExamConfigModal', () => {
     fireEvent.click(saveButton);
 
     await waitFor(() => {
-      expect(mockApi.setExamConfig).toHaveBeenCalledWith('1', {
+      expect(mockApiClient.setExamConfig).toHaveBeenCalledWith('1', {
         examDate: '2024-12-01T00:00:00.000Z',
         targetScore: 85,
       });
@@ -107,8 +108,8 @@ describe('ExamConfigModal', () => {
       updatedAt: '2024-01-01T00:00:00Z',
     };
 
-    mockApi.getExamConfig.mockResolvedValue(existingConfig);
-    mockApi.updateExamConfig.mockResolvedValue({
+    mockApiClient.getExamConfig.mockResolvedValue(existingConfig);
+    mockApiClient.updateExamConfig.mockResolvedValue({
       ...existingConfig,
       examDate: '2024-12-01T00:00:00Z',
       targetScore: 90,
@@ -132,7 +133,7 @@ describe('ExamConfigModal', () => {
     fireEvent.click(saveButton);
 
     await waitFor(() => {
-      expect(mockApi.updateExamConfig).toHaveBeenCalledWith('1', {
+      expect(mockApiClient.updateExamConfig).toHaveBeenCalledWith('1', {
         examDate: '2024-12-01T00:00:00.000Z',
         targetScore: 90,
       });
@@ -151,7 +152,7 @@ describe('ExamConfigModal', () => {
       expect(screen.getByText('試験日を入力してください')).toBeInTheDocument();
     });
 
-    expect(mockApi.setExamConfig).not.toHaveBeenCalled();
+    expect(mockApiClient.setExamConfig).not.toHaveBeenCalled();
     expect(mockProps.onSave).not.toHaveBeenCalled();
   });
 
@@ -202,8 +203,8 @@ describe('ExamConfigModal', () => {
       updatedAt: '2024-01-01T00:00:00Z',
     };
 
-    mockApi.getExamConfig.mockResolvedValue(existingConfig);
-    mockApi.deleteExamConfig.mockResolvedValue({ message: 'Deleted' });
+    mockApiClient.getExamConfig.mockResolvedValue(existingConfig);
+    mockApiClient.deleteExamConfig.mockResolvedValue({ message: 'Deleted' });
 
     render(<ExamConfigModal {...mockProps} />);
 
@@ -219,14 +220,14 @@ describe('ExamConfigModal', () => {
     fireEvent.click(confirmButton);
 
     await waitFor(() => {
-      expect(mockApi.deleteExamConfig).toHaveBeenCalledWith('1');
+      expect(mockApiClient.deleteExamConfig).toHaveBeenCalledWith('1');
       expect(mockProps.onSave).toHaveBeenCalled();
     });
   });
 
   it('should handle API errors gracefully', async () => {
-    mockApi.getExamConfig.mockRejectedValue(new Error('Not found'));
-    mockApi.setExamConfig.mockRejectedValue(new Error('Server error'));
+    mockApiClient.getExamConfig.mockRejectedValue(new Error('Not found'));
+    mockApiClient.setExamConfig.mockRejectedValue(new Error('Server error'));
 
     render(<ExamConfigModal {...mockProps} />);
 
@@ -271,7 +272,7 @@ describe('ExamConfigModal', () => {
   });
 
   it('should show loading state during API calls', async () => {
-    mockApi.getExamConfig.mockReturnValue(new Promise(resolve => setTimeout(resolve, 100)));
+    mockApiClient.getExamConfig.mockReturnValue(new Promise(resolve => setTimeout(resolve, 100)));
 
     render(<ExamConfigModal {...mockProps} />);
 
