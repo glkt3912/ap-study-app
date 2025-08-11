@@ -21,7 +21,7 @@ import { errorHandler } from '@/lib/error-handler';
 import { ThemeToggle } from '@/components/ThemeToggle';
 
 export default function ClientHome() {
-  const { isAuthenticated, user, isLoading: authLoading, logout } = useAuth();
+  const { isAuthenticated, user, userId, isLoading: authLoading, logout } = useAuth();
   // const { theme } = useTheme(); // テーマは現在未使用
   const [activeTab, setActiveTab] = useState('dashboard');
   const [studyData, setStudyData] = useState(studyPlanData);
@@ -51,7 +51,7 @@ export default function ClientHome() {
   // 試験設定を読み込む
   const loadExamConfig = async () => {
     try {
-      const config = await apiClient.getExamConfig('default-user'); // 実際のユーザーIDに変更が必要
+      const config = await apiClient.getExamConfig(userId.toString());
       setExamConfig(config);
     } catch (_error) {
       // 設定が存在しない場合は null のまま
@@ -277,7 +277,7 @@ export default function ClientHome() {
         isOpen={isExamConfigModalOpen}
         onClose={() => setIsExamConfigModalOpen(false)}
         onSave={handleExamConfigSave}
-        userId="default-user" // 実際のユーザーIDに変更が必要
+        userId={userId.toString()}
         {...(examConfig && { initialConfig: examConfig })}
       />
 

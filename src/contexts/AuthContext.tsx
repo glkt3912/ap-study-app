@@ -118,19 +118,52 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(true);
     setError(null);
 
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[AuthContext] Signup attempt:', { 
+        email, 
+        passwordLength: password.length,
+        name,
+        apiUrl: `${API_BASE_URL}/api/auth/signup`
+      });
+    }
+
     try {
+      const requestBody = { email, password, name };
+      
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[AuthContext] Sending signup request:', requestBody);
+      }
+
       const response = await fetch(`${API_BASE_URL}/api/auth/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password, name }),
+        body: JSON.stringify(requestBody),
       });
+
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[AuthContext] Signup response status:', response.status);
+        console.log('[AuthContext] Response headers:', Object.fromEntries(response.headers.entries()));
+      }
 
       const data = await response.json();
 
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[AuthContext] Signup response data:', data);
+      }
+
       if (response.ok && data.success) {
         const { token: newToken, user: userData } = data.data;
+        
+        if (process.env.NODE_ENV === 'development') {
+          console.log('[AuthContext] Signup successful, setting user data:', {
+            userId: userData.id,
+            email: userData.email,
+            tokenLength: newToken.length
+          });
+        }
+
         setToken(newToken);
         setUser({
           ...userData,
@@ -139,11 +172,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         localStorage.setItem('ap-study-token', newToken);
         return true;
       } else {
-        setError(data.message || 'アカウント作成に失敗しました');
+        const errorMessage = data.message || data.error || 'アカウント作成に失敗しました';
+        
+        if (process.env.NODE_ENV === 'development') {
+          console.error('[AuthContext] Signup failed:', {
+            status: response.status,
+            statusText: response.statusText,
+            data,
+            errorMessage
+          });
+        }
+
+        setError(errorMessage);
         return false;
       }
-    } catch {
-      setError('ネットワークエラーが発生しました');
+    } catch (error) {
+      const errorMessage = 'ネットワークエラーが発生しました';
+      
+      if (process.env.NODE_ENV === 'development') {
+        console.error('[AuthContext] Signup network error:', error);
+      }
+
+      setError(errorMessage);
       return false;
     } finally {
       setIsLoading(false);

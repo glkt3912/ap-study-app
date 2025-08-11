@@ -80,7 +80,11 @@ export function LoginForm({ onModeChange }: LoginFormProps) {
         <button
           type='submit'
           disabled={isLoading || !formData.email || !formData.password}
-          className='w-full btn-primary hover-lift click-shrink focus-ring interactive-disabled'
+          className={`w-full hover-lift click-shrink focus-ring ${
+            isLoading || !formData.email || !formData.password
+              ? 'interactive-disabled'
+              : 'btn-primary'
+          }`}
         >
           {isLoading ? 'ログイン中...' : 'ログイン'}
         </button>
