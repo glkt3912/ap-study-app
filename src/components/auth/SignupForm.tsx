@@ -51,6 +51,14 @@ export function SignupForm({ onModeChange }: SignupFormProps) {
     setValidationError('');
   };
 
+  // フォームの入力完了状態をチェック
+  const isFormValid = 
+    formData.email.trim() !== '' && 
+    formData.password.trim() !== '' && 
+    formData.confirmPassword.trim() !== '' &&
+    formData.password.length >= 8 &&
+    formData.password === formData.confirmPassword;
+
   return (
     <div className='card-primary p-8 rounded-lg shadow-md w-full max-w-md mx-auto'>
       <h2 className='text-2xl font-bold text-center mb-6 text-primary'>アカウント作成</h2>
@@ -121,17 +129,34 @@ export function SignupForm({ onModeChange }: SignupFormProps) {
 
         {(validationError || error) && (
           <div className='bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-3'>
-            <p className='text-sm text-red-600 dark:text-red-400'>{validationError || error}</p>
+            <div className='flex items-start'>
+              <div className='flex-shrink-0'>
+                <span className='text-red-400'>⚠️</span>
+              </div>
+              <div className='ml-2'>
+                <h4 className='text-sm font-medium text-red-800 dark:text-red-200'>
+                  アカウント作成エラー
+                </h4>
+                <p className='text-sm text-red-600 dark:text-red-400 mt-1'>
+                  {validationError || error}
+                </p>
+              </div>
+            </div>
           </div>
         )}
 
         <button
           type='submit'
-          disabled={isLoading || !formData.email || !formData.password}
-          className='w-full btn-success hover-lift click-shrink focus-ring interactive-disabled'
+          disabled={isLoading || !isFormValid}
+          className={`w-full hover-lift click-shrink focus-ring ${
+            isLoading || !isFormValid 
+              ? 'interactive-disabled' 
+              : 'btn-success'
+          }`}
         >
           {isLoading ? 'アカウント作成中...' : 'アカウント作成'}
         </button>
+
       </form>
 
       <div className='mt-6 text-center'>

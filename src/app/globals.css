@@ -555,8 +555,13 @@
   @apply opacity-50 cursor-not-allowed pointer-events-none;
 }
 
-.interactive-loading {
-  @apply opacity-75 cursor-wait;
+/* 共通トランジション */
+.transition-smooth {
+  @apply transition-all duration-200;
+}
+
+.transition-glow {
+  @apply transition-all duration-300;
 }
 
 /* コンテナクエリ対応 */

@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState, useEffect, lazy, Suspense } from 'react';
+import React, { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import { apiClient, type ExamConfig } from '../lib/api';
 import { ExamConfigModal } from './ExamConfigModal';
+import { useAuth } from '../contexts/AuthContext';
 
 const PieChart = lazy(() => import('recharts').then(module => ({ default: module.PieChart })));
 const Pie = lazy(() => import('recharts').then(module => ({ default: module.Pie })));
@@ -100,6 +101,7 @@ const calculateRemainingDays = (examDate: string): number => {
 };
 
 export function AdvancedAnalysis() {
+  const { userId } = useAuth();
   const [activeTab, setActiveTab] = useState<'performance' | 'readiness' | 'pattern' | 'efficiency'>('performance');
   const [performanceMetrics, setPerformanceMetrics] = useState<PerformanceMetrics | null>(null);
   const [examReadiness, setExamReadiness] = useState<ExamReadiness | null>(null);
@@ -115,20 +117,10 @@ export function AdvancedAnalysis() {
   const [examDate, setExamDate] = useState('');
   const [targetScore, setTargetScore] = useState(60);
 
-  useEffect(() => {
-    if (activeTab === 'performance') {
-      loadPerformanceMetrics();
-    } else if (activeTab === 'pattern') {
-      loadLearningPattern();
-    } else if (activeTab === 'readiness') {
-      loadExamConfig();
-    }
-  }, [activeTab]);
-
   // 試験設定を読み込む
-  const loadExamConfig = async () => {
+  const loadExamConfig = useCallback(async () => {
     try {
-      const config = await apiClient.getExamConfig('default-user'); // 実際のユーザーIDに変更が必要
+      const config = await apiClient.getExamConfig(userId.toString());
       setExamConfig(config);
       if (config) {
         setExamDate(new Date(config.examDate).toISOString().split('T')[0] || '');
@@ -138,7 +130,17 @@ export function AdvancedAnalysis() {
       // 設定が存在しない場合は無視
       setExamConfig(null);
     }
-  };
+  }, [userId]);
+
+  useEffect(() => {
+    if (activeTab === 'performance') {
+      loadPerformanceMetrics();
+    } else if (activeTab === 'pattern') {
+      loadLearningPattern();
+    } else if (activeTab === 'readiness') {
+      loadExamConfig();
+    }
+  }, [activeTab, userId, loadExamConfig]);
 
   // モーダル保存ハンドラー
   const handleExamConfigSave = (savedConfig: ExamConfig) => {
@@ -667,7 +669,7 @@ export function AdvancedAnalysis() {
         isOpen={isExamConfigModalOpen}
         onClose={() => setIsExamConfigModalOpen(false)}
         onSave={handleExamConfigSave}
-        userId="default-user" // 実際のユーザーIDに変更が必要
+        userId={userId.toString()}
         {...(examConfig && { initialConfig: examConfig })}
       />
     </div>
