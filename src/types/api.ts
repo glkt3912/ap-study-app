@@ -120,3 +120,130 @@ export type SubmitAnswerRequest = {
 
 export type CreateMorningTestRequest = Omit<MorningTest, 'id' | 'accuracy'>;
 export type CreateAfternoonTestRequest = Omit<AfternoonTest, 'id'>;
+
+// Dynamic Study Plan types (from backend PR #16)
+export interface StudyPlan {
+  id: number;
+  userId: number;
+  title: string;
+  description?: string;
+  studyPeriodDays: number;
+  weeklyStudyHours: number;
+  dailyStudyHours: number;
+  learningStyle: 'visual' | 'auditory' | 'kinesthetic' | 'reading';
+  difficultyPreference: 'easy' | 'medium' | 'hard' | 'mixed';
+  createdAt: string;
+  updatedAt: string;
+  isActive: boolean;
+  progressPercentage: number;
+  achievementRate: number;
+  nextReviewDate?: string;
+}
+
+export interface StudyPlanProgress {
+  planId: number;
+  totalDays: number;
+  completedDays: number;
+  totalHours: number;
+  completedHours: number;
+  averageScore: number;
+  streakDays: number;
+  lastStudyDate?: string;
+  upcomingMilestones: StudyMilestone[];
+}
+
+export interface StudyMilestone {
+  id: number;
+  title: string;
+  targetDate: string;
+  isCompleted: boolean;
+  completedDate?: string;
+  description?: string;
+}
+
+export interface StudyRecommendation {
+  id: number;
+  userId: number;
+  type: 'topic_focus' | 'time_adjustment' | 'difficulty_change' | 'review_schedule';
+  title: string;
+  description: string;
+  priority: 'low' | 'medium' | 'high';
+  actionable: boolean;
+  estimatedImpact: string;
+  createdAt: string;
+}
+
+export interface StudyPlanTemplate {
+  id: number;
+  name: string;
+  description: string;
+  defaultPeriodDays: number;
+  defaultWeeklyHours: number;
+  targetAudience: string;
+  difficulty: 'beginner' | 'intermediate' | 'advanced';
+  features: string[];
+  isPopular: boolean;
+}
+
+export interface StudyPlanPreferences {
+  planId: number;
+  reminderEnabled: boolean;
+  reminderTime?: string;
+  weekendStudy: boolean;
+  intensiveMode: boolean;
+  adaptiveDifficulty: boolean;
+  notificationPreferences: {
+    email: boolean;
+    push: boolean;
+    daily: boolean;
+    weekly: boolean;
+  };
+}
+
+// Study Plan Request types
+export interface CreateStudyPlanRequest {
+  title: string;
+  description?: string;
+  studyPeriodDays: number;
+  weeklyStudyHours: number;
+  dailyStudyHours: number;
+  learningStyle: 'visual' | 'auditory' | 'kinesthetic' | 'reading';
+  difficultyPreference: 'easy' | 'medium' | 'hard' | 'mixed';
+}
+
+export interface UpdateStudyPlanRequest {
+  title?: string;
+  description?: string;
+  studyPeriodDays?: number;
+  weeklyStudyHours?: number;
+  dailyStudyHours?: number;
+  learningStyle?: 'visual' | 'auditory' | 'kinesthetic' | 'reading';
+  difficultyPreference?: 'easy' | 'medium' | 'hard' | 'mixed';
+  isActive?: boolean;
+}
+
+export interface CreateStudyPlanFromTemplateRequest {
+  templateId: number;
+  customization?: {
+    title?: string;
+    studyPeriodDays?: number;
+    weeklyStudyHours?: number;
+    dailyStudyHours?: number;
+    learningStyle?: 'visual' | 'auditory' | 'kinesthetic' | 'reading';
+    difficultyPreference?: 'easy' | 'medium' | 'hard' | 'mixed';
+  };
+}
+
+export interface UpdateStudyPlanPreferencesRequest {
+  reminderEnabled?: boolean;
+  reminderTime?: string;
+  weekendStudy?: boolean;
+  intensiveMode?: boolean;
+  adaptiveDifficulty?: boolean;
+  notificationPreferences?: {
+    email?: boolean;
+    push?: boolean;
+    daily?: boolean;
+    weekly?: boolean;
+  };
+}
