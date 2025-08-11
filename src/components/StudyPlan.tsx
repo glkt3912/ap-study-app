@@ -12,7 +12,7 @@ interface StudyPlanComponentProps {
   userId?: number;
   initialPlan?: StudyPlan;
   mode: 'create' | 'edit' | 'view';
-  onSave?: (plan: StudyPlan) => void;
+  onSave?: (_plan: StudyPlan) => void;
   onCancel?: () => void;
 }
 
@@ -107,7 +107,9 @@ export default function StudyPlan({
         totalDays: initialPlan.studyPeriodDays,
         completedDays: Math.floor(initialPlan.studyPeriodDays * initialPlan.progressPercentage / 100),
         totalHours: initialPlan.studyPeriodDays * initialPlan.dailyStudyHours,
-        completedHours: Math.floor(initialPlan.studyPeriodDays * initialPlan.dailyStudyHours * initialPlan.progressPercentage / 100),
+        completedHours: Math.floor(
+          initialPlan.studyPeriodDays * initialPlan.dailyStudyHours * initialPlan.progressPercentage / 100
+        ),
         averageScore: initialPlan.achievementRate,
         streakDays: 5,
         lastStudyDate: new Date().toISOString(),
