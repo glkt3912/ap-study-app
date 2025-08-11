@@ -107,7 +107,16 @@ export default function ClientHome() {
 
         if (process.env.NODE_ENV === 'development') {
           // eslint-disable-next-line no-console
-          console.error('学習データの取得に失敗しました:', standardError);
+          console.error('学習データの取得に失敗しました:', {
+            id: standardError.id,
+            category: standardError.category,
+            severity: standardError.severity,
+            code: standardError.code,
+            message: standardError.message,
+            userMessage: standardError.userMessage,
+            timestamp: standardError.timestamp,
+            retryable: standardError.retryable
+          });
         }
 
         setError('データの読み込みに失敗しました。モックデータを使用します。');
