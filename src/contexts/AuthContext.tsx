@@ -271,7 +271,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AuthContext.Provider value={contextValue}>
-      <AutoRefreshProvider isAuthenticated={contextValue.isAuthenticated} token={token}>
+      <AutoRefreshProvider _isAuthenticated={contextValue.isAuthenticated} _token={token}>
         {children}
       </AutoRefreshProvider>
     </AuthContext.Provider>
@@ -281,12 +281,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 // 自動リフレッシュを管理するコンポーネント
 function AutoRefreshProvider({ 
   children, 
-  isAuthenticated, 
-  token 
+  _isAuthenticated, 
+  _token 
 }: { 
   children: React.ReactNode;
-  isAuthenticated: boolean;
-  token: string | null;
+  _isAuthenticated: boolean;
+  _token: string | null;
 }) {
   useAutoRefresh();
   return <>{children}</>;
