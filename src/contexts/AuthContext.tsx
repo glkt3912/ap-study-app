@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import { useAutoRefresh } from '../hooks/useAutoRefresh';
 
 interface User {
   id: number;
@@ -32,16 +33,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // 自動リフレッシュフック（認証状態が確立した後にのみ初期化）
 
   // トークン検証とユーザー情報取得
-  const verifyToken = useCallback(async (token: string): Promise<boolean> => {
+  const verifyToken = useCallback(async (token?: string): Promise<boolean> => {
     try {
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+      
+      // トークンが提供された場合のみAuthorizationヘッダーを設定
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
+      }
+
       const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
         method: 'GET',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+        headers,
+        credentials: 'include', // HttpOnly Cookieを送信
       });
 
       if (response.ok) {
@@ -61,8 +71,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // 初期化時にトークンをチェック
   useEffect(() => {
     const initAuth = async () => {
+      // まずHttpOnly Cookieでの認証を試行
+      const isCookieValid = await verifyToken();
+      
+      if (isCookieValid) {
+        setToken('cookie-based'); // Cookieベースの認証を示す
+        setIsLoading(false);
+        return;
+      }
+      
+      // フォールバック: localStorageのトークンをチェック
       const storedToken = localStorage.getItem('ap-study-token');
-
       if (storedToken) {
         const isValid = await verifyToken(storedToken);
         if (isValid) {
@@ -88,6 +107,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // HttpOnly Cookieを受信
         body: JSON.stringify({ email, password }),
       });
 
@@ -95,11 +115,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (response.ok && data.success) {
         const { token: newToken, user: userData } = data.data;
-        setToken(newToken);
+        
+        // Cookieベースの認証を優先
+        setToken('cookie-based');
         setUser({
           ...userData,
           createdAt: new Date(userData.createdAt),
         });
+        
+        // フォールバック用にlocalStorageにも保存
         localStorage.setItem('ap-study-token', newToken);
         return true;
       } else {
@@ -139,6 +163,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // HttpOnly Cookieを受信
         body: JSON.stringify(requestBody),
       });
 
@@ -164,11 +189,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           });
         }
 
-        setToken(newToken);
+        // Cookieベースの認証を優先
+        setToken('cookie-based');
         setUser({
           ...userData,
           createdAt: new Date(userData.createdAt),
         });
+        
+        // フォールバック用にlocalStorageにも保存
         localStorage.setItem('ap-study-token', newToken);
         return true;
       } else {
@@ -200,7 +228,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
+    try {
+      // サーバーサイドログアウト（Cookieクリア）
+      await fetch(`${API_BASE_URL}/api/auth/logout`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+    } catch (error) {
+      console.warn('Server logout failed:', error);
+    }
+    
+    // クライアントサイドの状態をクリア
     setUser(null);
     setToken(null);
     setError(null);
@@ -230,7 +269,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     error,
   };
 
-  return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={contextValue}>
+      <AutoRefreshProvider isAuthenticated={contextValue.isAuthenticated} token={token}>
+        {children}
+      </AutoRefreshProvider>
+    </AuthContext.Provider>
+  );
+}
+
+// 自動リフレッシュを管理するコンポーネント
+function AutoRefreshProvider({ 
+  children, 
+  isAuthenticated, 
+  token 
+}: { 
+  children: React.ReactNode;
+  isAuthenticated: boolean;
+  token: string | null;
+}) {
+  useAutoRefresh();
+  return <>{children}</>;
 }
 
 export function useAuth() {
