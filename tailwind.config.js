@@ -403,7 +403,198 @@ export default {
         ...motionUtilities,
       });
 
-      addComponents(containerComponents);
+      // Study Plan Components
+      const studyPlanComponents = {
+        // Container Classes
+        '.study-container': {
+          '@apply max-w-4xl mx-auto p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg': {},
+        },
+        '.study-container-wide': {
+          '@apply max-w-6xl mx-auto p-6': {},
+        },
+        '.study-card': {
+          '@apply bg-white dark:bg-gray-800 rounded-lg shadow-subtle border dark:border-gray-700 p-6': {},
+        },
+        '.study-card-compact': {
+          '@apply bg-white dark:bg-gray-800 rounded-lg shadow-subtle border dark:border-gray-700 p-4': {},
+        },
+
+        // Form Components
+        '.study-input': {
+          '@apply w-full px-3 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent dark:bg-gray-700 dark:text-white focus-ring': {},
+        },
+        '.study-select': {
+          '@apply w-full px-3 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent dark:bg-gray-700 dark:text-white focus-ring': {},
+        },
+        '.study-textarea': {
+          '@apply w-full px-3 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent dark:bg-gray-700 dark:text-white resize-none focus-ring': {},
+        },
+        '.study-form-label': {
+          '@apply block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2': {},
+        },
+
+        // Button Components
+        '.study-btn-primary': {
+          '@apply px-6 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg transition-colors duration-200 focus-ring disabled:opacity-50 disabled:cursor-not-allowed': {},
+        },
+        '.study-btn-secondary': {
+          '@apply px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white transition-colors duration-200 focus-ring': {},
+        },
+
+        // Progress Components
+        '.study-progress-bar': {
+          '@apply w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2': {},
+        },
+        '.study-progress-fill': {
+          '@apply h-2 rounded-full transition-all duration-700': {},
+          transitionTimingFunction: 'cubic-bezier(0.19, 1, 0.22, 1)',
+        },
+        '.study-progress-fill-blue': {
+          '@apply bg-brand-600': {},
+        },
+        '.study-progress-fill-green': {
+          '@apply bg-success-500': {},
+        },
+
+        // Status Components
+        '.study-badge': {
+          '@apply px-2 py-1 text-xs rounded-full font-medium': {},
+        },
+        '.study-badge-popular': {
+          '@apply bg-brand-600 text-white px-3 py-1 text-sm rounded-full': {},
+        },
+        '.study-badge-difficulty-beginner': {
+          '@apply text-success-700 dark:text-success-400 bg-success-100 dark:bg-success-900/50': {},
+        },
+        '.study-badge-difficulty-intermediate': {
+          '@apply text-warning-700 dark:text-warning-400 bg-warning-100 dark:bg-warning-900/50': {},
+        },
+        '.study-badge-difficulty-advanced': {
+          '@apply text-error-700 dark:text-error-400 bg-error-100 dark:bg-error-900/50': {},
+        },
+
+        // Priority Badges
+        '.study-badge-priority-high': {
+          '@apply px-3 py-1 text-sm rounded-full bg-error-100 dark:bg-error-900/50 text-error-800 dark:text-error-200': {},
+        },
+        '.study-badge-priority-medium': {
+          '@apply px-3 py-1 text-sm rounded-full bg-warning-100 dark:bg-warning-900/50 text-warning-800 dark:text-warning-200': {},
+        },
+        '.study-badge-priority-low': {
+          '@apply px-3 py-1 text-sm rounded-full bg-brand-100 dark:bg-brand-900/50 text-brand-800 dark:text-brand-200': {},
+        },
+
+        // Statistics Components
+        '.study-stat-box': {
+          '@apply text-center': {},
+        },
+        '.study-stat-number': {
+          '@apply text-2xl font-bold': {},
+        },
+        '.study-stat-label': {
+          '@apply text-sm text-gray-500 dark:text-gray-400': {},
+        },
+
+        // Card Components
+        '.study-template-card': {
+          '@apply relative p-6 border-2 rounded-lg cursor-pointer transition-all duration-200 hover:shadow-gentle focus-ring': {},
+        },
+        '.study-template-card-default': {
+          '@apply border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-brand-300 dark:hover:border-brand-500': {},
+        },
+        '.study-template-card-popular': {
+          '@apply border-brand-200 dark:border-brand-600 bg-brand-50 dark:bg-brand-900/10 hover:border-brand-300 dark:hover:border-brand-500': {},
+        },
+
+        // Recommendation Components
+        '.study-recommendation-card': {
+          '@apply p-6 rounded-lg border animate-fade-in': {},
+        },
+        '.study-recommendation-card-high': {
+          '@apply border-error-200 dark:border-error-500 bg-error-50 dark:bg-error-900/20': {},
+        },
+        '.study-recommendation-card-medium': {
+          '@apply border-warning-200 dark:border-warning-500 bg-warning-50 dark:bg-warning-900/20': {},
+        },
+        '.study-recommendation-card-low': {
+          '@apply border-brand-200 dark:border-brand-500 bg-brand-50 dark:bg-brand-900/20': {},
+        },
+
+        // State Components
+        '.study-loading': {
+          '@apply flex items-center justify-center p-8': {},
+        },
+        '.study-loading-compact': {
+          '@apply flex items-center justify-center p-4': {},
+        },
+        '.study-loading-spinner': {
+          '@apply animate-spin rounded-full h-8 w-8 border-b-2 border-brand-600': {},
+        },
+        '.study-loading-spinner-compact': {
+          '@apply animate-spin rounded-full h-6 w-6 border-b-2 border-brand-600': {},
+        },
+        '.study-error': {
+          '@apply p-4 bg-error-50 dark:bg-error-900/20 border border-error-200 dark:border-error-500 rounded-lg': {},
+        },
+        '.study-error-text': {
+          '@apply text-error-700 dark:text-error-300 text-sm': {},
+        },
+        '.study-error-button': {
+          '@apply mt-2 text-sm text-error-600 dark:text-error-400 hover:underline focus-ring': {},
+        },
+        '.study-empty': {
+          '@apply p-4 text-gray-500 dark:text-gray-400 text-sm text-center': {},
+        },
+
+        // Milestone Components
+        '.study-milestone-card': {
+          '@apply flex items-start justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg animate-fade-in': {},
+        },
+
+        // Typography
+        '.study-title': {
+          '@apply text-2xl font-bold text-gray-900 dark:text-white': {},
+        },
+        '.study-subtitle': {
+          '@apply text-lg font-semibold text-gray-900 dark:text-white mb-4': {},
+        },
+        '.study-section-title': {
+          '@apply font-medium text-gray-900 dark:text-white mb-2': {},
+        },
+        '.study-description': {
+          '@apply text-gray-600 dark:text-gray-300 mt-2': {},
+        },
+        '.study-meta': {
+          '@apply text-sm text-gray-500 dark:text-gray-400': {},
+        },
+
+        // Achievement Colors
+        '.study-achievement-high': {
+          '@apply text-success-600 dark:text-success-400': {},
+        },
+        '.study-achievement-medium': {
+          '@apply text-warning-600 dark:text-warning-400': {},
+        },
+        '.study-achievement-low': {
+          '@apply text-error-600 dark:text-error-400': {},
+        },
+
+        // Streak Colors
+        '.study-streak-good': {
+          '@apply text-success-600 dark:text-success-400': {},
+        },
+        '.study-streak-warning': {
+          '@apply text-warning-600 dark:text-warning-400': {},
+        },
+        '.study-streak-danger': {
+          '@apply text-error-600 dark:text-error-400': {},
+        },
+      };
+
+      addComponents({
+        ...containerComponents,
+        ...studyPlanComponents,
+      });
     },
   ],
 };

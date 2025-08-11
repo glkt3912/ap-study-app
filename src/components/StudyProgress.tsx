@@ -99,8 +99,8 @@ export default function StudyProgress({ planId, plan, compact = false }: StudyPr
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center p-4">
-        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+      <div className="study-loading-compact">
+        <div className="study-loading-spinner-compact"></div>
         <span className="ml-2 text-sm">読み込み中...</span>
       </div>
     );
@@ -108,11 +108,11 @@ export default function StudyProgress({ planId, plan, compact = false }: StudyPr
 
   if (error) {
     return (
-      <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-500 rounded-lg">
-        <p className="text-red-700 dark:text-red-300 text-sm">{error}</p>
+      <div className="study-error">
+        <p className="study-error-text">{error}</p>
         <button
           onClick={loadProgress}
-          className="mt-2 text-sm text-red-600 dark:text-red-400 hover:underline"
+          className="study-error-button"
         >
           再試行
         </button>
@@ -122,7 +122,7 @@ export default function StudyProgress({ planId, plan, compact = false }: StudyPr
 
   if (!progress) {
     return (
-      <div className="p-4 text-gray-500 dark:text-gray-400 text-sm">
+      <div className="study-empty">
         進捗データがありません
       </div>
     );
@@ -130,23 +130,23 @@ export default function StudyProgress({ planId, plan, compact = false }: StudyPr
 
   if (compact) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 p-4">
+      <div className="study-card-compact">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="font-medium text-gray-900 dark:text-white">学習進捗</h3>
-          <span className="text-sm text-gray-500 dark:text-gray-400">
+          <h3 className="study-section-title">学習進捗</h3>
+          <span className="study-meta">
             {formatDate(progress.lastStudyDate || new Date().toISOString())}
           </span>
         </div>
         
         <div className="grid grid-cols-2 gap-4 mb-3">
           <div>
-            <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">完了日数</div>
+            <div className="study-stat-label">完了日数</div>
             <div className="text-lg font-semibold text-gray-900 dark:text-white">
               {progress.completedDays}<span className="text-sm text-gray-500">/{progress.totalDays}</span>
             </div>
           </div>
           <div>
-            <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">学習時間</div>
+            <div className="study-stat-label">学習時間</div>
             <div className="text-lg font-semibold text-gray-900 dark:text-white">
               {progress.completedHours}<span className="text-sm text-gray-500">h</span>
             </div>
@@ -158,9 +158,9 @@ export default function StudyProgress({ planId, plan, compact = false }: StudyPr
             <span>進捗率</span>
             <span>{calculateProgressPercentage(progress.completedDays, progress.totalDays)}%</span>
           </div>
-          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+          <div className="study-progress-bar">
             <div
-              className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+              className="study-progress-fill study-progress-fill-blue"
               style={{ width: `${calculateProgressPercentage(progress.completedDays, progress.totalDays)}%` }}
             />
           </div>
@@ -221,7 +221,7 @@ export default function StudyProgress({ planId, plan, compact = false }: StudyPr
               <span>日数進捗</span>
               <span>{progress.completedDays}/{progress.totalDays}日</span>
             </div>
-            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+            <div className="study-progress-bar">
               <div
                 className="bg-green-500 h-2 rounded-full transition-all duration-300"
                 style={{ width: `${calculateProgressPercentage(progress.completedDays, progress.totalDays)}%` }}
@@ -234,7 +234,7 @@ export default function StudyProgress({ planId, plan, compact = false }: StudyPr
               <span>時間進捗</span>
               <span>{progress.completedHours}/{progress.totalHours}時間</span>
             </div>
-            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+            <div className="study-progress-bar">
               <div
                 className="bg-blue-500 h-2 rounded-full transition-all duration-300"
                 style={{ width: `${calculateProgressPercentage(progress.completedHours, progress.totalHours)}%` }}
