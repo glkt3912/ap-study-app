@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import Dashboard from '@/components/Dashboard';
 import WeeklyPlan from '@/components/WeeklyPlan';
 import StudyLog from '@/components/StudyLog';
@@ -49,7 +49,7 @@ export default function ClientHome() {
 
 
   // 試験設定を読み込む
-  const loadExamConfig = async () => {
+  const loadExamConfig = useCallback(async () => {
     try {
       const config = await apiClient.getExamConfig(userId.toString());
       setExamConfig(config);
@@ -57,7 +57,7 @@ export default function ClientHome() {
       // 設定が存在しない場合は null のまま
       setExamConfig(null);
     }
-  };
+  }, [userId]);
 
   // 試験設定保存ハンドラー
   const handleExamConfigSave = (savedConfig: ExamConfig) => {
@@ -119,7 +119,7 @@ export default function ClientHome() {
     };
 
     fetchStudyData();
-  }, [user?.id]);
+  }, [user?.id, loadExamConfig]);
 
   const renderContent = () => {
     switch (activeTab) {

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, lazy, Suspense } from 'react';
+import React, { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import { apiClient, type ExamConfig } from '../lib/api';
 import { ExamConfigModal } from './ExamConfigModal';
 import { useAuth } from '../contexts/AuthContext';
@@ -117,18 +117,8 @@ export function AdvancedAnalysis() {
   const [examDate, setExamDate] = useState('');
   const [targetScore, setTargetScore] = useState(60);
 
-  useEffect(() => {
-    if (activeTab === 'performance') {
-      loadPerformanceMetrics();
-    } else if (activeTab === 'pattern') {
-      loadLearningPattern();
-    } else if (activeTab === 'readiness') {
-      loadExamConfig();
-    }
-  }, [activeTab]);
-
   // 試験設定を読み込む
-  const loadExamConfig = async () => {
+  const loadExamConfig = useCallback(async () => {
     try {
       const config = await apiClient.getExamConfig(userId.toString());
       setExamConfig(config);
@@ -140,7 +130,17 @@ export function AdvancedAnalysis() {
       // 設定が存在しない場合は無視
       setExamConfig(null);
     }
-  };
+  }, [userId]);
+
+  useEffect(() => {
+    if (activeTab === 'performance') {
+      loadPerformanceMetrics();
+    } else if (activeTab === 'pattern') {
+      loadLearningPattern();
+    } else if (activeTab === 'readiness') {
+      loadExamConfig();
+    }
+  }, [activeTab, userId, loadExamConfig]);
 
   // モーダル保存ハンドラー
   const handleExamConfigSave = (savedConfig: ExamConfig) => {

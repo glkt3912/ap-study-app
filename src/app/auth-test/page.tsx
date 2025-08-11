@@ -40,8 +40,10 @@ export default function AuthTestPage() {
     try {
       const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
       
-      console.log('Testing signup with:', { email, password: testPassword, name: testName });
-      console.log('API URL:', API_BASE_URL);
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Testing signup with:', { email, password: testPassword, name: testName });
+        console.log('API URL:', API_BASE_URL);
+      }
 
       const response = await fetch(`${API_BASE_URL}/api/auth/signup`, {
         method: 'POST',
@@ -58,7 +60,9 @@ export default function AuthTestPage() {
       const responseTime = Math.round(performance.now() - startTime);
       const data = await response.json();
 
-      console.log('Signup response:', { status: response.status, data });
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Signup response:', { status: response.status, data });
+      }
 
       if (response.ok) {
         setResults(prev => prev.map(r => 
@@ -88,7 +92,9 @@ export default function AuthTestPage() {
       }
     } catch (error) {
       const responseTime = Math.round(performance.now() - startTime);
-      console.error('Signup error:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Signup error:', error);
+      }
       
       setResults(prev => prev.map(r => 
         r.action === 'Direct API Signup' && r.status === 'pending'
@@ -116,7 +122,9 @@ export default function AuthTestPage() {
       // AuthContext signup関数のシミュレーション
       const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
       
-      console.log('Testing AuthContext signup with:', { email, password: testPassword, name: testName });
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Testing AuthContext signup with:', { email, password: testPassword, name: testName });
+      }
 
       const response = await fetch(`${API_BASE_URL}/api/auth/signup`, {
         method: 'POST',
@@ -129,12 +137,16 @@ export default function AuthTestPage() {
       const data = await response.json();
       const responseTime = Math.round(performance.now() - startTime);
 
-      console.log('AuthContext signup response:', { status: response.ok, data });
+      if (process.env.NODE_ENV === 'development') {
+        console.log('AuthContext signup response:', { status: response.ok, data });
+      }
 
       if (response.ok && data.success) {
         // AuthContextと同じ処理
         const { token: newToken, user: userData } = data.data;
-        console.log('Success - Token and user data received:', { token: newToken.substring(0, 20) + '...', user: userData });
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Success - Token and user data received:', { token: newToken.substring(0, 20) + '...', user: userData });
+        }
         
         setResults(prev => prev.map(r => 
           r.action === 'AuthContext Signup' && r.status === 'pending'
@@ -148,7 +160,9 @@ export default function AuthTestPage() {
             : r
         ));
       } else {
-        console.log('Failed - Error from server:', data.message || data.error);
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Failed - Error from server:', data.message || data.error);
+        }
         
         setResults(prev => prev.map(r => 
           r.action === 'AuthContext Signup' && r.status === 'pending'
@@ -165,7 +179,9 @@ export default function AuthTestPage() {
       }
     } catch (error) {
       const responseTime = Math.round(performance.now() - startTime);
-      console.error('AuthContext signup error:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('AuthContext signup error:', error);
+      }
       
       setResults(prev => prev.map(r => 
         r.action === 'AuthContext Signup' && r.status === 'pending'
@@ -387,7 +403,7 @@ export default function AuthTestPage() {
         {results.length === 0 && !isRunning && (
           <div className='text-center py-12'>
             <p className='text-slate-600 dark:text-slate-400 text-lg'>
-              No test results yet. Click "Run Tests" to start authentication testing.
+              No test results yet. Click &quot;Run Tests&quot; to start authentication testing.
             </p>
           </div>
         )}
