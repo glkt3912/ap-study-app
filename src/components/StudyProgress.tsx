@@ -261,7 +261,9 @@ export default function StudyProgress({ planId, plan, compact = false }: StudyPr
               <div className="flex justify-between">
                 <span className="text-gray-600 dark:text-gray-300">1日平均学習時間</span>
                 <span className="font-medium">
-                  {progress.completedDays > 0 ? Math.round((progress.completedHours / progress.completedDays) * 10) / 10 : 0}時間
+                  {progress.completedDays > 0 
+                    ? Math.round((progress.completedHours / progress.completedDays) * 10) / 10 
+                    : 0}時間
                 </span>
               </div>
             </div>
@@ -278,7 +280,10 @@ export default function StudyProgress({ planId, plan, compact = false }: StudyPr
                 <span className="text-gray-600 dark:text-gray-300">必要な1日学習時間</span>
                 <span className="font-medium">
                   {progress.totalDays - progress.completedDays > 0 
-                    ? Math.round(((progress.totalHours - progress.completedHours) / (progress.totalDays - progress.completedDays)) * 10) / 10
+                    ? Math.round(
+                        ((progress.totalHours - progress.completedHours) / 
+                         (progress.totalDays - progress.completedDays)) * 10
+                      ) / 10
                     : 0}時間
                 </span>
               </div>
