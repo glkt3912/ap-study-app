@@ -13,9 +13,10 @@ import { AdvancedAnalysis } from '@/components/AdvancedAnalysis';
 import { ReviewSystem } from '@/components/ReviewSystem';
 import { AuthModal } from '@/components/auth';
 import { ErrorToastManager } from '@/components/ErrorToast';
+import { ExamConfigModal } from '@/components/ExamConfigModal';
 import { useAuth } from '@/contexts/AuthContext';
 import { studyPlanData } from '@/data/studyPlan';
-import { apiClient } from '@/lib/api';
+import { apiClient, type ExamConfig } from '@/lib/api';
 import { errorHandler } from '@/lib/error-handler';
 import { ThemeToggle } from '@/components/ThemeToggle';
 
@@ -27,6 +28,10 @@ export default function ClientHome() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
+
+  // 試験設定関連
+  const [examConfig, setExamConfig] = useState<ExamConfig | null>(null);
+  const [isExamConfigModalOpen, setIsExamConfigModalOpen] = useState(false);
 
   // タブ定義（メモ化で最適化）
   const tabs = useMemo(() => [
@@ -43,6 +48,28 @@ export default function ClientHome() {
   ], []);
 
 
+  // 試験設定を読み込む
+  const loadExamConfig = async () => {
+    try {
+      const config = await apiClient.getExamConfig('default-user'); // 実際のユーザーIDに変更が必要
+      setExamConfig(config);
+    } catch (_error) {
+      // 設定が存在しない場合は null のまま
+      setExamConfig(null);
+    }
+  };
+
+  // 試験設定保存ハンドラー
+  const handleExamConfigSave = (savedConfig: ExamConfig) => {
+    setExamConfig(savedConfig);
+    setIsExamConfigModalOpen(false);
+  };
+
+  // 残り日数計算
+  const calculateRemainingDays = (examDate: string): number => {
+    return Math.ceil((new Date(examDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+  };
+
   // バックエンドからデータを取得
   useEffect(() => {
     const fetchStudyData = async () => {
@@ -51,6 +78,9 @@ export default function ClientHome() {
         setError(null);
         const data = await apiClient.getStudyPlan();
 
+        // 試験設定も読み込む
+        await loadExamConfig();
+        
         // バックエンドのデータ構造をフロントエンドの構造に変換
         const convertedData = data.map(week => ({
           ...week,
@@ -128,7 +158,27 @@ export default function ClientHome() {
                 応用情報技術者試験 学習管理
               </h1>
               <p className='text-sm sm:text-base text-secondary mt-1'>
-                試験まで残り: <span className='font-semibold text-blue-600 dark:text-blue-400'>約12週間</span>
+                {examConfig ? (
+                  <span>
+                    試験まで残り: 
+                    <span className='font-semibold text-blue-600 dark:text-blue-400 ml-1'>
+                      {calculateRemainingDays(examConfig.examDate)}日
+                    </span>
+                    <span className='text-xs text-gray-500 ml-2'>
+                      ({new Date(examConfig.examDate).toLocaleDateString('ja-JP')})
+                    </span>
+                  </span>
+                ) : (
+                  <span className='text-orange-600 dark:text-orange-400'>
+                    試験日未設定 - 
+                    <button
+                      onClick={() => setIsExamConfigModalOpen(true)}
+                      className='ml-1 underline hover:no-underline font-semibold'
+                    >
+                      今すぐ設定
+                    </button>
+                  </span>
+                )}
               </p>
             </div>
             <div className='flex items-center space-x-3'>
@@ -221,6 +271,15 @@ export default function ClientHome() {
 
       {/* 認証モーダル */}
       <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
+
+      {/* 試験設定モーダル */}
+      <ExamConfigModal
+        isOpen={isExamConfigModalOpen}
+        onClose={() => setIsExamConfigModalOpen(false)}
+        onSave={handleExamConfigSave}
+        userId="default-user" // 実際のユーザーIDに変更が必要
+        {...(examConfig && { initialConfig: examConfig })}
+      />
 
       {/* エラートースト管理 */}
       <ErrorToastManager />

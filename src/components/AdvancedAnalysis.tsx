@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect, lazy, Suspense } from 'react';
-import { apiClient } from '../lib/api';
+import { apiClient, type ExamConfig } from '../lib/api';
+import { ExamConfigModal } from './ExamConfigModal';
 
 const PieChart = lazy(() => import('recharts').then(module => ({ default: module.PieChart })));
 const Pie = lazy(() => import('recharts').then(module => ({ default: module.Pie })));
@@ -93,6 +94,11 @@ interface LearningPattern {
   };
 }
 
+// 残り日数を計算するヘルパー関数
+const calculateRemainingDays = (examDate: string): number => {
+  return Math.ceil((new Date(examDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+};
+
 export function AdvancedAnalysis() {
   const [activeTab, setActiveTab] = useState<'performance' | 'readiness' | 'pattern' | 'efficiency'>('performance');
   const [performanceMetrics, setPerformanceMetrics] = useState<PerformanceMetrics | null>(null);
@@ -101,7 +107,11 @@ export function AdvancedAnalysis() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // 試験日設定用
+  // 試験設定モーダル管理
+  const [isExamConfigModalOpen, setIsExamConfigModalOpen] = useState(false);
+  const [examConfig, setExamConfig] = useState<ExamConfig | null>(null);
+
+  // 試験日設定用（既存フォーム用）
   const [examDate, setExamDate] = useState('');
   const [targetScore, setTargetScore] = useState(60);
 
@@ -110,8 +120,33 @@ export function AdvancedAnalysis() {
       loadPerformanceMetrics();
     } else if (activeTab === 'pattern') {
       loadLearningPattern();
+    } else if (activeTab === 'readiness') {
+      loadExamConfig();
     }
   }, [activeTab]);
+
+  // 試験設定を読み込む
+  const loadExamConfig = async () => {
+    try {
+      const config = await apiClient.getExamConfig('default-user'); // 実際のユーザーIDに変更が必要
+      setExamConfig(config);
+      if (config) {
+        setExamDate(new Date(config.examDate).toISOString().split('T')[0] || '');
+        setTargetScore(config.targetScore || 60);
+      }
+    } catch (_error) {
+      // 設定が存在しない場合は無視
+      setExamConfig(null);
+    }
+  };
+
+  // モーダル保存ハンドラー
+  const handleExamConfigSave = (savedConfig: ExamConfig) => {
+    setExamConfig(savedConfig);
+    setExamDate(new Date(savedConfig.examDate).toISOString().split('T')[0] || '');
+    setTargetScore(savedConfig.targetScore || 60);
+    setIsExamConfigModalOpen(false);
+  };
 
   const loadPerformanceMetrics = async () => {
     setLoading(true);
@@ -127,8 +162,8 @@ export function AdvancedAnalysis() {
   };
 
   const loadExamReadiness = async () => {
-    if (!examDate) {
-      setError('試験日を設定してください');
+    if (!examConfig && !examDate) {
+      setError('試験設定が必要です。設定を編集してください。');
       return;
     }
 
@@ -136,8 +171,8 @@ export function AdvancedAnalysis() {
     setError(null);
     try {
       const data = await apiClient.evaluateExamReadiness({
-        examDate,
-        targetScore,
+        examDate: examConfig?.examDate || examDate,
+        targetScore: examConfig?.targetScore || targetScore,
       });
       setExamReadiness(data);
     } catch (err) {
@@ -388,36 +423,57 @@ export function AdvancedAnalysis() {
         <div className='space-y-6'>
           {/* 試験設定 */}
           <div className='card-accent p-4'>
-            <h3 className='font-semibold text-lg mb-3 text-gray-800 dark:text-white'>試験設定</h3>
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-              <div>
-                <label className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1'>試験日</label>
-                <input
-                  type='date'
-                  value={examDate}
-                  onChange={e => setExamDate(e.target.value)}
-                  className='input-primary'
-                />
-              </div>
-              <div>
-                <label className='label-primary'>目標点数</label>
-                <input
-                  type='number'
-                  value={targetScore}
-                  onChange={e => setTargetScore(parseInt(e.target.value))}
-                  min='0'
-                  max='100'
-                  className='input-primary'
-                />
-              </div>
+            <div className='flex justify-between items-center mb-3'>
+              <h3 className='font-semibold text-lg text-gray-800 dark:text-white'>試験設定</h3>
+              <button
+                onClick={() => setIsExamConfigModalOpen(true)}
+                className='px-3 py-1 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors'
+              >
+                設定を編集
+              </button>
             </div>
-            <button
-              onClick={loadExamReadiness}
-              disabled={!examDate || loading}
-              className='btn-primary hover-lift click-shrink focus-ring interactive-disabled mt-4'
-            >
-              準備度を評価
-            </button>
+            
+            {examConfig ? (
+              <div className='space-y-3'>
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                  <div className='flex items-center'>
+                    <span className='text-sm font-medium text-gray-700 dark:text-gray-300 mr-2'>試験日:</span>
+                    <span className='text-sm text-gray-900 dark:text-white'>
+                      {new Date(examConfig.examDate).toLocaleDateString('ja-JP')}
+                    </span>
+                  </div>
+                  <div className='flex items-center'>
+                    <span className='text-sm font-medium text-gray-700 dark:text-gray-300 mr-2'>目標点数:</span>
+                    <span className='text-sm text-gray-900 dark:text-white'>
+                      {examConfig.targetScore || 60}点
+                    </span>
+                  </div>
+                </div>
+                <div className='flex items-center'>
+                  <span className='text-sm font-medium text-gray-700 dark:text-gray-300 mr-2'>残り日数:</span>
+                  <span className='text-sm text-blue-600 dark:text-blue-400 font-medium'>
+                    {examConfig.remainingDays || calculateRemainingDays(examConfig.examDate)}日
+                  </span>
+                </div>
+                <button
+                  onClick={loadExamReadiness}
+                  disabled={loading}
+                  className='btn-primary hover-lift click-shrink focus-ring interactive-disabled w-full mt-4'
+                >
+                  {loading ? '評価中...' : '準備度を評価'}
+                </button>
+              </div>
+            ) : (
+              <div className='text-center py-6'>
+                <p className='text-gray-600 dark:text-gray-400 mb-4'>試験設定が未設定です</p>
+                <button
+                  onClick={() => setIsExamConfigModalOpen(true)}
+                  className='btn-primary hover-lift click-shrink focus-ring'
+                >
+                  試験設定を開始
+                </button>
+              </div>
+            )}
           </div>
 
           {/* 試験準備度結果 */}
@@ -605,13 +661,20 @@ export function AdvancedAnalysis() {
           </div>
         </div>
       )}
+      
+      {/* ExamConfigModal */}
+      <ExamConfigModal
+        isOpen={isExamConfigModalOpen}
+        onClose={() => setIsExamConfigModalOpen(false)}
+        onSave={handleExamConfigSave}
+        userId="default-user" // 実際のユーザーIDに変更が必要
+        {...(examConfig && { initialConfig: examConfig })}
+      />
     </div>
   );
 }
 
 // 動的インポート用のLazy Componentを定義
 const LearningEfficiencyDashboardComponent = lazy(() =>
-  import('./LearningEfficiencyDashboard').then(module => ({
-    default: module.LearningEfficiencyDashboard,
-  }))
+  import('./LearningEfficiencyDashboard')
 );

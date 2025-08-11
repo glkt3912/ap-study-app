@@ -340,3 +340,6 @@ export function LearningEfficiencyDashboard() {
     </div>
   );
 }
+
+// default exportを追加
+export default LearningEfficiencyDashboard;
