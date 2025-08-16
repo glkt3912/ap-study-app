@@ -1,4 +1,4 @@
-import { StudyWeek } from '@/types/api';
+import { StudyWeek } from '@/data/studyPlan';
 
 export interface WeeklyPlanTemplate {
   id: string;

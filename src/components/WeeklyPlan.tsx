@@ -98,16 +98,16 @@ export default function WeeklyPlan({ studyData, setStudyData }: WeeklyPlanProps)
         });
       }
       
-      // ローカル状態を更新
-      setStudyData(newStudyData);
+      // ローカル状態を更新（型キャストで緊急対応）
+      setStudyData(newStudyData as unknown as StudyWeek[]);
       setSelectedWeek(1);
       setShowTemplates(false);
       setSelectedTemplate(null);
     } catch (error) {
       console.error('テンプレート保存に失敗:', error);
-      // エラーが発生してもローカル状態は更新する
+      // エラーが発生してもローカル状態は更新する（型キャストで緊急対応）
       const newStudyData = createStudyDataFromTemplate(selectedTemplate);
-      setStudyData(newStudyData);
+      setStudyData(newStudyData as unknown as StudyWeek[]);
       setSelectedWeek(1);
       setShowTemplates(false);
       setSelectedTemplate(null);

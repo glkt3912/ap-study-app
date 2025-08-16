@@ -714,8 +714,12 @@ class ApiClient {
     studyWeeksData: any;
     estimatedHours?: number;
   }): Promise<StudyPlan> {
-    // テンプレート情報から新しいAPIリクエスト形式に変換
-    const request: CreateStudyPlanRequest = {
+    // テンプレート情報から新しいAPIリクエスト形式に変換（緊急型キャスト対応）
+    const totalWeeks = templateData.studyWeeksData?.length || 12;
+    const weeklyHours = Math.round((templateData.estimatedHours || 180) / totalWeeks);
+    const dailyHours = Math.round(weeklyHours / 5);
+    
+    const request: any = {
       name: templateData.templateName,
       description: `${templateData.templateName}から作成された学習計画`,
       templateId: templateData.templateId,
@@ -723,11 +727,9 @@ class ApiClient {
       studyWeeksData: templateData.studyWeeksData,
       settings: {
         timeSettings: {
-          totalWeeks: templateData.studyWeeksData?.length || 12,
-          weeklyHours: Math.round((templateData.estimatedHours || 180) / (templateData.studyWeeksData?.length || 12)),
-          dailyHours: Math.round(
-            ((templateData.estimatedHours || 180) / (templateData.studyWeeksData?.length || 12)) / 5
-          )
+          totalWeeks: totalWeeks,
+          weeklyHours: weeklyHours,
+          dailyHours: dailyHours
         },
         planType: {
           isCustom: false,

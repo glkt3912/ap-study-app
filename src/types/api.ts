@@ -121,24 +121,8 @@ export type SubmitAnswerRequest = {
 export type CreateMorningTestRequest = Omit<MorningTest, 'id' | 'accuracy'>;
 export type CreateAfternoonTestRequest = Omit<AfternoonTest, 'id'>;
 
-// Dynamic Study Plan types (from backend PR #16)
-export interface StudyPlan {
-  id: number;
-  userId: number;
-  title: string;
-  description?: string;
-  studyPeriodDays: number;
-  weeklyStudyHours: number;
-  dailyStudyHours: number;
-  learningStyle: 'visual' | 'auditory' | 'kinesthetic' | 'reading';
-  difficultyPreference: 'easy' | 'medium' | 'hard' | 'mixed';
-  createdAt: string;
-  updatedAt: string;
-  isActive: boolean;
-  progressPercentage: number;
-  achievementRate: number;
-  nextReviewDate?: string;
-}
+// Additional custom types not covered by OpenAPI
+// Note: Main StudyPlan types are auto-generated from OpenAPI to avoid duplicates
 
 export interface StudyPlanProgress {
   planId: number;

@@ -188,26 +188,10 @@ async function generateTypes() {
     console.log('🔄 OpenAPI仕様書から型定義を生成中...');
     const generatedTypes = generateTypesFromSpec(openApiSpec);
 
-    // Add custom dynamic study plan types
+    // Add minimal custom types (avoid duplicates with OpenAPI generated types)
     const customTypes = `
-// Dynamic Study Plan types (from backend PR #16)
-export interface StudyPlan {
-  id: number;
-  userId: number;
-  title: string;
-  description?: string;
-  studyPeriodDays: number;
-  weeklyStudyHours: number;
-  dailyStudyHours: number;
-  learningStyle: 'visual' | 'auditory' | 'kinesthetic' | 'reading';
-  difficultyPreference: 'easy' | 'medium' | 'hard' | 'mixed';
-  createdAt: string;
-  updatedAt: string;
-  isActive: boolean;
-  progressPercentage: number;
-  achievementRate: number;
-  nextReviewDate?: string;
-}
+// Additional custom types not covered by OpenAPI
+// Note: Main StudyPlan types are auto-generated from OpenAPI to avoid duplicates
 
 export interface StudyPlanProgress {
   planId: number;
