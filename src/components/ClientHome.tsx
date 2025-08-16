@@ -66,8 +66,33 @@ export default function ClientHome() {
   // バックエンドからデータを取得
   useEffect(() => {
     const fetchStudyData = async () => {
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.log('=== fetchStudyData called ===');
+        // eslint-disable-next-line no-console
+        console.log('Auth state:', {
+          isAuthenticated,
+          authLoading,
+          userId: user?.id,
+          hasUser: !!user
+        });
+      }
+
+      // 認証ローディング中は待機
+      if (authLoading) {
+        if (process.env.NODE_ENV === 'development') {
+          // eslint-disable-next-line no-console
+          console.log('Auth loading, waiting...');
+        }
+        return;
+      }
+
       // 認証されていない場合はモックデータを使用
       if (!isAuthenticated || !user?.id) {
+        if (process.env.NODE_ENV === 'development') {
+          // eslint-disable-next-line no-console
+          console.log('Not authenticated or no user ID, using mock data');
+        }
         setStudyData(studyPlanData);
         setLoading(false);
         return;
@@ -76,6 +101,12 @@ export default function ClientHome() {
       try {
         setLoading(true);
         setError(null);
+        
+        if (process.env.NODE_ENV === 'development') {
+          // eslint-disable-next-line no-console
+          console.log('Making API call to getStudyPlan...');
+        }
+        
         const data = await apiClient.getStudyPlan();
 
         // 試験設定も読み込む
@@ -107,27 +138,90 @@ export default function ClientHome() {
 
         if (process.env.NODE_ENV === 'development') {
           // eslint-disable-next-line no-console
-          console.error('学習データの取得に失敗しました:', {
-            id: standardError.id,
-            category: standardError.category,
-            severity: standardError.severity,
-            code: standardError.code,
-            message: standardError.message,
-            userMessage: standardError.userMessage,
-            timestamp: standardError.timestamp,
-            retryable: standardError.retryable
+          console.error('=== 学習データの取得に失敗しました ===');
+          // eslint-disable-next-line no-console
+          console.error('StandardError詳細:', {
+            id: standardError?.id || 'N/A',
+            category: standardError?.category || 'N/A',
+            severity: standardError?.severity || 'N/A',
+            code: standardError?.code || 'N/A',
+            message: standardError?.message || 'N/A',
+            userMessage: standardError?.userMessage || 'N/A',
+            timestamp: standardError?.timestamp || 'N/A',
+            retryable: standardError?.retryable || false
+          });
+          // eslint-disable-next-line no-console
+          console.error('Original Error:', err);
+          // eslint-disable-next-line no-console
+          console.error('User Info:', {
+            isAuthenticated,
+            userId: user?.id,
+            hasUser: !!user
+          });
+          // eslint-disable-next-line no-console
+          console.error('API Endpoint:', '/api/study/plan');
+          // eslint-disable-next-line no-console
+          console.error('Context:', {
+            userId: user?.id?.toString()
           });
         }
 
         // 認証エラーの場合は自動的にログアウト
         if (standardError.code === 'AUTH_TOKEN_EXPIRED' || standardError.code === 'AUTH_UNAUTHORIZED') {
           setError('セッションが期限切れです。再ログインしてください。');
+          
+          if (process.env.NODE_ENV === 'development') {
+            // eslint-disable-next-line no-console
+            console.log('Authentication error detected, logging out...');
+          }
+          
           // 自動ログアウト
           if (typeof logout === 'function') {
             logout();
           }
           // モックデータを使用
           setStudyData(studyPlanData);
+        } else if (standardError.retryable && standardError.code !== 'NETWORK_ERROR') {
+          // リトライ可能なエラーの場合（ネットワークエラー以外）
+          if (process.env.NODE_ENV === 'development') {
+            // eslint-disable-next-line no-console
+            console.log('Retryable error detected, will retry in 2 seconds...');
+          }
+          
+          setError('データの読み込みに失敗しました。2秒後に再試行します...');
+          
+          // 2秒後にリトライ
+          setTimeout(async () => {
+            if (process.env.NODE_ENV === 'development') {
+              // eslint-disable-next-line no-console
+              console.log('Retrying API call...');
+            }
+            try {
+              const data = await apiClient.getStudyPlan();
+              const convertedData = data.map(week => ({
+                ...week,
+                goals: typeof week.goals === 'string' ? JSON.parse(week.goals) : week.goals,
+                days: week.days.map(day => ({
+                  ...day,
+                  topics: typeof day.topics === 'string' ? JSON.parse(day.topics) : day.topics,
+                })),
+              }));
+              setStudyData(convertedData);
+              setError(null); // エラーをクリア
+              
+              if (process.env.NODE_ENV === 'development') {
+                // eslint-disable-next-line no-console
+                console.log('Retry successful!');
+              }
+            } catch (retryErr) {
+              if (process.env.NODE_ENV === 'development') {
+                // eslint-disable-next-line no-console
+                console.log('Retry failed, using mock data');
+              }
+              setError('データの読み込みに失敗しました。モックデータを使用します。');
+              setStudyData(studyPlanData);
+            }
+          }, 2000);
         } else {
           setError('データの読み込みに失敗しました。モックデータを使用します。');
           // エラー時はモックデータを使用
