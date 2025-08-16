@@ -124,6 +124,33 @@ export default function ClientHome() {
 
         setStudyData(convertedData);
       } catch (err) {
+        if (process.env.NODE_ENV === 'development') {
+          // eslint-disable-next-line no-console
+          console.error('=== 学習データの取得に失敗しました ===');
+          // eslint-disable-next-line no-console
+          console.error('API_BASE_URL:', process.env.NEXT_PUBLIC_API_URL);
+          // eslint-disable-next-line no-console
+          console.error('Full URL:', `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/study/plan`);
+          // eslint-disable-next-line no-console
+          console.error('Original Error:', err);
+          // eslint-disable-next-line no-console
+          console.error('Error Type:', typeof err, Object.prototype.toString.call(err));
+          // eslint-disable-next-line no-console
+          console.error('Error Properties:', Object.getOwnPropertyNames(err));
+          // eslint-disable-next-line no-console
+          console.error('Error Message:', err?.message);
+          // eslint-disable-next-line no-console
+          console.error('Error Stack:', err?.stack);
+          // eslint-disable-next-line no-console
+          console.error('User Info:', {
+            isAuthenticated,
+            userId: user?.id,
+            hasUser: !!user
+          });
+          // eslint-disable-next-line no-console
+          console.error('Network Status:', navigator.onLine ? 'Online' : 'Offline');
+        }
+
         // 高度なエラーハンドリング
         const standardError = await errorHandler.handleApiError(
           err,
@@ -138,32 +165,15 @@ export default function ClientHome() {
 
         if (process.env.NODE_ENV === 'development') {
           // eslint-disable-next-line no-console
-          console.error('=== 学習データの取得に失敗しました ===');
-          // eslint-disable-next-line no-console
-          console.error('StandardError詳細:', {
-            id: standardError?.id || 'N/A',
-            category: standardError?.category || 'N/A',
-            severity: standardError?.severity || 'N/A',
-            code: standardError?.code || 'N/A',
-            message: standardError?.message || 'N/A',
-            userMessage: standardError?.userMessage || 'N/A',
-            timestamp: standardError?.timestamp || 'N/A',
-            retryable: standardError?.retryable || false
-          });
-          // eslint-disable-next-line no-console
-          console.error('Original Error:', err);
-          // eslint-disable-next-line no-console
-          console.error('User Info:', {
-            isAuthenticated,
-            userId: user?.id,
-            hasUser: !!user
-          });
-          // eslint-disable-next-line no-console
-          console.error('API Endpoint:', '/api/study/plan');
-          // eslint-disable-next-line no-console
-          console.error('Context:', {
-            userId: user?.id?.toString()
-          });
+          console.error('StandardError詳細:', standardError);
+        }
+
+        // HTTP 500エラーの場合は開発環境でモックデータを使用
+        if (process.env.NODE_ENV === 'development' && err?.message?.includes('500')) {
+          console.warn('HTTP 500エラーのため、モックデータを使用します');
+          setStudyData(studyPlanData);
+          setError('サーバーエラーが発生しました。モックデータを表示しています。バックエンドログを確認してください。');
+          return;
         }
 
         // 認証エラーの場合は自動的にログアウト

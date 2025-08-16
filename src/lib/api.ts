@@ -161,6 +161,12 @@ class ApiClient {
       'Content-Type': 'application/json',
     };
 
+    // 開発環境では認証ヘッダーを一時的に無効化（デバッグ用）
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Development mode: Skipping authorization header for debugging');
+      return headers;
+    }
+
     // ブラウザ環境でのみLocalStorageにアクセス（フォールバック用）
     // HttpOnly Cookieが優先されるため、Bearerトークンはバックアップとして使用
     if (typeof window !== 'undefined') {
@@ -183,7 +189,8 @@ class ApiClient {
         ...this.getAuthHeaders(),
         ...options?.headers,
       },
-      credentials: 'include' as const, // HttpOnly Cookieを優先して送信
+      // 開発環境では credentials を一時的に調整
+      credentials: process.env.NODE_ENV === 'development' ? 'omit' as const : 'include' as const,
       ...options,
     };
 
@@ -219,14 +226,49 @@ class ApiClient {
       }
 
       if (!response.ok) {
-        const error = new Error(`HTTP error! status: ${response.status}`);
+        let errorMessage = `HTTP error! status: ${response.status}`;
+        let errorDetails = null;
+
+        try {
+          const errorBody = await response.text();
+          if (errorBody) {
+            try {
+              errorDetails = JSON.parse(errorBody);
+              errorMessage = errorDetails.error || errorDetails.message || errorMessage;
+            } catch {
+              errorMessage = errorBody.length > 0 ? errorBody : errorMessage;
+            }
+          }
+        } catch {
+          // エラーボディの読み取りに失敗した場合はデフォルトメッセージを使用
+        }
+
+        const error = new Error(errorMessage);
+        
+        // 開発環境でより詳細なエラー情報をログに出力
+        if (process.env.NODE_ENV === 'development') {
+          // eslint-disable-next-line no-console
+          console.error('=== HTTP Error Details ===');
+          // eslint-disable-next-line no-console
+          console.error('Status:', response.status, response.statusText);
+          // eslint-disable-next-line no-console
+          console.error('URL:', url);
+          // eslint-disable-next-line no-console
+          console.error('Method:', method);
+          // eslint-disable-next-line no-console
+          console.error('Error Body:', errorDetails || errorMessage);
+          // eslint-disable-next-line no-console
+          console.error('Response Headers:', Object.fromEntries(response.headers.entries()));
+        }
 
         if (process.env.NODE_ENV === 'development') {
           // eslint-disable-next-line no-console
           console.error('API Error - Response not OK:', {
             status: response.status,
             statusText: response.statusText,
-            url
+            url,
+            errorDetails,
+            requestHeaders: requestConfig.headers
           });
         }
 
