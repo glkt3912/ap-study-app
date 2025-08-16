@@ -502,15 +502,6 @@ export interface AfternoonTest {
   memo?: string;
 }
 
-// Additional utility types
-export type ApiResponse<T> = {
-  success: true;
-  data: T;
-} | {
-  success: false;
-  error: string;
-};
-
 // Request types
 export type CreateStudyLogRequest = Omit<StudyLog, 'id' | 'efficiency'>;
 export type StartQuizSessionRequest = {
