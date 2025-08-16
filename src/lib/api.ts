@@ -177,20 +177,56 @@ class ApiClient {
     const method = options?.method || 'GET';
     const url = `${API_BASE_URL}${endpoint}`;
 
+    const requestConfig = {
+      headers: {
+        ...this.getAuthHeaders(),
+        ...options?.headers,
+      },
+      ...options,
+    };
+
+    if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
+      console.log('=== API Request ===');
+      // eslint-disable-next-line no-console
+      console.log('URL:', url);
+      // eslint-disable-next-line no-console
+      console.log('Method:', method);
+      // eslint-disable-next-line no-console
+      console.log('Headers:', requestConfig.headers);
+      if (options?.body) {
+        // eslint-disable-next-line no-console
+        console.log('Body:', options.body);
+      }
+    }
+
     try {
-      const response = await fetch(url, {
-        headers: {
-          ...this.getAuthHeaders(),
-          ...options?.headers,
-        },
-        ...options,
-      });
+      const response = await fetch(url, requestConfig);
 
       const duration = performance.now() - startTime;
+
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.log('=== API Response ===');
+        // eslint-disable-next-line no-console
+        console.log('Status:', response.status);
+        // eslint-disable-next-line no-console
+        console.log('Status Text:', response.statusText);
+        // eslint-disable-next-line no-console
+        console.log('Duration:', `${duration.toFixed(2)}ms`);
+      }
 
       if (!response.ok) {
         const error = new Error(`HTTP error! status: ${response.status}`);
 
+        if (process.env.NODE_ENV === 'development') {
+          // eslint-disable-next-line no-console
+          console.error('API Error - Response not OK:', {
+            status: response.status,
+            statusText: response.statusText,
+            url
+          });
+        }
 
         // 監視システムにAPI エラーを記録
         if (typeof window !== 'undefined') {
@@ -202,6 +238,11 @@ class ApiClient {
       }
 
       const data = await response.json();
+
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.log('Response Data:', data);
+      }
 
       if (!data.success) {
         const error = new Error(data.error || 'API request failed');
