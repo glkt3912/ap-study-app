@@ -744,11 +744,8 @@ class ApiClient {
     return this.request(`/api/study-plan/${planId}/progress`);
   }
 
-  // Removed: complex StudyPlan methods (replaced by template-based approach)
-  // - updateStudyPlanPreferences
-  // - getStudyRecommendations  
-  // - getStudyPlanTemplates
-  // - createStudyPlanFromTemplate
+  // Note: Study plan advanced features have been removed as they were not used in the frontend
+  // Simplified to basic CRUD operations only
 
   // 学習計画テンプレート永続化メソッド（新しいバックエンドAPI対応）
   async saveWeeklyPlanTemplate(userId: number, templateData: {
@@ -802,11 +799,8 @@ class ApiClient {
     }
   }
 
-  // Removed: deprecated dynamic study plan methods
-  // - getStudyScheduleTemplates
-  // - createDynamicStudyPlan  
-  // - optimizeStudyPlan
-  // - getStudyPlanAnalytics
+  // Note: Dynamic study plan methods were removed as they were experimental features
+  // not integrated into the frontend UI
 
   // 学習効率分析API
   async generateLearningEfficiencyAnalysis(options: {
