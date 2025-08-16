@@ -2,10 +2,12 @@
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { useAutoRefresh } from '../hooks/useAutoRefresh';
+import { validateLoginInput } from '../utils/validation';
 
 interface User {
   id: number;
   name: string;
+  username?: string;
   email: string;
   role: 'user' | 'admin';
   createdAt: Date;
@@ -16,8 +18,8 @@ interface AuthContextType {
   userId: number;
   token: string | null;
   isAuthenticated: boolean;
-  login: (_email: string, _password: string) => Promise<boolean>;
-  signup: (_email: string, _password: string, _name?: string) => Promise<boolean>;
+  login: (_emailOrUsername: string, _password: string) => Promise<boolean>;
+  signup: (_email: string, _password: string, _name?: string, _username?: string) => Promise<boolean>;
   logout: () => void;
   updateUser: (_updates: Partial<User>) => void;
   isLoading: boolean;
@@ -97,18 +99,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     initAuth();
   }, [verifyToken]);
 
-  const login = useCallback(async (email: string, password: string): Promise<boolean> => {
+  const login = useCallback(async (emailOrUsername: string, password: string): Promise<boolean> => {
     setIsLoading(true);
     setError(null);
 
+    // クライアントサイドバリデーション
+    const validation = validateLoginInput(emailOrUsername, password);
+    if (!validation.isValid) {
+      setError(validation.errors.join(' '));
+      setIsLoading(false);
+      return false;
+    }
+
     try {
+      const requestBody = {
+        emailOrUsername: emailOrUsername.trim(),
+        password,
+      };
+
       const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         credentials: 'include', // HttpOnly Cookieを受信
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify(requestBody),
       });
 
       const data = await response.json();
@@ -138,7 +153,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const signup = useCallback(async (email: string, password: string, name?: string): Promise<boolean> => {
+  const signup = useCallback(async (
+    email: string, 
+    password: string, 
+    name?: string, 
+    username?: string
+  ): Promise<boolean> => {
     setIsLoading(true);
     setError(null);
 
@@ -152,7 +172,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     try {
-      const requestBody = { email, password, name };
+      const requestBody = { email, password, name, username };
       
       if (process.env.NODE_ENV === 'development') {
         console.log('[AuthContext] Sending signup request:', requestBody);

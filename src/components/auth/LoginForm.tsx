@@ -10,18 +10,18 @@ interface LoginFormProps {
 export function LoginForm({ onModeChange }: LoginFormProps) {
   const { login, isLoading, error } = useAuth();
   const [formData, setFormData] = useState({
-    email: '',
+    emailOrUsername: '',
     password: '',
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.email || !formData.password) {
+    if (!formData.emailOrUsername || !formData.password) {
       return;
     }
 
-    const success = await login(formData.email, formData.password);
+    const success = await login(formData.emailOrUsername, formData.password);
     if (success) {
       // ログイン成功時は親コンポーネントで処理される
     }
@@ -40,18 +40,18 @@ export function LoginForm({ onModeChange }: LoginFormProps) {
 
       <form onSubmit={handleSubmit} className='space-y-4'>
         <div>
-          <label htmlFor='email' className='label-primary'>
-            メールアドレス
+          <label htmlFor='emailOrUsername' className='label-primary'>
+            メールアドレスまたはユーザー名
           </label>
           <input
-            type='email'
-            id='email'
-            name='email'
-            value={formData.email}
+            type='text'
+            id='emailOrUsername'
+            name='emailOrUsername'
+            value={formData.emailOrUsername}
             onChange={handleChange}
             required
             className='input-primary'
-            placeholder='email@example.com'
+            placeholder='email@example.com または username'
           />
         </div>
 
@@ -79,9 +79,9 @@ export function LoginForm({ onModeChange }: LoginFormProps) {
 
         <button
           type='submit'
-          disabled={isLoading || !formData.email || !formData.password}
+          disabled={isLoading || !formData.emailOrUsername || !formData.password}
           className={`w-full hover-lift click-shrink focus-ring ${
-            isLoading || !formData.email || !formData.password
+            isLoading || !formData.emailOrUsername || !formData.password
               ? 'interactive-disabled'
               : 'btn-primary'
           }`}
@@ -103,7 +103,7 @@ export function LoginForm({ onModeChange }: LoginFormProps) {
       </div>
 
       <div className='mt-4 p-3 bg-slate-50 dark:bg-slate-700 rounded-md'>
-        <p className='text-xs text-secondary text-center'>開発環境用: test@example.com / test1234</p>
+        <p className='text-xs text-secondary text-center'>開発環境用: test@example.com またはユーザー名 / test1234</p>
       </div>
     </div>
   );
