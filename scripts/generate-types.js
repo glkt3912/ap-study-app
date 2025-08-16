@@ -592,6 +592,35 @@ export interface StudyScheduleTemplate {
   estimatedHoursPerWeek: number;
   isFlexible: boolean;
 }
+
+// StudyPlan interface (required for StudyProgress component)
+export interface StudyPlan {
+  id: number;
+  userId: number;
+  name: string;
+  description?: string;
+  isActive: boolean;
+  startDate: string;
+  targetExamDate?: string;
+  createdAt: string;
+  updatedAt: string;
+  templateId?: string;
+  templateName?: string;
+  studyWeeksData?: any;
+  settings: Record<string, any>;
+  weeks?: any[];
+}
+
+export interface CreateStudyPlanRequest {
+  name: string;
+  description?: string;
+  templateId?: string;
+  templateName?: string;
+  studyWeeksData?: any[];
+  targetExamDate?: string;
+  startDate?: string;
+  settings?: Record<string, any>;
+}
 `;
 
     // ファイルに保存
