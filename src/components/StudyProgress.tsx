@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { StudyPlanProgress, StudyPlan } from '../types/api';
+import { apiClient } from '../lib/api';
 
 interface StudyProgressProps {
   planId: number;
@@ -9,7 +10,7 @@ interface StudyProgressProps {
   compact?: boolean;
 }
 
-export default function StudyProgress({ planId, plan, compact = false }: StudyProgressProps) {
+export default function StudyProgress({ planId, plan: _plan, compact = false }: StudyProgressProps) {
   const [progress, setProgress] = useState<StudyPlanProgress | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -23,47 +24,10 @@ export default function StudyProgress({ planId, plan, compact = false }: StudyPr
       setLoading(true);
       setError(null);
       
-      // Mock API call - replace with actual API call
-      // const response = await fetch(`/api/study-plan/${planId}/progress`);
-      // const result = await response.json();
-      
-      // Mock progress data for demonstration
-      const mockProgress: StudyPlanProgress = {
-        planId,
-        totalDays: plan?.studyPeriodDays || 90,
-        completedDays: Math.floor((plan?.studyPeriodDays || 90) * 0.3),
-        totalHours: (plan?.studyPeriodDays || 90) * (plan?.dailyStudyHours || 3),
-        completedHours: Math.floor((plan?.studyPeriodDays || 90) * (plan?.dailyStudyHours || 3) * 0.3),
-        averageScore: 75,
-        streakDays: 5,
-        lastStudyDate: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-        upcomingMilestones: [
-          {
-            id: 1,
-            title: '第1章完了',
-            targetDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
-            isCompleted: false,
-            description: 'コンピュータシステムの基礎知識',
-          },
-          {
-            id: 2,
-            title: '模擬試験1回目',
-            targetDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
-            isCompleted: false,
-            description: '学習進捗の確認テスト',
-          },
-          {
-            id: 3,
-            title: '中間評価',
-            targetDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-            isCompleted: false,
-            description: '学習計画の見直しと調整',
-          },
-        ],
-      };
-
-      setProgress(mockProgress);
+      const progressData = await apiClient.getStudyPlanProgress(planId);
+      setProgress(progressData);
     } catch (err) {
+      console.error('Failed to load progress:', err);
       setError('進捗データの読み込みに失敗しました');
     } finally {
       setLoading(false);
