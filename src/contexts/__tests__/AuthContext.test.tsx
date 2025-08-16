@@ -222,6 +222,19 @@ describe('AuthContext', () => {
       });
 
       expect(loginResult!).toBe(true);
+      
+      // 認証状態チェックとログインの両方が呼ばれることを確認
+      expect(fetch).toHaveBeenCalledWith(
+        'http://localhost:8000/api/auth/me',
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+        }
+      );
+      
       expect(fetch).toHaveBeenCalledWith(
         'http://localhost:8000/api/auth/login',
         {
@@ -230,7 +243,7 @@ describe('AuthContext', () => {
             'Content-Type': 'application/json',
           },
           credentials: 'include',
-          body: JSON.stringify({ email, password }),
+          body: JSON.stringify({ emailOrUsername: email, password }),
         }
       );
 
