@@ -583,6 +583,16 @@ export interface UpdateStudyPlanPreferencesRequest {
   };
 }
 
+export interface WeeklyStudyPattern {
+  monday: string;
+  tuesday: string;
+  wednesday: string;
+  thursday: string;
+  friday: string;
+  saturday?: string;
+  sunday?: string;
+}
+
 export interface StudyScheduleTemplate {
   id: number;
   name: string;
