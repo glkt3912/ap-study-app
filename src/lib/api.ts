@@ -161,10 +161,11 @@ class ApiClient {
       'Content-Type': 'application/json',
     };
 
-    // ブラウザ環境でのみLocalStorageにアクセス
+    // ブラウザ環境でのみLocalStorageにアクセス（フォールバック用）
+    // HttpOnly Cookieが優先されるため、Bearerトークンはバックアップとして使用
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('ap-study-token');
-      if (token) {
+      if (token && token !== 'cookie-authenticated') {
         headers['Authorization'] = `Bearer ${token}`;
       }
     }
@@ -182,6 +183,7 @@ class ApiClient {
         ...this.getAuthHeaders(),
         ...options?.headers,
       },
+      credentials: 'include' as const, // HttpOnly Cookieを優先して送信
       ...options,
     };
 

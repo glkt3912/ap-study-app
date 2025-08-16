@@ -38,22 +38,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   
   // 自動リフレッシュフック（認証状態が確立した後にのみ初期化）
 
-  // トークン検証とユーザー情報取得
-  const verifyToken = useCallback(async (token?: string): Promise<boolean> => {
+  // トークン検証とユーザー情報取得（HttpOnly Cookie優先）
+  const verifyToken = useCallback(async (fallbackToken?: string): Promise<boolean> => {
     try {
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',
       };
       
-      // トークンが提供された場合のみAuthorizationヘッダーを設定
-      if (token) {
-        headers.Authorization = `Bearer ${token}`;
+      // フォールバック用のトークンが提供された場合のみAuthorizationヘッダーを設定
+      if (fallbackToken) {
+        headers.Authorization = `Bearer ${fallbackToken}`;
       }
 
       const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
         method: 'GET',
         headers,
-        credentials: 'include', // HttpOnly Cookieを送信
+        credentials: 'include', // HttpOnly Cookieを優先して送信
       });
 
       if (response.ok) {
@@ -70,14 +70,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  // 初期化時にトークンをチェック
+  // 初期化時にトークンをチェック（HttpOnly Cookie優先）
   useEffect(() => {
     const initAuth = async () => {
-      // まずHttpOnly Cookieでの認証を試行
+      // HttpOnly Cookieでの認証を優先して試行
       const isCookieValid = await verifyToken();
       
       if (isCookieValid) {
-        setToken('cookie-based'); // Cookieベースの認証を示す
+        setToken('cookie-authenticated'); // Cookie認証成功を示す
         setIsLoading(false);
         return;
       }
@@ -85,14 +85,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // フォールバック: localStorageのトークンをチェック
       const storedToken = localStorage.getItem('ap-study-token');
       if (storedToken) {
-        const isValid = await verifyToken(storedToken);
-        if (isValid) {
+        const isTokenValid = await verifyToken(storedToken);
+        if (isTokenValid) {
           setToken(storedToken);
+          setIsLoading(false);
+          return;
         } else {
+          // 無効なトークンを削除
           localStorage.removeItem('ap-study-token');
         }
       }
 
+      // 認証に失敗した場合
       setIsLoading(false);
     };
 
@@ -131,15 +135,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (response.ok && data.success) {
         const { token: newToken, user: userData } = data.data;
         
-        // Cookieベースの認証を優先
-        setToken('cookie-based');
+        // Cookie認証が成功
+        setToken('cookie-authenticated');
         setUser({
           ...userData,
           createdAt: new Date(userData.createdAt),
         });
         
         // フォールバック用にlocalStorageにも保存
-        localStorage.setItem('ap-study-token', newToken);
+        if (newToken) {
+          localStorage.setItem('ap-study-token', newToken);
+        }
         return true;
       } else {
         setError(data.message || 'ログインに失敗しました');
@@ -209,15 +215,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           });
         }
 
-        // Cookieベースの認証を優先
-        setToken('cookie-based');
+        // Cookie認証が成功
+        setToken('cookie-authenticated');
         setUser({
           ...userData,
           createdAt: new Date(userData.createdAt),
         });
         
         // フォールバック用にlocalStorageにも保存
-        localStorage.setItem('ap-study-token', newToken);
+        if (newToken) {
+          localStorage.setItem('ap-study-token', newToken);
+        }
         return true;
       } else {
         const errorMessage = data.message || data.error || 'アカウント作成に失敗しました';
