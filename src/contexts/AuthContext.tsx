@@ -38,16 +38,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   
   // 自動リフレッシュフック（認証状態が確立した後にのみ初期化）
 
-  // トークン検証とユーザー情報取得（HttpOnly Cookie優先）
+  // トークン検証とユーザー情報取得（環境別認証戦略）
   const verifyToken = useCallback(async (fallbackToken?: string): Promise<boolean> => {
     try {
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',
       };
       
-      // フォールバック用のトークンが提供された場合のみAuthorizationヘッダーを設定
-      if (fallbackToken) {
-        headers.Authorization = `Bearer ${fallbackToken}`;
+      // 開発環境での認証戦略
+      if (process.env.NODE_ENV === 'development') {
+        // 開発環境では認証を柔軟に処理
+        if (fallbackToken) {
+          headers.Authorization = `Bearer ${fallbackToken}`;
+        }
+        // ログ出力で認証状態を確認
+        console.log('Auth verification in development mode', {
+          hasFallbackToken: !!fallbackToken,
+          endpoint: `${API_BASE_URL}/api/auth/me`
+        });
+      } else {
+        // 本番環境では厳密な認証
+        if (fallbackToken) {
+          headers.Authorization = `Bearer ${fallbackToken}`;
+        }
       }
 
       const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
@@ -58,14 +71,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (response.ok) {
         const data = await response.json();
-        setUser({
-          ...data.data.user,
-          createdAt: new Date(data.data.user.createdAt),
-        });
-        return true;
+        if (data.success && data.data?.user) {
+          setUser({
+            ...data.data.user,
+            createdAt: new Date(data.data.user.createdAt),
+          });
+          return true;
+        }
       }
+      
+      // 開発環境では認証失敗をログ出力
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Auth verification failed', {
+          status: response.status,
+          statusText: response.statusText
+        });
+      }
+      
       return false;
-    } catch {
+    } catch (error) {
+      // 開発環境ではエラー詳細をログ出力
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Auth verification error', error);
+      }
       return false;
     }
   }, []);

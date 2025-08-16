@@ -161,18 +161,30 @@ class ApiClient {
       'Content-Type': 'application/json',
     };
 
-    // 開発環境では認証ヘッダーを一時的に無効化（デバッグ用）
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Development mode: Skipping authorization header for debugging');
-      return headers;
-    }
-
-    // ブラウザ環境でのみLocalStorageにアクセス（フォールバック用）
-    // HttpOnly Cookieが優先されるため、Bearerトークンはバックアップとして使用
+    // ブラウザ環境でのみLocalStorageにアクセス
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('ap-study-token');
-      if (token && token !== 'cookie-authenticated') {
-        headers['Authorization'] = `Bearer ${token}`;
+      
+      const authRequired = process.env.NEXT_PUBLIC_AUTH_REQUIRED === 'true';
+      const enableAuthLogging = process.env.NEXT_PUBLIC_ENABLE_AUTH_LOGGING === 'true';
+      
+      if (process.env.NODE_ENV === 'development') {
+        // 開発環境: 設定に応じた柔軟な認証
+        if (token && token !== 'cookie-authenticated') {
+          headers['Authorization'] = `Bearer ${token}`;
+          if (enableAuthLogging) {
+            console.log('Development mode: Using Bearer token authentication');
+          }
+        } else {
+          if (enableAuthLogging) {
+            console.log(`Development mode: No token found, auth required: ${authRequired}`);
+          }
+        }
+      } else {
+        // 本番環境: HttpOnly Cookie優先、フォールバックとしてBearer token
+        if (token && token !== 'cookie-authenticated') {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
       }
     }
 
@@ -189,8 +201,9 @@ class ApiClient {
         ...this.getAuthHeaders(),
         ...options?.headers,
       },
-      // 開発環境では credentials を一時的に調整
-      credentials: process.env.NODE_ENV === 'development' ? 'omit' as const : 'include' as const,
+      // HttpOnly Cookie対応: 常にcredentials includeを使用
+      // バックエンドはオプショナル認証なので、認証なしでも動作する
+      credentials: 'include' as const,
       ...options,
     };
 
