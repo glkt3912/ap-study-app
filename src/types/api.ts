@@ -120,3 +120,148 @@ export type SubmitAnswerRequest = {
 
 export type CreateMorningTestRequest = Omit<MorningTest, 'id' | 'accuracy'>;
 export type CreateAfternoonTestRequest = Omit<AfternoonTest, 'id'>;
+
+// Additional custom types not covered by OpenAPI
+// Note: Main StudyPlan types are auto-generated from OpenAPI to avoid duplicates
+
+export interface StudyPlanProgress {
+  planId: number;
+  totalDays: number;
+  completedDays: number;
+  totalHours: number;
+  completedHours: number;
+  averageScore: number;
+  streakDays: number;
+  lastStudyDate?: string;
+  upcomingMilestones: StudyMilestone[];
+}
+
+export interface StudyMilestone {
+  id: number;
+  title: string;
+  targetDate: string;
+  isCompleted: boolean;
+  completedDate?: string;
+  description?: string;
+}
+
+export interface StudyRecommendation {
+  id: number;
+  userId: number;
+  type: 'topic_focus' | 'time_adjustment' | 'difficulty_change' | 'review_schedule';
+  title: string;
+  description: string;
+  priority: 'low' | 'medium' | 'high';
+  actionable: boolean;
+  estimatedImpact: string;
+  createdAt: string;
+}
+
+export interface StudyPlanTemplate {
+  id: number;
+  name: string;
+  description: string;
+  defaultPeriodDays: number;
+  defaultWeeklyHours: number;
+  targetAudience: string;
+  difficulty: 'beginner' | 'intermediate' | 'advanced';
+  features: string[];
+  isPopular: boolean;
+}
+
+export interface StudyPlanPreferences {
+  planId: number;
+  reminderEnabled: boolean;
+  reminderTime?: string;
+  weekendStudy: boolean;
+  intensiveMode: boolean;
+  adaptiveDifficulty: boolean;
+  notificationPreferences: {
+    email: boolean;
+    push: boolean;
+    daily: boolean;
+    weekly: boolean;
+  };
+}
+
+// Study Plan Request types
+export interface CreateStudyPlanRequest {
+  title: string;
+  description?: string;
+  studyPeriodDays: number;
+  weeklyStudyHours: number;
+  dailyStudyHours: number;
+  learningStyle: 'visual' | 'auditory' | 'kinesthetic' | 'reading';
+  difficultyPreference: 'easy' | 'medium' | 'hard' | 'mixed';
+}
+
+export interface UpdateStudyPlanRequest {
+  title?: string;
+  description?: string;
+  studyPeriodDays?: number;
+  weeklyStudyHours?: number;
+  dailyStudyHours?: number;
+  learningStyle?: 'visual' | 'auditory' | 'kinesthetic' | 'reading';
+  difficultyPreference?: 'easy' | 'medium' | 'hard' | 'mixed';
+  isActive?: boolean;
+}
+
+export interface CreateStudyPlanFromTemplateRequest {
+  templateId: number;
+  customization?: {
+    title?: string;
+    studyPeriodDays?: number;
+    weeklyStudyHours?: number;
+    dailyStudyHours?: number;
+    learningStyle?: 'visual' | 'auditory' | 'kinesthetic' | 'reading';
+    difficultyPreference?: 'easy' | 'medium' | 'hard' | 'mixed';
+  };
+}
+
+export interface UpdateStudyPlanPreferencesRequest {
+  reminderEnabled?: boolean;
+  reminderTime?: string;
+  weekendStudy?: boolean;
+  intensiveMode?: boolean;
+  adaptiveDifficulty?: boolean;
+  notificationPreferences?: {
+    email?: boolean;
+    push?: boolean;
+    daily?: boolean;
+    weekly?: boolean;
+  };
+}
+
+// StudyPlan関連型定義（バックエンドと統一）
+export interface StudyPlan {
+  id: number;
+  userId: number;
+  name: string;
+  description?: string;
+  isActive: boolean;
+  startDate: string;
+  targetExamDate?: string;
+  createdAt: string;
+  updatedAt: string;
+  templateId?: string;
+  templateName?: string;
+  studyWeeksData?: any;
+  settings: Record<string, any>;
+  weeks?: any[];
+}
+
+export interface CreateStudyPlanRequest {
+  name: string;
+  description?: string;
+  templateId?: string;
+  templateName?: string;
+  studyWeeksData?: any[];
+  targetExamDate?: string;
+  startDate?: string;
+  settings?: Record<string, any>;
+}
+
+export interface TimeRange {
+  startTime: string;
+  endTime: string;
+}

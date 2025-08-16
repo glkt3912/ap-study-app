@@ -1,4 +1,5 @@
 // API Client for backend communication
+import { StudyPlan, CreateStudyPlanRequest, StudyPlanProgress, UpdateStudyPlanRequest } from '@/types/api';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -670,6 +671,99 @@ class ApiClient {
       }),
     });
   }
+
+  // Dynamic Study Plan API (from backend PR #16)
+  async getStudyPlans(userId: number): Promise<StudyPlan[]> {
+    return this.request(`/api/study-plan/${userId}`);
+  }
+
+  async createStudyPlan(userId: number, plan: CreateStudyPlanRequest): Promise<StudyPlan> {
+    return this.request(`/api/study-plan/${userId}`, {
+      method: 'POST',
+      body: JSON.stringify(plan),
+    });
+  }
+
+  async updateStudyPlan(planId: number, plan: UpdateStudyPlanRequest): Promise<StudyPlan> {
+    return this.request(`/api/study-plan/${planId}`, {
+      method: 'PUT',
+      body: JSON.stringify(plan),
+    });
+  }
+
+  async deleteStudyPlan(planId: number): Promise<void> {
+    await this.request(`/api/study-plan/${planId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async getStudyPlanProgress(planId: number): Promise<StudyPlanProgress> {
+    return this.request(`/api/study-plan/${planId}/progress`);
+  }
+
+  // Removed: complex StudyPlan methods (replaced by template-based approach)
+  // - updateStudyPlanPreferences
+  // - getStudyRecommendations  
+  // - getStudyPlanTemplates
+  // - createStudyPlanFromTemplate
+
+  // 学習計画テンプレート永続化メソッド（新しいバックエンドAPI対応）
+  async saveWeeklyPlanTemplate(userId: number, templateData: {
+    templateId: string;
+    templateName: string;
+    studyWeeksData: any;
+    estimatedHours?: number;
+  }): Promise<StudyPlan> {
+    // テンプレート情報から新しいAPIリクエスト形式に変換（緊急型キャスト対応）
+    const totalWeeks = templateData.studyWeeksData?.length || 12;
+    const weeklyHours = Math.round((templateData.estimatedHours || 180) / totalWeeks);
+    const dailyHours = Math.round(weeklyHours / 5);
+    
+    const request: any = {
+      name: templateData.templateName,
+      description: `${templateData.templateName}から作成された学習計画`,
+      templateId: templateData.templateId,
+      templateName: templateData.templateName,
+      studyWeeksData: templateData.studyWeeksData,
+      settings: {
+        timeSettings: {
+          totalWeeks: totalWeeks,
+          weeklyHours: weeklyHours,
+          dailyHours: dailyHours
+        },
+        planType: {
+          isCustom: false,
+          source: 'template_based'
+        },
+        preferences: {},
+        metadata: {
+          templateId: templateData.templateId,
+          templateName: templateData.templateName
+        }
+      }
+    };
+
+    return this.request(`/api/study-plan/${userId}`, {
+      method: 'POST',
+      body: JSON.stringify(request),
+    });
+  }
+
+  async getWeeklyPlanTemplate(userId: number): Promise<StudyPlan | null> {
+    try {
+      // 既存の学習計画を取得
+      return await this.request(`/api/study-plan/${userId}`);
+    } catch (error) {
+      // 学習計画が存在しない場合はnullを返す
+      return null;
+    }
+  }
+
+  // Removed: deprecated dynamic study plan methods
+  // - getStudyScheduleTemplates
+  // - createDynamicStudyPlan  
+  // - optimizeStudyPlan
+  // - getStudyPlanAnalytics
 
   // 学習効率分析API
   async generateLearningEfficiencyAnalysis(options: {

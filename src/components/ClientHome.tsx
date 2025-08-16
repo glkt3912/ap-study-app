@@ -66,6 +66,13 @@ export default function ClientHome() {
   // バックエンドからデータを取得
   useEffect(() => {
     const fetchStudyData = async () => {
+      // 認証されていない場合はモックデータを使用
+      if (!isAuthenticated || !user?.id) {
+        setStudyData(studyPlanData);
+        setLoading(false);
+        return;
+      }
+
       try {
         setLoading(true);
         setError(null);
@@ -112,16 +119,27 @@ export default function ClientHome() {
           });
         }
 
-        setError('データの読み込みに失敗しました。モックデータを使用します。');
-        // エラー時はモックデータを使用
-        setStudyData(studyPlanData);
+        // 認証エラーの場合は自動的にログアウト
+        if (standardError.code === 'AUTH_TOKEN_EXPIRED' || standardError.code === 'AUTH_UNAUTHORIZED') {
+          setError('セッションが期限切れです。再ログインしてください。');
+          // 自動ログアウト
+          if (typeof logout === 'function') {
+            logout();
+          }
+          // モックデータを使用
+          setStudyData(studyPlanData);
+        } else {
+          setError('データの読み込みに失敗しました。モックデータを使用します。');
+          // エラー時はモックデータを使用
+          setStudyData(studyPlanData);
+        }
       } finally {
         setLoading(false);
       }
     };
 
     fetchStudyData();
-  }, [user?.id, loadExamConfig]);
+  }, [isAuthenticated, user?.id, loadExamConfig, logout]);
 
   // イベントハンドラー
   const handleExamConfigClick = () => {
