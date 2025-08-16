@@ -13,7 +13,7 @@ const OUTPUT_FILE = path.join(OUTPUT_DIR, 'api.ts');
 
 function generateTypesFromSpec(openApiSpec) {
   try {
-    console.log('🔧 カスタム型生成を開始...');
+    console.log('🔧 OpenAPI型生成を開始...');
 
     // 基本的なTypeScript型定義を生成
     let typesContent = `// Generated from OpenAPI specification
@@ -59,7 +59,8 @@ export type CreateStudyLogRequest = Omit<StudyLog, 'id' | 'efficiency'>;
 `;
       }
 
-      if (paths['/api/study/plan']) {
+      if (paths['/api/study/plan'] || paths['/study-plan']) {
+        // バックエンドのZodスキーマに基づいた型定義（nameフィールドベース）
         typesContent += `// Study Plan types
 export interface StudyWeek {
   id: number;
@@ -82,6 +83,36 @@ export interface StudyDay {
   completed: boolean;
   understanding: number;
   memo?: string;
+}
+
+// StudyPlan interface (based on backend Zod schema)
+export interface StudyPlan {
+  id: number;
+  userId: number;
+  name: string;
+  description?: string;
+  isActive: boolean;
+  startDate: string;
+  targetExamDate?: string;
+  createdAt: string;
+  updatedAt: string;
+  templateId?: string;
+  templateName?: string;
+  studyWeeksData?: any;
+  settings: Record<string, any>;
+  weeks?: any[];
+}
+
+// StudyPlan Request types (based on backend Zod schema)
+export interface CreateStudyPlanRequest {
+  name: string;
+  description?: string;
+  templateId?: string;
+  templateName?: string;
+  studyWeeksData?: any[];
+  targetExamDate?: string;
+  startDate?: string;
+  settings?: Record<string, any>;
 }
 
 `;
@@ -155,12 +186,33 @@ export type SubmitAnswerRequest = {
 
 export type CreateMorningTestRequest = Omit<MorningTest, 'id' | 'accuracy'>;
 export type CreateAfternoonTestRequest = Omit<AfternoonTest, 'id'>;
+
+// Exam Config types
+export interface ExamConfig {
+  id: number;
+  userId: number;
+  examDate: string;
+  targetScore?: number;
+  remainingDays?: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateExamConfigRequest {
+  examDate: string;
+  targetScore?: number;
+}
+
+export interface UpdateExamConfigRequest {
+  examDate?: string;
+  targetScore?: number;
+}
 `;
 
-    console.log('✅ カスタム型生成が完了しました');
+    console.log('✅ OpenAPI型生成が完了しました');
     return typesContent;
   } catch (error) {
-    console.error('❌ カスタム型生成エラー:', error.message);
+    console.error('❌ OpenAPI型生成エラー:', error.message);
     throw error;
   }
 }
@@ -188,10 +240,9 @@ async function generateTypes() {
     console.log('🔄 OpenAPI仕様書から型定義を生成中...');
     const generatedTypes = generateTypesFromSpec(openApiSpec);
 
-    // Add minimal custom types (avoid duplicates with OpenAPI generated types)
-    const customTypes = `
-// Additional custom types not covered by OpenAPI
-// Note: Main StudyPlan types are auto-generated from OpenAPI to avoid duplicates
+    // OpenAPI生成時は重複を避けるため、基本的な型のみ追加
+    const additionalTypes = `
+// Additional utility types for OpenAPI generated types
 
 export interface StudyPlanProgress {
   planId: number;
@@ -253,37 +304,25 @@ export interface StudyPlanPreferences {
   };
 }
 
-// Study Plan Request types
-export interface CreateStudyPlanRequest {
-  title: string;
-  description?: string;
-  studyPeriodDays: number;
-  weeklyStudyHours: number;
-  dailyStudyHours: number;
-  learningStyle: 'visual' | 'auditory' | 'kinesthetic' | 'reading';
-  difficultyPreference: 'easy' | 'medium' | 'hard' | 'mixed';
-}
-
 export interface UpdateStudyPlanRequest {
-  title?: string;
+  name?: string;
   description?: string;
-  studyPeriodDays?: number;
-  weeklyStudyHours?: number;
-  dailyStudyHours?: number;
-  learningStyle?: 'visual' | 'auditory' | 'kinesthetic' | 'reading';
-  difficultyPreference?: 'easy' | 'medium' | 'hard' | 'mixed';
+  totalWeeks?: number;
+  weeklyHours?: number;
+  dailyHours?: number;
+  targetExamDate?: string;
   isActive?: boolean;
+  settings?: Record<string, any>;
 }
 
 export interface CreateStudyPlanFromTemplateRequest {
   templateId: number;
   customization?: {
-    title?: string;
-    studyPeriodDays?: number;
-    weeklyStudyHours?: number;
-    dailyStudyHours?: number;
-    learningStyle?: 'visual' | 'auditory' | 'kinesthetic' | 'reading';
-    difficultyPreference?: 'easy' | 'medium' | 'hard' | 'mixed';
+    name?: string;
+    description?: string;
+    totalWeeks?: number;
+    weeklyHours?: number;
+    dailyHours?: number;
   };
 }
 
@@ -301,41 +340,12 @@ export interface UpdateStudyPlanPreferencesRequest {
   };
 }
 
-// StudyPlan関連型定義（バックエンドと統一）
-export interface StudyPlan {
-  id: number;
-  userId: number;
-  name: string;
-  description?: string;
-  isActive: boolean;
-  startDate: string;
-  targetExamDate?: string;
-  createdAt: string;
-  updatedAt: string;
-  templateId?: string;
-  templateName?: string;
-  studyWeeksData?: any;
-  settings: Record<string, any>;
-  weeks?: any[];
-}
-
-export interface CreateStudyPlanRequest {
-  name: string;
-  description?: string;
-  templateId?: string;
-  templateName?: string;
-  studyWeeksData?: any[];
-  targetExamDate?: string;
-  startDate?: string;
-  settings?: Record<string, any>;
-}
-
 export interface TimeRange {
   startTime: string;
   endTime: string;
 }`;
 
-    const typesWithAdditions = generatedTypes + customTypes;
+    const typesWithAdditions = generatedTypes + additionalTypes;
 
     // ファイルに保存
     await fs.writeFile(OUTPUT_FILE, typesWithAdditions, 'utf8');
@@ -358,9 +368,25 @@ export interface TimeRange {
 
 async function generateFallbackTypes() {
   try {
-    // 基本的な型定義（フォールバック）
+    // フォールバック型定義（バックエンドAPIスキーマに統一）
     const fallbackTypes = `// Fallback type definitions (OpenAPI generation failed)
 // Do not edit this file manually
+// Type definitions based on backend Zod schemas
+
+// API Response wrapper type
+export type ApiResponse<T> = {
+  success: true;
+  data: T;
+} | {
+  success: false;
+  error: string;
+};
+
+// Error response type
+export interface ErrorResponse {
+  success: false;
+  error: string;
+}
 
 export interface StudyLog {
   id: number;
@@ -395,6 +421,36 @@ export interface StudyDay {
   completed: boolean;
   understanding: number;
   memo?: string;
+}
+
+// StudyPlan interface (based on backend Zod schema)
+export interface StudyPlan {
+  id: number;
+  userId: number;
+  name: string;
+  description?: string;
+  isActive: boolean;
+  startDate: string;
+  targetExamDate?: string;
+  createdAt: string;
+  updatedAt: string;
+  templateId?: string;
+  templateName?: string;
+  studyWeeksData?: any;
+  settings: Record<string, any>;
+  weeks?: any[];
+}
+
+// StudyPlan Request types (based on backend Zod schema)
+export interface CreateStudyPlanRequest {
+  name: string;
+  description?: string;
+  templateId?: string;
+  templateName?: string;
+  studyWeeksData?: any[];
+  targetExamDate?: string;
+  startDate?: string;
+  settings?: Record<string, any>;
 }
 
 export interface QuizSession {
@@ -446,15 +502,6 @@ export interface AfternoonTest {
   memo?: string;
 }
 
-// Additional utility types
-export type ApiResponse<T> = {
-  success: true;
-  data: T;
-} | {
-  success: false;
-  error: string;
-};
-
 // Request types
 export type CreateStudyLogRequest = Omit<StudyLog, 'id' | 'efficiency'>;
 export type StartQuizSessionRequest = {
@@ -471,7 +518,26 @@ export type SubmitAnswerRequest = {
 export type CreateMorningTestRequest = Omit<MorningTest, 'id' | 'accuracy'>;
 export type CreateAfternoonTestRequest = Omit<AfternoonTest, 'id'>;
 
-// 重複除去済み - 上記で定義済み
+// Exam Config types
+export interface ExamConfig {
+  id: number;
+  userId: number;
+  examDate: string;
+  targetScore?: number;
+  remainingDays?: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateExamConfigRequest {
+  examDate: string;
+  targetScore?: number;
+}
+
+export interface UpdateExamConfigRequest {
+  examDate?: string;
+  targetScore?: number;
+}
 
 export interface StudySession {
   startTime: string;
@@ -547,25 +613,24 @@ export interface StudyPlanPreferences {
 }
 
 export interface UpdateStudyPlanRequest {
-  title?: string;
+  name?: string;
   description?: string;
-  studyPeriodDays?: number;
-  weeklyStudyHours?: number;
-  dailyStudyHours?: number;
-  learningStyle?: 'visual' | 'auditory' | 'kinesthetic' | 'reading';
-  difficultyPreference?: 'easy' | 'medium' | 'hard' | 'mixed';
+  totalWeeks?: number;
+  weeklyHours?: number;
+  dailyHours?: number;
+  targetExamDate?: string;
   isActive?: boolean;
+  settings?: Record<string, any>;
 }
 
 export interface CreateStudyPlanFromTemplateRequest {
   templateId: number;
   customization?: {
-    title?: string;
-    studyPeriodDays?: number;
-    weeklyStudyHours?: number;
-    dailyStudyHours?: number;
-    learningStyle?: 'visual' | 'auditory' | 'kinesthetic' | 'reading';
-    difficultyPreference?: 'easy' | 'medium' | 'hard' | 'mixed';
+    name?: string;
+    description?: string;
+    totalWeeks?: number;
+    weeklyHours?: number;
+    dailyHours?: number;
   };
 }
 
@@ -603,34 +668,6 @@ export interface StudyScheduleTemplate {
   isFlexible: boolean;
 }
 
-// StudyPlan interface (required for StudyProgress component)
-export interface StudyPlan {
-  id: number;
-  userId: number;
-  name: string;
-  description?: string;
-  isActive: boolean;
-  startDate: string;
-  targetExamDate?: string;
-  createdAt: string;
-  updatedAt: string;
-  templateId?: string;
-  templateName?: string;
-  studyWeeksData?: any;
-  settings: Record<string, any>;
-  weeks?: any[];
-}
-
-export interface CreateStudyPlanRequest {
-  name: string;
-  description?: string;
-  templateId?: string;
-  templateName?: string;
-  studyWeeksData?: any[];
-  targetExamDate?: string;
-  startDate?: string;
-  settings?: Record<string, any>;
-}
 `;
 
     // ファイルに保存
