@@ -33,7 +33,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false); // 初期値をfalseに変更
   const [error, setError] = useState<string | null>(null);
   
   // 自動リフレッシュフック（認証状態が確立した後にのみ初期化）
@@ -98,36 +98,43 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  // 初期化時にトークンをチェック（HttpOnly Cookie優先）
+  // 初期化時にトークンをチェック（非ブロッキング）
   useEffect(() => {
     const initAuth = async () => {
-      // HttpOnly Cookieでの認証を優先して試行
-      const isCookieValid = await verifyToken();
+      console.log('AuthContext: バックグラウンド認証チェック開始');
       
-      if (isCookieValid) {
-        setToken('cookie-authenticated'); // Cookie認証成功を示す
-        setIsLoading(false);
-        return;
-      }
-      
-      // フォールバック: localStorageのトークンをチェック
-      const storedToken = localStorage.getItem('ap-study-token');
-      if (storedToken) {
-        const isTokenValid = await verifyToken(storedToken);
-        if (isTokenValid) {
-          setToken(storedToken);
-          setIsLoading(false);
+      try {
+        // HttpOnly Cookieでの認証を優先して試行（非ブロッキング）
+        const isCookieValid = await verifyToken();
+        
+        if (isCookieValid) {
+          setToken('cookie-authenticated');
+          console.log('AuthContext: Cookie認証成功');
           return;
-        } else {
-          // 無効なトークンを削除
-          localStorage.removeItem('ap-study-token');
         }
-      }
+        
+        // フォールバック: localStorageのトークンをチェック
+        const storedToken = localStorage.getItem('ap-study-token');
+        if (storedToken) {
+          const isTokenValid = await verifyToken(storedToken);
+          if (isTokenValid) {
+            setToken(storedToken);
+            console.log('AuthContext: Token認証成功');
+            return;
+          } else {
+            // 無効なトークンを削除
+            localStorage.removeItem('ap-study-token');
+            console.log('AuthContext: 無効なトークンを削除');
+          }
+        }
 
-      // 認証に失敗した場合
-      setIsLoading(false);
+        console.log('AuthContext: 未認証状態で継続');
+      } catch (error) {
+        console.error('AuthContext: 認証チェックエラー', error);
+      }
     };
 
+    // 非同期で認証チェックを実行（UIをブロックしない）
     initAuth();
   }, [verifyToken]);
 

@@ -13,6 +13,7 @@ import {
   PersonalizedRecommendations,
   AdvancedWeakPointsAnalysis,
 } from '../lib/api';
+import { unifiedApiClient } from '../lib/unified-api';
 import { useAuth } from '../contexts/AuthContext';
 // import { ChartSkeleton, CardSkeleton } from './ui/Skeleton'
 
@@ -112,12 +113,52 @@ export default function Analysis() {
   // フォールバック: 個別API呼び出し (バックエンド未対応時)
   const fetchAnalysisDataFallback = useCallback(async () => {
     try {
-      const [logs, morningData, afternoonData, stats] = await Promise.all([
+      // 統一APIとレガシーAPIの併用で最適化
+      const userId = user?.id || 1;
+      
+      let morningData: MorningTest[] = [];
+      let afternoonData: AfternoonTest[] = [];
+      
+      // テストデータは統一APIを優先使用
+      try {
+        const sessions = await unifiedApiClient.getTestSessions(userId, 50, 0);
+        morningData = sessions
+          .filter(session => session.type === 'morning')
+          .map(session => ({
+            id: session.id,
+            date: session.date ? new Date(session.date).toISOString().split('T')[0] : '',
+            category: session.category || '',
+            totalQuestions: session.totalQuestions || 0,
+            correctAnswers: session.correctAnswers || 0,
+            accuracy: session.totalQuestions ? 
+              Math.round((session.correctAnswers || 0) / session.totalQuestions * 100) : 0,
+            timeSpent: session.timeSpent || 0,
+            memo: session.memo || ''
+          })) as MorningTest[];
+
+        afternoonData = sessions
+          .filter(session => session.type === 'afternoon')
+          .map(session => ({
+            id: session.id,
+            date: session.date ? new Date(session.date).toISOString().split('T')[0] : '',
+            category: session.category || '',
+            score: session.score || 0,
+            timeSpent: session.timeSpent || 0,
+            memo: session.memo || ''
+          })) as AfternoonTest[];
+      } catch (unifiedError) {
+        console.warn('統一API失敗、テストデータはレガシーAPIにフォールバック:', 
+          unifiedError);
+        // フォールバック: 既存APIを使用
+        morningData = await apiClient.getMorningTests();
+        afternoonData = await apiClient.getAfternoonTests();
+      }
+      
+      const [logs, stats] = await Promise.all([
         apiClient.getStudyLogs(),
-        apiClient.getMorningTests(),
-        apiClient.getAfternoonTests(),
         apiClient.getStudyLogStats().catch(() => null),
       ]);
+      
       setStudyLogs(logs);
       setMorningTests(morningData);
       setAfternoonTests(afternoonData);
@@ -183,8 +224,29 @@ export default function Analysis() {
 
   const fetchLatestAnalysis = async () => {
     try {
-      const result = await apiClient.getLatestAnalysis();
-      setAnalysisResult(result);
+      // 統一APIを使用して分析結果を取得
+      try {
+        const analyses = await unifiedApiClient.getUserAnalysis(user?.id || 1);
+        // 最新の分析結果を取得（配列の最初の要素）
+        const latestAnalysis = analyses[0];
+        if (latestAnalysis) {
+          // 統一API形式から既存形式に変換
+          const convertedResult = {
+            id: latestAnalysis.id,
+            analysisDate: latestAnalysis.date,
+            studyPattern: latestAnalysis.studyPattern || {},
+            weaknessAnalysis: latestAnalysis.weaknessAnalysis || { weakSubjects: [], weakTopics: [] },
+            studyRecommendation: latestAnalysis.studyRecommendation || {},
+            overallScore: latestAnalysis.overallScore || 0
+          };
+          setAnalysisResult(convertedResult);
+        }
+      } catch (unifiedError) {
+        console.warn('統一API失敗、レガシーAPIにフォールバック:', unifiedError);
+        // フォールバック: 既存APIを使用
+        const result = await apiClient.getLatestAnalysis();
+        setAnalysisResult(result);
+      }
     } catch (error) {
       // 最新分析結果の取得に失敗
     }

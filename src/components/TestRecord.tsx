@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { testCategories, afternoonQuestionTypes } from '@/data/studyPlan';
 import { apiClient, MorningTest, AfternoonTest } from '../lib/api';
+import { unifiedApiClient } from '../lib/unified-api';
 
 export default function TestRecord() {
   const [activeTab, setActiveTab] = useState<'morning' | 'afternoon'>('morning');
@@ -37,13 +38,36 @@ export default function TestRecord() {
   const fetchMorningTests = async () => {
     try {
       setIsLoading(true);
-      const tests = await apiClient.getMorningTests();
-      setMorningTests(
-        tests.map(test => ({
-          ...test,
-          date: new Date(test.date).toISOString().split('T')[0] || '',
-        }))
-      );
+      
+      // 統一APIを使用してテストセッションを取得
+      try {
+        const sessions = await unifiedApiClient.getTestSessions(1, 50, 0);
+        const morningOnlyTests = sessions
+          .filter(session => session.type === 'morning')
+          .map(session => ({
+            id: session.id,
+            date: session.date ? new Date(session.date).toISOString().split('T')[0] : '',
+            category: session.category || '',
+            totalQuestions: session.totalQuestions || 0,
+            correctAnswers: session.correctAnswers || 0,
+            accuracy: session.totalQuestions ? 
+              Math.round((session.correctAnswers || 0) / session.totalQuestions * 100) : 0,
+            timeSpent: session.timeSpent || 0,
+            memo: session.memo || ''
+          })) as MorningTest[];
+        
+        setMorningTests(morningOnlyTests);
+      } catch (unifiedError) {
+        console.warn('統一API失敗、レガシーAPIにフォールバック:', unifiedError);
+        // フォールバック: 既存APIを使用
+        const tests = await apiClient.getMorningTests();
+        setMorningTests(
+          tests.map(test => ({
+            ...test,
+            date: new Date(test.date).toISOString().split('T')[0] || '',
+          }))
+        );
+      }
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : '午前問題記録の取得に失敗しました');
@@ -54,15 +78,35 @@ export default function TestRecord() {
 
   const fetchAfternoonTests = async () => {
     try {
-      const tests = await apiClient.getAfternoonTests();
-      setAfternoonTests(
-        tests.map(test => ({
-          ...test,
-          date: new Date(test.date).toISOString().split('T')[0] || '',
-        }))
-      );
+      // 統一APIを使用してテストセッションを取得
+      try {
+        const sessions = await unifiedApiClient.getTestSessions(1, 50, 0);
+        const afternoonOnlyTests = sessions
+          .filter(session => session.type === 'afternoon')
+          .map(session => ({
+            id: session.id,
+            date: session.date ? new Date(session.date).toISOString().split('T')[0] : '',
+            category: session.category || '',
+            score: session.score || 0,
+            timeSpent: session.timeSpent || 0,
+            memo: session.memo || ''
+          })) as AfternoonTest[];
+        
+        setAfternoonTests(afternoonOnlyTests);
+      } catch (unifiedError) {
+        console.warn('統一API失敗、レガシーAPIにフォールバック:', unifiedError);
+        // フォールバック: 既存APIを使用
+        const tests = await apiClient.getAfternoonTests();
+        setAfternoonTests(
+          tests.map(test => ({
+            ...test,
+            date: new Date(test.date).toISOString().split('T')[0] || '',
+          }))
+        );
+      }
     } catch (err) {
       // 午後問題記録の取得に失敗
+      console.error('午後問題記録の取得エラー:', err);
     }
   };
 
@@ -71,19 +115,50 @@ export default function TestRecord() {
     if (newMorningTest.category && newMorningTest.totalQuestions > 0 && newMorningTest.timeSpent > 0) {
       try {
         setIsLoading(true);
-        const createdTest = await apiClient.createMorningTest({
-          ...newMorningTest,
-          date: new Date(newMorningTest.date).toISOString(),
-        });
+        
+        // 統一APIを使用してテストセッションを作成
+        try {
+          const createdSession = await unifiedApiClient.createTestSession(1, {
+            sessionType: 'morning',
+            category: newMorningTest.category,
+            totalQuestions: newMorningTest.totalQuestions,
+            correctAnswers: newMorningTest.correctAnswers,
+            timeSpentMinutes: Math.round(newMorningTest.timeSpent / 60), // 秒から分に変換
+            notes: newMorningTest.memo || undefined,
+            startedAt: new Date(newMorningTest.date),
+            isCompleted: true,
+          });
 
-        // ローカル状態を更新
-        setMorningTests(prevTests => [
-          {
-            ...createdTest,
-            date: new Date(createdTest.date).toISOString().split('T')[0] || '',
-          },
-          ...prevTests,
-        ]);
+          // 統一APIレスポンスを既存形式に変換してローカル状態を更新
+          const convertedTest: MorningTest = {
+            id: createdSession.id,
+            date: newMorningTest.date,
+            category: createdSession.category || '',
+            totalQuestions: createdSession.totalQuestions || 0,
+            correctAnswers: createdSession.correctAnswers || 0,
+            accuracy: createdSession.totalQuestions ? 
+              Math.round((createdSession.correctAnswers || 0) / createdSession.totalQuestions * 100) : 0,
+            timeSpent: createdSession.timeSpent || 0,
+            memo: createdSession.memo || ''
+          };
+
+          setMorningTests(prevTests => [convertedTest, ...prevTests]);
+        } catch (unifiedError) {
+          console.warn('統一API失敗、レガシーAPIにフォールバック:', unifiedError);
+          // フォールバック: 既存APIを使用
+          const createdTest = await apiClient.createMorningTest({
+            ...newMorningTest,
+            date: new Date(newMorningTest.date).toISOString(),
+          });
+
+          setMorningTests(prevTests => [
+            {
+              ...createdTest,
+              date: new Date(createdTest.date).toISOString().split('T')[0] || '',
+            },
+            ...prevTests,
+          ]);
+        }
 
         // フォームをリセット
         setNewMorningTest({
@@ -108,19 +183,46 @@ export default function TestRecord() {
     if (newAfternoonTest.category && newAfternoonTest.score >= 0 && newAfternoonTest.timeSpent > 0) {
       try {
         setIsLoading(true);
-        const createdTest = await apiClient.createAfternoonTest({
-          ...newAfternoonTest,
-          date: new Date(newAfternoonTest.date).toISOString(),
-        });
+        
+        // 統一APIを使用してテストセッションを作成
+        try {
+          const createdSession = await unifiedApiClient.createTestSession(1, {
+            sessionType: 'afternoon',
+            category: newAfternoonTest.category,
+            score: newAfternoonTest.score,
+            timeSpentMinutes: Math.round(newAfternoonTest.timeSpent / 60), // 秒から分に変換
+            notes: newAfternoonTest.memo || undefined,
+            startedAt: new Date(newAfternoonTest.date),
+            isCompleted: true,
+          });
 
-        // ローカル状態を更新
-        setAfternoonTests(prevTests => [
-          {
-            ...createdTest,
-            date: new Date(createdTest.date).toISOString().split('T')[0] || '',
-          },
-          ...prevTests,
-        ]);
+          // 統一APIレスポンスを既存形式に変換してローカル状態を更新
+          const convertedTest: AfternoonTest = {
+            id: createdSession.id,
+            date: newAfternoonTest.date,
+            category: createdSession.category || '',
+            score: createdSession.score || 0,
+            timeSpent: createdSession.timeSpent || 0,
+            memo: createdSession.memo || ''
+          };
+
+          setAfternoonTests(prevTests => [convertedTest, ...prevTests]);
+        } catch (unifiedError) {
+          console.warn('統一API失敗、レガシーAPIにフォールバック:', unifiedError);
+          // フォールバック: 既存APIを使用
+          const createdTest = await apiClient.createAfternoonTest({
+            ...newAfternoonTest,
+            date: new Date(newAfternoonTest.date).toISOString(),
+          });
+
+          setAfternoonTests(prevTests => [
+            {
+              ...createdTest,
+              date: new Date(createdTest.date).toISOString().split('T')[0] || '',
+            },
+            ...prevTests,
+          ]);
+        }
 
         // フォームをリセット
         setNewAfternoonTest({

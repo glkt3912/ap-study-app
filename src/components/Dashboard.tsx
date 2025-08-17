@@ -68,13 +68,13 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
     } finally {
       setIsLoadingAI(false);
     }
-  }, [user?.id, fetchAIDataFallback]);
+  }, [user?.id]); // fetchAIDataFallbackを依存配列から除去
 
   useEffect(() => {
-    if (user?.id && !isLoading) {
+    if (user?.id && !isLoading && !predictiveAnalysis) {
       fetchBatchDashboardMLData();
     }
-  }, [user?.id, isLoading, fetchBatchDashboardMLData]);
+  }, [user?.id, isLoading, predictiveAnalysis]); // データが既にある場合は実行しない
 
   if (isLoading) {
     return (
