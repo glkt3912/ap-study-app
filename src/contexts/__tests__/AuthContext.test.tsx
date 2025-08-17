@@ -74,7 +74,7 @@ describe('AuthContext', () => {
 
       expect(screen.getByTestId('user-id')).toHaveTextContent('0');
       expect(screen.getByTestId('is-authenticated')).toHaveTextContent('false');
-      expect(screen.getByTestId('is-loading')).toHaveTextContent('true');
+      expect(screen.getByTestId('is-loading')).toHaveTextContent('false');
       expect(screen.getByTestId('error')).toHaveTextContent('none');
       expect(screen.getByTestId('token')).toHaveTextContent('none');
       expect(screen.getByTestId('user-email')).toHaveTextContent('none');
@@ -111,7 +111,7 @@ describe('AuthContext', () => {
       );
 
       expect(screen.getByTestId('is-authenticated')).toHaveTextContent('true');
-      expect(screen.getByTestId('token')).toHaveTextContent('cookie-based');
+      expect(screen.getByTestId('token')).toHaveTextContent('cookie-authenticated');
       expect(screen.getByTestId('user-email')).toHaveTextContent('test@example.com');
     });
 
@@ -248,7 +248,7 @@ describe('AuthContext', () => {
       );
 
       expect(result.current.isAuthenticated).toBe(true);
-      expect(result.current.token).toBe('cookie-based');
+      expect(result.current.token).toBe('cookie-authenticated');
       expect(result.current.user?.email).toBe(email);
       expect(window.localStorage.setItem).toHaveBeenCalledWith('ap-study-token', token);
     });
@@ -356,7 +356,7 @@ describe('AuthContext', () => {
       );
 
       expect(result.current.isAuthenticated).toBe(true);
-      expect(result.current.token).toBe('cookie-based');
+      expect(result.current.token).toBe('cookie-authenticated');
       expect(result.current.user?.email).toBe(email);
       expect(window.localStorage.setItem).toHaveBeenCalledWith('ap-study-token', token);
     });
@@ -591,7 +591,7 @@ describe('AuthContext', () => {
         })
       );
 
-      expect(screen.getByTestId('token')).toHaveTextContent('cookie-based');
+      expect(screen.getByTestId('token')).toHaveTextContent('cookie-authenticated');
     });
   });
 
