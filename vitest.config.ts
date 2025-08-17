@@ -11,6 +11,8 @@ export default defineConfig({
     exclude: ['node_modules', 'dist', '.next'],
     globals: true,
     css: true,
+    testTimeout: 10000, // 10 seconds timeout for CI stability
+    hookTimeout: 10000, // 10 seconds timeout for setup/teardown hooks
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
