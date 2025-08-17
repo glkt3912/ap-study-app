@@ -40,6 +40,7 @@ describe('API Client', () => {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
       });
       expect(result).toEqual(mockData.data);
     });
@@ -84,6 +85,7 @@ describe('API Client', () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(studyLog),
+        credentials: 'include',
       });
       expect(result).toEqual(mockResponse.data);
     });
@@ -121,6 +123,7 @@ describe('API Client', () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(sessionOptions),
+        credentials: 'include',
       });
       expect(result).toEqual(mockResponse.data);
     });
