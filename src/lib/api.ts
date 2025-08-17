@@ -165,7 +165,6 @@ class ApiClient {
     if (typeof window !== 'undefined') {
       let token = localStorage.getItem('ap-study-token');
       
-      const authRequired = process.env.NEXT_PUBLIC_AUTH_REQUIRED === 'true';
       const enableAuthLogging = process.env.NEXT_PUBLIC_ENABLE_AUTH_LOGGING === 'true';
       
       if (process.env.NODE_ENV === 'development') {
