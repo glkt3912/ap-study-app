@@ -124,7 +124,7 @@ export default function TestRecord() {
             totalQuestions: newMorningTest.totalQuestions,
             correctAnswers: newMorningTest.correctAnswers,
             timeSpentMinutes: Math.round(newMorningTest.timeSpent / 60), // 秒から分に変換
-            notes: newMorningTest.memo || undefined,
+            notes: newMorningTest.memo || '',
             startedAt: new Date(newMorningTest.date),
             isCompleted: true,
           });
@@ -191,7 +191,7 @@ export default function TestRecord() {
             category: newAfternoonTest.category,
             score: newAfternoonTest.score,
             timeSpentMinutes: Math.round(newAfternoonTest.timeSpent / 60), // 秒から分に変換
-            notes: newAfternoonTest.memo || undefined,
+            notes: newAfternoonTest.memo || '',
             startedAt: new Date(newAfternoonTest.date),
             isCompleted: true,
           });
