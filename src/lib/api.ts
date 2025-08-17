@@ -163,21 +163,25 @@ class ApiClient {
 
     // ブラウザ環境でのみLocalStorageにアクセス
     if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('ap-study-token');
+      let token = localStorage.getItem('ap-study-token');
       
       const authRequired = process.env.NEXT_PUBLIC_AUTH_REQUIRED === 'true';
       const enableAuthLogging = process.env.NEXT_PUBLIC_ENABLE_AUTH_LOGGING === 'true';
       
       if (process.env.NODE_ENV === 'development') {
-        // 開発環境: 設定に応じた柔軟な認証
-        if (token && token !== 'cookie-authenticated') {
+        // 開発環境: デフォルトのテストトークンを使用
+        if (!token || token === 'cookie-authenticated') {
+          // 開発環境用のデフォルトテストトークン（User ID: 7）
+          token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI3IiwidXNlcklkIjo3LCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJyb2xlIjoidXNlciIsImlhdCI6MTc1NTQ2NTIwMywiZXhwIjoxNzU4MDU3MjAzfQ.RHF7B13iGWdvbNwGkZM0gH8XSsMU0JeFaMAfLQ1_glA';
+          if (enableAuthLogging) {
+            console.log('Development mode: Using default test token (User ID: 7)');
+          }
+        }
+        
+        if (token) {
           headers['Authorization'] = `Bearer ${token}`;
           if (enableAuthLogging) {
             console.log('Development mode: Using Bearer token authentication');
-          }
-        } else {
-          if (enableAuthLogging) {
-            console.log(`Development mode: No token found, auth required: ${authRequired}`);
           }
         }
       } else {
