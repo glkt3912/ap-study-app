@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
+import { act } from 'react';
 import { ExamConfigModal } from '../ExamConfigModal';
 
 // Mock API - 簡単なmock
@@ -24,10 +25,14 @@ describe('ExamConfigModal', () => {
     vi.clearAllMocks();
   });
 
-  it('should render modal when open', () => {
-    render(<ExamConfigModal {...mockProps} />);
+  it('should render modal when open', async () => {
+    await act(async () => {
+      render(<ExamConfigModal {...mockProps} />);
+    });
     
-    expect(screen.getByText('試験設定')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('試験設定')).toBeInTheDocument();
+    });
     expect(screen.getByLabelText('試験日')).toBeInTheDocument();
     expect(screen.getByLabelText('目標点数')).toBeInTheDocument();
   });
@@ -38,16 +43,20 @@ describe('ExamConfigModal', () => {
     expect(screen.queryByText('試験設定')).not.toBeInTheDocument();
   });
 
-  it('should show required form fields', () => {
-    render(<ExamConfigModal {...mockProps} />);
+  it('should show required form fields', async () => {
+    await act(async () => {
+      render(<ExamConfigModal {...mockProps} />);
+    });
     
-    const examDateInput = screen.getByLabelText('試験日');
-    const targetScoreInput = screen.getByLabelText('目標点数');
-    
-    expect(examDateInput).toBeRequired();
-    expect(targetScoreInput).toBeInTheDocument();
-    expect(targetScoreInput).toHaveAttribute('type', 'number');
-    expect(targetScoreInput).toHaveAttribute('min', '0');
-    expect(targetScoreInput).toHaveAttribute('max', '100');
+    await waitFor(() => {
+      const examDateInput = screen.getByLabelText('試験日');
+      const targetScoreInput = screen.getByLabelText('目標点数');
+      
+      expect(examDateInput).toBeRequired();
+      expect(targetScoreInput).toBeInTheDocument();
+      expect(targetScoreInput).toHaveAttribute('type', 'number');
+      expect(targetScoreInput).toHaveAttribute('min', '0');
+      expect(targetScoreInput).toHaveAttribute('max', '100');
+    });
   });
 });

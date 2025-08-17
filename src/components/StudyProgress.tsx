@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { StudyPlanProgress, StudyPlan } from '../types/api';
 import { apiClient } from '../lib/api';
+import { unifiedApiClient } from '../lib/unified-api';
 
 interface StudyProgressProps {
   planId: number;
@@ -24,14 +25,88 @@ export default function StudyProgress({ planId, plan: _plan, compact = false }: 
       setLoading(true);
       setError(null);
       
-      const progressData = await apiClient.getStudyPlanProgress(planId);
-      setProgress(progressData);
+      // 統一APIを使用して学習計画を取得
+      try {
+        const studyPlan = await unifiedApiClient.getStudyPlan(planId);
+        // 統一APIレスポンスから進捗データを生成
+        const progressData = generateProgressFromStudyPlan(studyPlan);
+        setProgress(progressData);
+      } catch (unifiedError) {
+        console.warn('統一API失敗、レガシーAPIにフォールバック:', unifiedError);
+        // フォールバック: 既存APIを使用
+        const progressData = await apiClient.getStudyPlanProgress(planId);
+        setProgress(progressData);
+      }
     } catch (err) {
       console.error('Failed to load progress:', err);
       setError('進捗データの読み込みに失敗しました');
     } finally {
       setLoading(false);
     }
+  };
+  
+  // 統一APIレスポンスから進捗データを生成するヘルパー関数
+  const generateProgressFromStudyPlan = (studyPlan: any): StudyPlanProgress => {
+    const totalDays = studyPlan.weeks?.reduce((total: number, week: any) => total + (week.days?.length || 0), 0) || 0;
+    const completedDays = studyPlan.weeks?.reduce((total: number, week: any) => 
+      total + (week.days?.filter((day: any) => day.completed).length || 0), 0) || 0;
+    
+    // 既存のStudyPlanProgress型に合わせたデータ構造を作成
+    return {
+      planId: studyPlan.id,
+      totalDays: totalDays,
+      completedDays: completedDays,
+      progressPercentage: totalDays > 0 ? Math.round((completedDays / totalDays) * 100) : 0,
+      totalHours: Math.round((studyPlan.weeks?.reduce((total: number, week: any) => 
+        total + (week.days?.reduce((weekTotal: number, day: any) => 
+          weekTotal + (day.actualTime || 0), 0) || 0), 0) || 0) / 60),
+      completedHours: Math.round((studyPlan.weeks?.reduce((total: number, week: any) => 
+        total + (week.days?.filter((day: any) => day.completed)
+          .reduce((weekTotal: number, day: any) => 
+            weekTotal + (day.actualTime || 0), 0) || 0), 0) || 0) / 60),
+      averageScore: calculateAverageUnderstanding(studyPlan.weeks || []) * 20, // 5段階 -> 100%変換
+      streakDays: calculateStreakDays(studyPlan.weeks || []),
+      lastStudyDate: getLastStudyDate(studyPlan.weeks || []),
+      weeklyProgress: studyPlan.weeks?.map((week: any) => ({
+        weekNumber: week.weekNumber,
+        completed: week.days?.filter((day: any) => day.completed).length || 0,
+        total: week.days?.length || 0,
+        progressPercentage: week.days?.length > 0 ? 
+          Math.round((week.days.filter((day: any) => day.completed).length / week.days.length) * 100) : 0
+      })) || [],
+      recentActivity: studyPlan.weeks?.slice(0, 3).map((week: any) => ({
+        type: 'study_unit' as const,
+        date: week.days?.[0]?.createdAt || new Date().toISOString(),
+        description: `第${week.weekNumber}週: ${week.title}`
+      })) || [],
+      createdAt: studyPlan.createdAt || new Date().toISOString(),
+      updatedAt: studyPlan.updatedAt || new Date().toISOString()
+    } as any;
+  };
+  
+  const calculateAverageUnderstanding = (weeks: any[]): number => {
+    const allDays = weeks.flatMap(week => week.days || []);
+    const daysWithUnderstanding = allDays.filter(day => day.understanding > 0);
+    if (daysWithUnderstanding.length === 0) return 0;
+    
+    const totalUnderstanding = daysWithUnderstanding.reduce(
+      (sum, day) => sum + day.understanding, 0);
+    return Math.round(totalUnderstanding / daysWithUnderstanding.length);
+  };
+
+  const calculateStreakDays = (weeks: any[]): number => {
+    // 簡単な実装：完了した日数を返す
+    const allDays = weeks.flatMap(week => week.days || []);
+    return allDays.filter(day => day.completed).length;
+  };
+
+  const getLastStudyDate = (weeks: any[]): string => {
+    const allDays = weeks.flatMap(week => week.days || []);
+    const completedDays = allDays.filter(day => day.completed);
+    if (completedDays.length === 0) return new Date().toISOString();
+    
+    // 最後に完了した日を返す（簡単な実装）
+    return completedDays[completedDays.length - 1]?.updatedAt || new Date().toISOString();
   };
 
   const calculateProgressPercentage = (completed: number, total: number) => {

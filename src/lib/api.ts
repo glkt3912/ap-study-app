@@ -164,8 +164,27 @@ class ApiClient {
     // ブラウザ環境でのみLocalStorageにアクセス
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('ap-study-token');
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
+      
+      const authRequired = process.env.NEXT_PUBLIC_AUTH_REQUIRED === 'true';
+      const enableAuthLogging = process.env.NEXT_PUBLIC_ENABLE_AUTH_LOGGING === 'true';
+      
+      if (process.env.NODE_ENV === 'development') {
+        // 開発環境: 設定に応じた柔軟な認証
+        if (token && token !== 'cookie-authenticated') {
+          headers['Authorization'] = `Bearer ${token}`;
+          if (enableAuthLogging) {
+            console.log('Development mode: Using Bearer token authentication');
+          }
+        } else {
+          if (enableAuthLogging) {
+            console.log(`Development mode: No token found, auth required: ${authRequired}`);
+          }
+        }
+      } else {
+        // 本番環境: HttpOnly Cookie優先、フォールバックとしてBearer token
+        if (token && token !== 'cookie-authenticated') {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
       }
     }
 
@@ -182,6 +201,9 @@ class ApiClient {
         ...this.getAuthHeaders(),
         ...options?.headers,
       },
+      // HttpOnly Cookie対応: 常にcredentials includeを使用
+      // バックエンドはオプショナル認証なので、認証なしでも動作する
+      credentials: 'include' as const,
       ...options,
     };
 
@@ -217,14 +239,49 @@ class ApiClient {
       }
 
       if (!response.ok) {
-        const error = new Error(`HTTP error! status: ${response.status}`);
+        let errorMessage = `HTTP error! status: ${response.status}`;
+        let errorDetails = null;
+
+        try {
+          const errorBody = await response.text();
+          if (errorBody) {
+            try {
+              errorDetails = JSON.parse(errorBody);
+              errorMessage = errorDetails.error || errorDetails.message || errorMessage;
+            } catch {
+              errorMessage = errorBody.length > 0 ? errorBody : errorMessage;
+            }
+          }
+        } catch {
+          // エラーボディの読み取りに失敗した場合はデフォルトメッセージを使用
+        }
+
+        const error = new Error(errorMessage);
+        
+        // 開発環境でより詳細なエラー情報をログに出力
+        if (process.env.NODE_ENV === 'development') {
+          // eslint-disable-next-line no-console
+          console.error('=== HTTP Error Details ===');
+          // eslint-disable-next-line no-console
+          console.error('Status:', response.status, response.statusText);
+          // eslint-disable-next-line no-console
+          console.error('URL:', url);
+          // eslint-disable-next-line no-console
+          console.error('Method:', method);
+          // eslint-disable-next-line no-console
+          console.error('Error Body:', errorDetails || errorMessage);
+          // eslint-disable-next-line no-console
+          console.error('Response Headers:', Object.fromEntries(response.headers.entries()));
+        }
 
         if (process.env.NODE_ENV === 'development') {
           // eslint-disable-next-line no-console
           console.error('API Error - Response not OK:', {
             status: response.status,
             statusText: response.statusText,
-            url
+            url,
+            errorDetails,
+            requestHeaders: requestConfig.headers
           });
         }
 
@@ -742,11 +799,8 @@ class ApiClient {
     return this.request(`/api/study-plan/${planId}/progress`);
   }
 
-  // Removed: complex StudyPlan methods (replaced by template-based approach)
-  // - updateStudyPlanPreferences
-  // - getStudyRecommendations  
-  // - getStudyPlanTemplates
-  // - createStudyPlanFromTemplate
+  // Note: Study plan advanced features have been removed as they were not used in the frontend
+  // Simplified to basic CRUD operations only
 
   // 学習計画テンプレート永続化メソッド（新しいバックエンドAPI対応）
   async saveWeeklyPlanTemplate(userId: number, templateData: {
@@ -800,11 +854,8 @@ class ApiClient {
     }
   }
 
-  // Removed: deprecated dynamic study plan methods
-  // - getStudyScheduleTemplates
-  // - createDynamicStudyPlan  
-  // - optimizeStudyPlan
-  // - getStudyPlanAnalytics
+  // Note: Dynamic study plan methods were removed as they were experimental features
+  // not integrated into the frontend UI
 
   // 学習効率分析API
   async generateLearningEfficiencyAnalysis(options: {

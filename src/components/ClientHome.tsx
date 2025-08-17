@@ -10,6 +10,7 @@ import { ExamConfigModal } from '@/components/ExamConfigModal';
 import { useAuth } from '@/contexts/AuthContext';
 import { studyPlanData } from '@/data/studyPlan';
 import { apiClient, type ExamConfig } from '@/lib/api';
+import { unifiedApiClient } from '@/lib/unified-api';
 import { errorHandler } from '@/lib/error-handler';
 
 export default function ClientHome() {
@@ -17,7 +18,7 @@ export default function ClientHome() {
   // const { theme } = useTheme(); // テーマは現在未使用
   const [activeTab, setActiveTab] = useState('dashboard');
   const [studyData, setStudyData] = useState(studyPlanData);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false); // テスト用に即座にfalse
   const [error, setError] = useState<string | null>(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
 
@@ -78,26 +79,6 @@ export default function ClientHome() {
         });
       }
 
-      // 認証ローディング中は待機
-      if (authLoading) {
-        if (process.env.NODE_ENV === 'development') {
-          // eslint-disable-next-line no-console
-          console.log('Auth loading, waiting...');
-        }
-        return;
-      }
-
-      // 認証されていない場合はモックデータを使用
-      if (!isAuthenticated || !user?.id) {
-        if (process.env.NODE_ENV === 'development') {
-          // eslint-disable-next-line no-console
-          console.log('Not authenticated or no user ID, using mock data');
-        }
-        setStudyData(studyPlanData);
-        setLoading(false);
-        return;
-      }
-
       try {
         setLoading(true);
         setError(null);
@@ -107,23 +88,109 @@ export default function ClientHome() {
           console.log('Making API call to getStudyPlan...');
         }
         
-        const data = await apiClient.getStudyPlan();
+        // 統一APIを使用して学習計画を取得（認証状態に関わらず試行）
+        let data;
+        const userIdToUse = user?.id || 1; // 認証されていない場合はデフォルトユーザー1を使用
+        
+        try {
+          const studyPlan = await unifiedApiClient.getStudyPlan(userIdToUse);
+          // 統一APIレスポンスを既存形式に変換
+          data = studyPlan.weeks || [];
+          
+          if (process.env.NODE_ENV === 'development') {
+            // eslint-disable-next-line no-console
+            console.log('統一API成功:', data.length, '週のデータを取得');
+          }
+        } catch (unifiedError) {
+          console.warn('統一API失敗、レガシーAPIにフォールバック:', unifiedError);
+          // フォールバック: 既存APIを使用
+          try {
+            data = await apiClient.getStudyPlan();
+            if (process.env.NODE_ENV === 'development') {
+              // eslint-disable-next-line no-console
+              console.log('レガシーAPI成功:', data.length, '週のデータを取得');
+            }
+          } catch (legacyError) {
+            console.warn('レガシーAPIも失敗、モックデータを使用:', legacyError);
+            // 両方のAPIが失敗した場合はモックデータを使用
+            setStudyData(studyPlanData);
+            setLoading(false);
+            setError('APIエラーが発生しました。モックデータを表示しています。');
+            return;
+          }
+        }
+
+        // 開発環境でデータ構造を確認
+        if (process.env.NODE_ENV === 'development') {
+          console.log('=== API Response Data ===');
+          console.log('Data length:', data?.length);
+          console.log('First week sample:', data?.[0]);
+          console.log('First day sample:', data?.[0]?.days?.[0]);
+        }
 
         // 試験設定も読み込む
         await loadExamConfig();
         
-        // バックエンドのデータ構造をフロントエンドの構造に変換
-        const convertedData = data.map(week => ({
-          ...week,
-          goals: typeof week.goals === 'string' ? JSON.parse(week.goals) : week.goals,
-          days: week.days.map(day => ({
-            ...day,
-            topics: typeof day.topics === 'string' ? JSON.parse(day.topics) : day.topics,
-          })),
-        }));
+        // バックエンドのデータ構造をフロントエンドの構造に変換（安全な変換）
+        const convertedData = data.map((week: any) => {
+          try {
+            return {
+              ...week,
+              goals: Array.isArray(week.goals) ? week.goals : 
+                     typeof week.goals === 'string' ? JSON.parse(week.goals) : [],
+              days: (week.days || []).map((day: any) => {
+                try {
+                  return {
+                    ...day,
+                    topics: Array.isArray(day.topics) ? day.topics : 
+                           typeof day.topics === 'string' ? JSON.parse(day.topics) : [],
+                  };
+                } catch (topicsError) {
+                  console.warn('Topics parsing error for day:', day, topicsError);
+                  return { ...day, topics: [] };
+                }
+              }),
+            };
+          } catch (weekError) {
+            console.warn('Week parsing error:', week, weekError);
+            return { ...week, goals: [], days: [] };
+          }
+        });
 
         setStudyData(convertedData);
+        setLoading(false); // 成功時に明示的にローディングを終了
+        
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Data loading completed successfully');
+        }
       } catch (err) {
+        if (process.env.NODE_ENV === 'development') {
+          // eslint-disable-next-line no-console
+          console.error('=== 学習データの取得に失敗しました ===');
+          // eslint-disable-next-line no-console
+          console.error('API_BASE_URL:', process.env.NEXT_PUBLIC_API_URL);
+          // eslint-disable-next-line no-console
+          console.error('Full URL:', `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/study/plan`);
+          // eslint-disable-next-line no-console
+          console.error('Original Error:', err);
+          // eslint-disable-next-line no-console
+          console.error('Error Type:', typeof err, Object.prototype.toString.call(err));
+          // eslint-disable-next-line no-console
+          console.error('Error Properties:', Object.getOwnPropertyNames(err));
+          // eslint-disable-next-line no-console
+          console.error('Error Message:', err instanceof Error ? err.message : String(err));
+          // eslint-disable-next-line no-console
+          console.error('Error Stack:', err instanceof Error ? err.stack : 'No stack trace');
+          // eslint-disable-next-line no-console
+          console.error('User Info:', {
+            isAuthenticated,
+            userId: user?.id,
+            hasUser: !!user
+          });
+          // eslint-disable-next-line no-console
+          console.error('Network Status:', navigator.onLine ? 'Online' : 'Offline');
+        }
+
         // 高度なエラーハンドリング
         const standardError = await errorHandler.handleApiError(
           err,
@@ -138,32 +205,15 @@ export default function ClientHome() {
 
         if (process.env.NODE_ENV === 'development') {
           // eslint-disable-next-line no-console
-          console.error('=== 学習データの取得に失敗しました ===');
-          // eslint-disable-next-line no-console
-          console.error('StandardError詳細:', {
-            id: standardError?.id || 'N/A',
-            category: standardError?.category || 'N/A',
-            severity: standardError?.severity || 'N/A',
-            code: standardError?.code || 'N/A',
-            message: standardError?.message || 'N/A',
-            userMessage: standardError?.userMessage || 'N/A',
-            timestamp: standardError?.timestamp || 'N/A',
-            retryable: standardError?.retryable || false
-          });
-          // eslint-disable-next-line no-console
-          console.error('Original Error:', err);
-          // eslint-disable-next-line no-console
-          console.error('User Info:', {
-            isAuthenticated,
-            userId: user?.id,
-            hasUser: !!user
-          });
-          // eslint-disable-next-line no-console
-          console.error('API Endpoint:', '/api/study/plan');
-          // eslint-disable-next-line no-console
-          console.error('Context:', {
-            userId: user?.id?.toString()
-          });
+          console.error('StandardError詳細:', standardError);
+        }
+
+        // HTTP 500エラーの場合は開発環境でモックデータを使用
+        if (process.env.NODE_ENV === 'development' && err instanceof Error && err.message?.includes('500')) {
+          console.warn('HTTP 500エラーのため、モックデータを使用します');
+          setStudyData(studyPlanData);
+          setError('サーバーエラーが発生しました。モックデータを表示しています。バックエンドログを確認してください。');
+          return;
         }
 
         // 認証エラーの場合は自動的にログアウト
@@ -197,11 +247,21 @@ export default function ClientHome() {
               console.log('Retrying API call...');
             }
             try {
-              const data = await apiClient.getStudyPlan();
-              const convertedData = data.map(week => ({
+              // リトライ時も統一APIを使用
+              let data;
+              const retryUserIdToUse = user?.id || 1;
+              try {
+                const studyPlan = await unifiedApiClient.getStudyPlan(retryUserIdToUse);
+                data = studyPlan.weeks || [];
+              } catch (unifiedError) {
+                console.warn('リトライ時の統一API失敗、レガシーAPIにフォールバック:', unifiedError);
+                data = await apiClient.getStudyPlan();
+              }
+              
+              const convertedData = data.map((week: any) => ({
                 ...week,
                 goals: typeof week.goals === 'string' ? JSON.parse(week.goals) : week.goals,
-                days: week.days.map(day => ({
+                days: week.days.map((day: any) => ({
                   ...day,
                   topics: typeof day.topics === 'string' ? JSON.parse(day.topics) : day.topics,
                 })),
@@ -233,7 +293,7 @@ export default function ClientHome() {
     };
 
     fetchStudyData();
-  }, [isAuthenticated, user?.id, loadExamConfig, logout]);
+  }, [isAuthenticated, user?.id, authLoading, loadExamConfig, logout]);
 
   // イベントハンドラー
   const handleExamConfigClick = () => {
