@@ -1,5 +1,5 @@
 // API Client for backend communication
-import { StudyPlan, CreateStudyPlanRequest, StudyPlanProgress, UpdateStudyPlanRequest } from '@/types/api';
+import { StudyPlan, CreateStudyPlanRequest, StudyPlanProgress, UpdateStudyPlanRequest, StudyWeek } from '@/types/api';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -15,17 +15,7 @@ export interface StudyDay {
   memo?: string;
 }
 
-export interface StudyWeek {
-  id: number;
-  weekNumber: number;
-  title: string;
-  phase: string;
-  goals: string[];
-  days: StudyDay[];
-  progressPercentage: number;
-  totalStudyTime: number;
-  averageUnderstanding: number;
-}
+// StudyWeek型はtypes/api.tsから使用
 
 export interface StudyLog {
   id?: number;
@@ -210,15 +200,10 @@ class ApiClient {
       ...options,
     };
 
-    if (process.env.NODE_ENV === 'development') {
+    // 詳細なAPI リクエストログは特定の環境変数でのみ有効
+    if (process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_ENABLE_API_LOGGING === 'true') {
       // eslint-disable-next-line no-console
-      console.log('=== API Request ===');
-      // eslint-disable-next-line no-console
-      console.log('URL:', url);
-      // eslint-disable-next-line no-console
-      console.log('Method:', method);
-      // eslint-disable-next-line no-console
-      console.log('Headers:', requestConfig.headers);
+      console.log(`API ${method}: ${url}`);
       if (options?.body) {
         // eslint-disable-next-line no-console
         console.log('Body:', options.body);
@@ -230,15 +215,10 @@ class ApiClient {
 
       const duration = performance.now() - startTime;
 
-      if (process.env.NODE_ENV === 'development') {
+      // 詳細なレスポンスログは特定の環境変数でのみ有効
+      if (process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_ENABLE_API_LOGGING === 'true') {
         // eslint-disable-next-line no-console
-        console.log('=== API Response ===');
-        // eslint-disable-next-line no-console
-        console.log('Status:', response.status);
-        // eslint-disable-next-line no-console
-        console.log('Status Text:', response.statusText);
-        // eslint-disable-next-line no-console
-        console.log('Duration:', `${duration.toFixed(2)}ms`);
+        console.log(`API ${response.status}: ${method} ${url} (${duration.toFixed(2)}ms)`);
       }
 
       if (!response.ok) {
@@ -261,31 +241,19 @@ class ApiClient {
 
         const error = new Error(errorMessage);
         
-        // 開発環境でより詳細なエラー情報をログに出力
+        // 開発環境でエラー情報をコンパクトに出力
         if (process.env.NODE_ENV === 'development') {
-          // eslint-disable-next-line no-console
-          console.error('=== HTTP Error Details ===');
-          // eslint-disable-next-line no-console
-          console.error('Status:', response.status, response.statusText);
-          // eslint-disable-next-line no-console
-          console.error('URL:', url);
-          // eslint-disable-next-line no-console
-          console.error('Method:', method);
-          // eslint-disable-next-line no-console
-          console.error('Error Body:', errorDetails || errorMessage);
-          // eslint-disable-next-line no-console
-          console.error('Response Headers:', Object.fromEntries(response.headers.entries()));
-        }
-
-        if (process.env.NODE_ENV === 'development') {
-          // eslint-disable-next-line no-console
-          console.error('API Error - Response not OK:', {
-            status: response.status,
-            statusText: response.statusText,
-            url,
-            errorDetails,
-            requestHeaders: requestConfig.headers
-          });
+          // 404エラーは警告レベルで出力（よくある正常なケース）
+          if (response.status === 404) {
+            // eslint-disable-next-line no-console
+            console.warn(`API 404: ${method} ${url}`);
+          } else if (response.status >= 500) {
+            // eslint-disable-next-line no-console
+            console.error(`API ${response.status}: ${method} ${url} - ${errorMessage}`);
+          } else {
+            // eslint-disable-next-line no-console
+            console.warn(`API ${response.status}: ${method} ${url} - ${errorMessage}`);
+          }
         }
 
         // 監視システムにAPI エラーを記録
@@ -325,6 +293,19 @@ class ApiClient {
       return data.data;
     } catch (error) {
       const duration = performance.now() - startTime;
+
+      // ネットワークエラーを開発環境で適切にログ出力
+      if (process.env.NODE_ENV === 'development') {
+        if (error instanceof Error) {
+          if (error.message.includes('fetch')) {
+            // eslint-disable-next-line no-console
+            console.warn(`Network error: ${method} ${url} - ${error.message}`);
+          } else {
+            // eslint-disable-next-line no-console
+            console.warn(`API request error: ${method} ${url} - ${error.message}`);
+          }
+        }
+      }
 
       // 監視システムにネットワークエラーを記録
       if (typeof window !== 'undefined') {
@@ -797,6 +778,7 @@ class ApiClient {
       method: 'DELETE',
     });
   }
+
 
   async getStudyPlanProgress(planId: number): Promise<StudyPlanProgress> {
     return this.request(`/api/study-plan/${planId}/progress`);
