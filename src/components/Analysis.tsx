@@ -193,6 +193,37 @@ function Analysis() {
     }
   }, [user?.id, fetchMLAnalysisDataFallback, handleError]);
 
+  // 最新分析結果取得
+  const fetchLatestAnalysis = useCallback(async () => {
+    try {
+      // 統一APIを使用して分析結果を取得
+      try {
+        const analyses = await unifiedApiClient.getUserAnalysis(user?.id || 1);
+        // 最新の分析結果を取得（配列の最初の要素）
+        const latestAnalysis = analyses[0];
+        if (latestAnalysis) {
+          // 統一API形式から既存形式に変換
+          const convertedResult = {
+            id: latestAnalysis.id,
+            analysisDate: latestAnalysis.date,
+            studyPattern: latestAnalysis.studyPattern || {},
+            weaknessAnalysis: latestAnalysis.weaknessAnalysis || { weakSubjects: [], weakTopics: [] },
+            studyRecommendation: latestAnalysis.studyRecommendation || {},
+            overallScore: latestAnalysis.overallScore || 0
+          };
+          setAnalysisResult(convertedResult);
+        }
+      } catch (unifiedError) {
+        console.warn('統一API失敗、レガシーAPIにフォールバック:', unifiedError);
+        // フォールバック: 既存APIを使用
+        const result = await apiClient.getLatestAnalysis();
+        setAnalysisResult(result);
+      }
+    } catch (error) {
+      // 最新分析結果の取得に失敗
+    }
+  }, [user?.id]);
+
   // バッチ処理: 分析データ一括取得 (7個API → 1個API)
   const fetchBatchAnalysisData = useCallback(async () => {
     if (!user?.id) return;
@@ -228,36 +259,6 @@ function Analysis() {
   useEffect(() => {
     fetchBatchAnalysisData();
   }, [fetchBatchAnalysisData]);
-
-  const fetchLatestAnalysis = useCallback(async () => {
-    try {
-      // 統一APIを使用して分析結果を取得
-      try {
-        const analyses = await unifiedApiClient.getUserAnalysis(user?.id || 1);
-        // 最新の分析結果を取得（配列の最初の要素）
-        const latestAnalysis = analyses[0];
-        if (latestAnalysis) {
-          // 統一API形式から既存形式に変換
-          const convertedResult = {
-            id: latestAnalysis.id,
-            analysisDate: latestAnalysis.date,
-            studyPattern: latestAnalysis.studyPattern || {},
-            weaknessAnalysis: latestAnalysis.weaknessAnalysis || { weakSubjects: [], weakTopics: [] },
-            studyRecommendation: latestAnalysis.studyRecommendation || {},
-            overallScore: latestAnalysis.overallScore || 0
-          };
-          setAnalysisResult(convertedResult);
-        }
-      } catch (unifiedError) {
-        console.warn('統一API失敗、レガシーAPIにフォールバック:', unifiedError);
-        // フォールバック: 既存APIを使用
-        const result = await apiClient.getLatestAnalysis();
-        setAnalysisResult(result);
-      }
-    } catch (error) {
-      // 最新分析結果の取得に失敗
-    }
-  }, [user?.id]);
 
   const runAnalysis = async () => {
     try {
