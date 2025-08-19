@@ -200,7 +200,7 @@ function Analysis() {
       try {
         const analyses = await unifiedApiClient.getUserAnalysis(user?.id || 1);
         // 最新の分析結果を取得（配列の最初の要素）
-        const latestAnalysis = analyses[0];
+        const latestAnalysis = analyses && analyses.length > 0 ? analyses[0] : null;
         if (latestAnalysis) {
           // 統一API形式から既存形式に変換
           const convertedResult = {
