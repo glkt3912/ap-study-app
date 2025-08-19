@@ -44,7 +44,7 @@ export interface StandardError {
   context?: {
     url?: string;
     method?: string;
-    userId?: string;
+    userId?: number;
     requestId?: string;
     userAgent?: string;
     stackTrace?: string;
@@ -102,7 +102,7 @@ class ErrorHandler {
       userMessage?: string;
       url?: string;
       method?: string;
-      userId?: string;
+      userId?: number;
       requestId?: string;
     }
   ): StandardError {
@@ -194,7 +194,7 @@ class ErrorHandler {
     endpoint: string,
     method: string,
     context?: {
-      userId?: string;
+      userId?: number;
       requestId?: string;
       requestData?: any;
     }

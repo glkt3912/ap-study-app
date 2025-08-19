@@ -4,6 +4,7 @@ import './globals.css';
 import { AuthProvider } from '../contexts/AuthContext';
 import { ThemeProvider } from '../contexts/ThemeContext';
 import { MonitoringProvider } from '../components/MonitoringProvider';
+import { ErrorToastManager } from '../components/ErrorToast';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -33,7 +34,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={inter.className}>
         <ThemeProvider>
           <MonitoringProvider>
-            <AuthProvider>{children}</AuthProvider>
+            <AuthProvider>
+              {children}
+              <ErrorToastManager />
+            </AuthProvider>
           </MonitoringProvider>
         </ThemeProvider>
         {/* Service Worker disabled for debugging */}

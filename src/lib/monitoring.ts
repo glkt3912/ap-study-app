@@ -23,7 +23,7 @@ interface ErrorEvent {
   timestamp: string;
   userAgent: string;
   url: string;
-  userId?: string;
+  userId?: number;
 }
 
 // パフォーマンス追跡型定義
@@ -33,7 +33,7 @@ interface PerformanceEvent {
   duration: number;
   timestamp: string;
   url: string;
-  userId?: string;
+  userId?: number;
   metadata?: Record<string, any>;
 }
 
@@ -43,7 +43,7 @@ interface UserEvent {
   target: string;
   timestamp: string;
   url: string;
-  userId?: string;
+  userId?: number;
   metadata?: Record<string, any>;
 }
 

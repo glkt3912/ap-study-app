@@ -5,6 +5,7 @@ import { StudyWeek } from '@/data/studyPlan';
 import { weeklyPlanTemplates, createStudyDataFromTemplate, type WeeklyPlanTemplate } from '@/data/weeklyPlanTemplates';
 import { apiClient } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
+import { errorHandler } from '@/lib/error-handler';
 
 interface WeeklyPlanProps {
   studyData: StudyWeek[];
@@ -62,18 +63,42 @@ export default function WeeklyPlan({ studyData, setStudyData }: WeeklyPlanProps)
 
     // バックエンドに進捗を保存
     try {
-      await apiClient.updateStudyProgress(week.weekNumber, dayIndex, {
+      const requestData = {
         completed: task.completed,
         actualTime: task.actualTime,
+      };
+      console.log('Sending updateStudyProgress request:', {
+        weekNumber: week.weekNumber,
+        dayIndex,
+        data: requestData
       });
+      
+      await apiClient.updateStudyProgress(week.weekNumber, dayIndex, requestData);
     } catch (error) {
-      // 進捗の保存に失敗しました
+      console.error('学習進捗の保存に失敗しました:', error);
+      
       // エラー時は元の状態に戻す
       task.completed = !isCompleting;
       if (!task.completed) {
         task.actualTime = 0;
       }
       setStudyData([...newData]);
+      
+      // エラーハンドラーを使用してユーザーに通知
+      await errorHandler.handleApiError(
+        error,
+        '/api/study/progress',
+        'PUT',
+        {
+          userId,
+          requestData: {
+            weekNumber: week.weekNumber,
+            dayIndex,
+            completed: !task.completed, // 元の値
+            actualTime: !task.completed ? 0 : task.actualTime
+          }
+        }
+      );
     }
   };
 
@@ -105,6 +130,21 @@ export default function WeeklyPlan({ studyData, setStudyData }: WeeklyPlanProps)
       setSelectedTemplate(null);
     } catch (error) {
       console.error('テンプレート保存に失敗:', error);
+      
+      // エラーハンドラーを使用してユーザーに通知
+      await errorHandler.handleApiError(
+        error,
+        '/api/study/template',
+        'POST',
+        {
+          userId,
+          requestData: {
+            templateId: selectedTemplate.id,
+            templateName: selectedTemplate.name
+          }
+        }
+      );
+      
       // エラーが発生してもローカル状態は更新する（型キャストで緊急対応）
       const newStudyData = createStudyDataFromTemplate(selectedTemplate);
       setStudyData(newStudyData as unknown as StudyWeek[]);
