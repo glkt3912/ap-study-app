@@ -223,13 +223,13 @@ function Analysis() {
     } finally {
       setIsLoading(false);
     }
-  }, [user?.id, fetchAnalysisDataFallback]);
+  }, [user?.id, fetchAnalysisDataFallback, fetchLatestAnalysis]);
 
   useEffect(() => {
     fetchBatchAnalysisData();
   }, [fetchBatchAnalysisData]);
 
-  const fetchLatestAnalysis = async () => {
+  const fetchLatestAnalysis = useCallback(async () => {
     try {
       // 統一APIを使用して分析結果を取得
       try {
@@ -257,7 +257,7 @@ function Analysis() {
     } catch (error) {
       // 最新分析結果の取得に失敗
     }
-  };
+  }, [user?.id]);
 
   const runAnalysis = async () => {
     try {

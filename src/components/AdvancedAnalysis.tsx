@@ -153,14 +153,26 @@ function AdvancedAnalysis() {
   }, [userId]);
 
   useEffect(() => {
+    if (!userId) return;
+    
     if (activeTab === 'performance') {
-      loadPerformanceMetrics();
+      setLoading(true);
+      setError(null);
+      apiClient.getPerformanceMetrics(30, userId)
+        .then(data => setPerformanceMetrics(data))
+        .catch(err => setError(handleError(err, 'パフォーマンス指標取得')))
+        .finally(() => setLoading(false));
     } else if (activeTab === 'pattern') {
-      loadLearningPattern();
+      setLoading(true);
+      setError(null);
+      apiClient.getLearningPattern(userId)
+        .then(data => setLearningPattern(data))
+        .catch(err => setError(handleError(err, '学習パターン分析')))
+        .finally(() => setLoading(false));
     } else if (activeTab === 'readiness') {
       loadExamConfig();
     }
-  }, [activeTab, userId, loadExamConfig]);
+  }, [activeTab, userId, loadExamConfig, handleError]);
 
   // モーダル保存ハンドラー
   const handleExamConfigSave = (savedConfig: ExamConfig) => {
@@ -170,19 +182,6 @@ function AdvancedAnalysis() {
     setIsExamConfigModalOpen(false);
   };
 
-  const loadPerformanceMetrics = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await apiClient.getPerformanceMetrics(30, userId);
-      setPerformanceMetrics(data);
-    } catch (err) {
-      const errorMessage = handleError(err, 'パフォーマンス指標取得');
-      setError(errorMessage);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const loadExamReadiness = async () => {
     if (!examConfig && !examDate) {
@@ -207,19 +206,6 @@ function AdvancedAnalysis() {
     }
   };
 
-  const loadLearningPattern = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await apiClient.getLearningPattern(userId);
-      setLearningPattern(data);
-    } catch (err) {
-      const errorMessage = handleError(err, '学習パターン分析');
-      setError(errorMessage);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const getReadinessColor = (level: string) => {
     switch (level) {
