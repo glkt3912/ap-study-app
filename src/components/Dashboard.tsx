@@ -12,7 +12,7 @@ interface DashboardProps {
 }
 
 export default function Dashboard({ studyData, isLoading = false }: DashboardProps) {
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
 
   // AI学習コーチ機能のステート
   const [predictiveAnalysis, setPredictiveAnalysis] = useState<PredictiveAnalysis | null>(null);
@@ -21,9 +21,12 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
   );
   const [isLoadingAI, setIsLoadingAI] = useState(false);
 
+  // 未ログイン時の早期リターン - AI機能を無効化
+  const isUserAuthenticated = isAuthenticated && user?.id && user.id > 0;
+
   // フォールバック: 個別AI分析データ取得 (バックエンド未対応時)
   const fetchAIDataFallback = useCallback(async () => {
-    if (!user?.id || user.id <= 0) {
+    if (!isUserAuthenticated) {
       return;
     }
 
@@ -36,17 +39,20 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
       setPredictiveAnalysis(predictions);
       setPersonalizedRecommendations(recommendations);
     } catch (error) {
-      // エラーログは開発環境でのみ出力
+      // AI機能のエラーは静かに処理（ユーザーには表示しない）
       if (process.env.NODE_ENV === 'development') {
         // eslint-disable-next-line no-console
-        console.error('AI データ取得エラー:', error);
+        console.warn('AI データ取得失敗（非表示）:', error);
       }
+      // AI機能が利用できない場合は静かに空にする
+      setPredictiveAnalysis(null);
+      setPersonalizedRecommendations(null);
     }
-  }, [user?.id]);
+  }, [isUserAuthenticated, user?.id]);
 
   // バッチ処理: ダッシュボードML分析データ一括取得 (2個API → 1個API)
   const fetchBatchDashboardMLData = useCallback(async () => {
-    if (!user?.id || user.id <= 0) {
+    if (!isUserAuthenticated) {
       return;
     }
 
@@ -57,24 +63,28 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
       setPredictiveAnalysis(batchData.predictiveAnalysis);
       setPersonalizedRecommendations(batchData.personalizedRecommendations);
     } catch (error) {
-      // バッチAPI失敗時はフォールバックを使用
-      await fetchAIDataFallback();
-
-      // エラーログは開発環境でのみ出力
-      if (process.env.NODE_ENV === 'development') {
-        // eslint-disable-next-line no-console
-        console.error('バッチML データ取得エラー、フォールバックを使用:', error);
+      // バッチAPI失敗時はフォールバックを試行
+      try {
+        await fetchAIDataFallback();
+      } catch (fallbackError) {
+        // フォールバックも失敗した場合は静かに処理
+        if (process.env.NODE_ENV === 'development') {
+          // eslint-disable-next-line no-console
+          console.warn('AI機能全体が利用不可（非表示）:', { error, fallbackError });
+        }
+        setPredictiveAnalysis(null);
+        setPersonalizedRecommendations(null);
       }
     } finally {
       setIsLoadingAI(false);
     }
-  }, [user?.id]); // fetchAIDataFallbackを依存配列から除去
+  }, [isUserAuthenticated, user?.id, fetchAIDataFallback]); // fetchAIDataFallback依存を追加
 
   useEffect(() => {
-    if (user?.id && !isLoading && !predictiveAnalysis) {
+    if (isUserAuthenticated && !isLoading && !predictiveAnalysis) {
       fetchBatchDashboardMLData();
     }
-  }, [user?.id, isLoading, predictiveAnalysis]); // データが既にある場合は実行しない
+  }, [isUserAuthenticated, isLoading, predictiveAnalysis, fetchBatchDashboardMLData]); // isUserAuthenticated使用に変更
 
   if (isLoading) {
     return (
@@ -180,9 +190,9 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
       </div>
 
       {/* ========================================
-          🤖 AI学習コーチ (新機能)
+          🤖 AI学習コーチ (新機能) - 認証済みユーザーのみ表示
           ======================================== */}
-      {user?.id && predictiveAnalysis && (
+      {isUserAuthenticated && predictiveAnalysis && (
         <div className='bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 rounded-lg shadow-moderate p-6 hover-lift z-content'>
           <div className='flex items-center justify-between mb-4'>
             <div className='flex items-center space-x-2'>

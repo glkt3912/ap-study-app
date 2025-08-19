@@ -52,8 +52,12 @@ export default function ClientHome() {
     try {
       const config = await apiClient.getExamConfig(userId.toString());
       setExamConfig(config);
-    } catch (_error) {
-      // 設定が存在しない場合は null のまま
+    } catch (error) {
+      // 設定が存在しない場合やAPIエラーは静かに処理
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.warn('試験設定の取得に失敗（非表示）:', error);
+      }
       setExamConfig(null);
     }
   }, [userId]);
@@ -63,6 +67,29 @@ export default function ClientHome() {
     setExamConfig(savedConfig);
     setIsExamConfigModalOpen(false);
   };
+
+  // データ取得とエラーハンドリングを分離
+  const handleDataFetch = useCallback(async (userIdToUse: number) => {
+    // 統一APIを使用して学習計画を取得
+    let data;
+    try {
+      const studyPlan = await unifiedApiClient.getStudyPlan(userIdToUse);
+      data = studyPlan.weeks || [];
+      
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.log('統一API成功:', data.length, '週のデータを取得');
+      }
+    } catch (unifiedError) {
+      console.warn('統一API失敗、レガシーAPIにフォールバック:', unifiedError);
+      data = await apiClient.getStudyPlan();
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.log('レガシーAPI成功:', data.length, '週のデータを取得');
+      }
+    }
+    return data;
+  }, []);
 
   // バックエンドからデータを取得
   useEffect(() => {
@@ -79,6 +106,24 @@ export default function ClientHome() {
         });
       }
 
+      // 認証が完了していない場合は処理をスキップ
+      if (authLoading) {
+        if (process.env.NODE_ENV === 'development') {
+          // eslint-disable-next-line no-console
+          console.log('Auth loading, skipping data fetch');
+        }
+        return;
+      }
+
+      // ローディング中の場合は重複実行を防ぐ
+      if (loading) {
+        if (process.env.NODE_ENV === 'development') {
+          // eslint-disable-next-line no-console
+          console.log('Already loading, skipping duplicate request');
+        }
+        return;
+      }
+
       try {
         setLoading(true);
         setError(null);
@@ -88,36 +133,37 @@ export default function ClientHome() {
           console.log('Making API call to getStudyPlan...');
         }
         
-        // 統一APIを使用して学習計画を取得（認証状態に関わらず試行）
-        let data;
-        const userIdToUse = user?.id || 1; // 認証されていない場合はデフォルトユーザー1を使用
-        
-        try {
-          const studyPlan = await unifiedApiClient.getStudyPlan(userIdToUse);
-          // 統一APIレスポンスを既存形式に変換
-          data = studyPlan.weeks || [];
-          
+        // 未ログイン時は基本的なモックデータのみ表示
+        if (!isAuthenticated || !user?.id) {
           if (process.env.NODE_ENV === 'development') {
             // eslint-disable-next-line no-console
-            console.log('統一API成功:', data.length, '週のデータを取得');
+            console.log('未ログイン状態 - モックデータを使用');
           }
-        } catch (unifiedError) {
-          console.warn('統一API失敗、レガシーAPIにフォールバック:', unifiedError);
-          // フォールバック: 既存APIを使用
-          try {
-            data = await apiClient.getStudyPlan();
-            if (process.env.NODE_ENV === 'development') {
-              // eslint-disable-next-line no-console
-              console.log('レガシーAPI成功:', data.length, '週のデータを取得');
-            }
-          } catch (legacyError) {
-            console.warn('レガシーAPIも失敗、モックデータを使用:', legacyError);
-            // 両方のAPIが失敗した場合はモックデータを使用
-            setStudyData(studyPlanData);
-            setLoading(false);
-            setError('APIエラーが発生しました。モックデータを表示しています。');
-            return;
+          setStudyData(studyPlanData);
+          setLoading(false);
+          setError(null); // エラー状態をクリア
+          return;
+        }
+
+        if (process.env.NODE_ENV === 'development') {
+          // eslint-disable-next-line no-console
+          console.log('認証済みユーザーのデータを取得中... User ID:', user.id);
+        }
+
+        const userIdToUse = user.id; // 認証済みユーザーのIDを使用
+        
+        let data;
+        try {
+          data = await handleDataFetch(userIdToUse);
+        } catch (dataError) {
+          console.warn('両方のAPIが失敗、モックデータを使用:', dataError);
+          setStudyData(studyPlanData);
+          setLoading(false);
+          // 認証直後の一時的エラーの場合は表示しない
+          if (process.env.NODE_ENV === 'development') {
+            setError('開発環境: APIエラーが発生しました。モックデータを表示しています。');
           }
+          return;
         }
 
         // 開発環境でデータ構造を確認
@@ -125,11 +171,19 @@ export default function ClientHome() {
           console.log('=== API Response Data ===');
           console.log('Data length:', data?.length);
           console.log('First week sample:', data?.[0]);
-          console.log('First day sample:', data?.[0]?.days?.[0]);
+          console.log('First day sample:', (data?.[0] as any)?.days?.[0]);
         }
 
-        // 試験設定も読み込む
-        await loadExamConfig();
+        // 試験設定も読み込む（エラーが発生しても続行）
+        try {
+          await loadExamConfig();
+        } catch (examConfigError) {
+          // 試験設定のエラーは静かに処理（メインの学習データ取得を妨げない）
+          if (process.env.NODE_ENV === 'development') {
+            // eslint-disable-next-line no-console
+            console.warn('試験設定読み込みエラー（非表示）:', examConfigError);
+          }
+        }
         
         // バックエンドのデータ構造をフロントエンドの構造に変換（安全な変換）
         const convertedData = data.map((week: any) => {
@@ -161,7 +215,18 @@ export default function ClientHome() {
         setLoading(false); // 成功時に明示的にローディングを終了
         
         if (process.env.NODE_ENV === 'development') {
-          console.log('Data loading completed successfully');
+          console.log('データ取得完了:', {
+            weeksLoaded: convertedData.length,
+            userId: user.id,
+            isAuthenticated
+          });
+        }
+        
+        // 認証成功後の一時的な成功メッセージ（開発環境のみ）
+        if (process.env.NODE_ENV === 'development' && isAuthenticated && user?.id) {
+          setError('✅ ログインが完了しました。学習データを同期中です...');
+          // 3秒後にメッセージをクリア
+          setTimeout(() => setError(null), 3000);
         }
       } catch (err) {
         if (process.env.NODE_ENV === 'development') {
@@ -198,7 +263,7 @@ export default function ClientHome() {
           'GET',
           user?.id
             ? {
-                userId: user.id.toString(),
+                userId: user.id,
               }
             : undefined
         );
@@ -212,24 +277,21 @@ export default function ClientHome() {
         if (process.env.NODE_ENV === 'development' && err instanceof Error && err.message?.includes('500')) {
           console.warn('HTTP 500エラーのため、モックデータを使用します');
           setStudyData(studyPlanData);
-          setError('サーバーエラーが発生しました。モックデータを表示しています。バックエンドログを確認してください。');
+          setError('開発環境: サーバーエラーが発生しました。バックエンドログを確認してください。');
           return;
         }
 
         // 認証エラーの場合は自動的にログアウト
         if (standardError.code === 'AUTH_TOKEN_EXPIRED' || standardError.code === 'AUTH_UNAUTHORIZED') {
-          setError('セッションが期限切れです。再ログインしてください。');
+          setError('認証が必要です。ログインすると学習データを同期できます。');
           
           if (process.env.NODE_ENV === 'development') {
             // eslint-disable-next-line no-console
             console.log('Authentication error detected, logging out...');
           }
           
-          // 自動ログアウト
-          if (typeof logout === 'function') {
-            logout();
-          }
-          // モックデータを使用
+          // 認証エラー時はログアウトせず、モックデータを表示
+          // これにより未ログインユーザーでも基本的な学習計画を確認できる
           setStudyData(studyPlanData);
         } else if (standardError.retryable && standardError.code !== 'NETWORK_ERROR') {
           // リトライ可能なエラーの場合（ネットワークエラー以外）
@@ -238,7 +300,10 @@ export default function ClientHome() {
             console.log('Retryable error detected, will retry in 2 seconds...');
           }
           
-          setError('データの読み込みに失敗しました。2秒後に再試行します...');
+          // 本番環境ではエラーメッセージを表示しない（自動リトライのみ）
+          if (process.env.NODE_ENV === 'development') {
+            setError('開発環境: データの読み込みに失敗しました。2秒後に再試行します...');
+          }
           
           // 2秒後にリトライ
           setTimeout(async () => {
@@ -246,10 +311,18 @@ export default function ClientHome() {
               // eslint-disable-next-line no-console
               console.log('Retrying API call...');
             }
+            
+            // リトライは認証済みユーザーのみ実行
+            if (!isAuthenticated || !user?.id) {
+              setError('ログインが必要です。');
+              setStudyData(studyPlanData);
+              return;
+            }
+            
             try {
               // リトライ時も統一APIを使用
               let data;
-              const retryUserIdToUse = user?.id || 1;
+              const retryUserIdToUse = user.id;
               try {
                 const studyPlan = await unifiedApiClient.getStudyPlan(retryUserIdToUse);
                 data = studyPlan.weeks || [];
@@ -278,12 +351,17 @@ export default function ClientHome() {
                 // eslint-disable-next-line no-console
                 console.log('Retry failed, using mock data');
               }
-              setError('データの読み込みに失敗しました。モックデータを使用します。');
+              if (process.env.NODE_ENV === 'development') {
+                setError('開発環境: データの読み込みに失敗しました。モックデータを使用します。');
+              }
               setStudyData(studyPlanData);
             }
           }, 2000);
         } else {
-          setError('データの読み込みに失敗しました。モックデータを使用します。');
+          // 本番環境では静かにモックデータを使用
+          if (process.env.NODE_ENV === 'development') {
+            setError('開発環境: データの読み込みに失敗しました。モックデータを使用します。');
+          }
           // エラー時はモックデータを使用
           setStudyData(studyPlanData);
         }
@@ -293,7 +371,7 @@ export default function ClientHome() {
     };
 
     fetchStudyData();
-  }, [isAuthenticated, user?.id, authLoading, loadExamConfig, logout]);
+  }, [isAuthenticated, user?.id, authLoading, loadExamConfig, logout, user, handleDataFetch]);
 
   // イベントハンドラー
   const handleExamConfigClick = () => {
