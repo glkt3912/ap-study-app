@@ -239,20 +239,21 @@ function AdvancedAnalysis() {
   const dayNames = ['日', '月', '火', '水', '木', '金', '土'];
 
   // パフォーマンス最適化: メモ化された計算
-  const { hourlyChartData, subjectChartData } = useMemo(() => {
-    const hourlyData = performanceMetrics?.hourlyEfficiency?.map(h => ({
-      ...h,
-      hour: `${h.hour}:00`,
-      efficiencyScore: Math.round(h.efficiencyScore * 100) / 100,
+  const memoizedChartData = useMemo(() => {
+    // 実際のperformanceMetricsデータ構造に合わせて調整
+    const categoryData = performanceMetrics?.categoryBalance?.map(c => ({
+      category: c.category,
+      accuracy: Math.round(c.accuracy_rate * 100) / 100,
+      proportion: Math.round(c.proportion * 100) / 100,
     })) || [];
 
-    const subjectData = performanceMetrics?.subjectEfficiency?.map(s => ({
-      ...s,
-      learningVelocity: Math.round(s.learningVelocity * 100) / 100,
-      completionRate: Math.round(s.completionRate * 100),
+    const growthData = performanceMetrics?.growthAnalysis?.map(g => ({
+      week: g.week_start,
+      score: Math.round(g.avg_score * 100) / 100,
+      change: Math.round(g.score_change * 100) / 100,
     })) || [];
 
-    return { hourlyChartData: hourlyData, subjectChartData: subjectData };
+    return { categoryData, growthData };
   }, [performanceMetrics]);
 
   return (
