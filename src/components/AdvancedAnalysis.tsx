@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, lazy, Suspense, memo, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, lazy, Suspense, memo } from 'react';
 import { apiClient, type ExamConfig } from '../lib/api';
 import { ExamConfigModal } from './ExamConfigModal';
 import { useAuth } from '../contexts/AuthContext';
