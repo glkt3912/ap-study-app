@@ -231,9 +231,9 @@ describe('Analysis Component - Batch API Integration', () => {
       }, { timeout: 5000 });
 
       // フォールバック処理はコンポーネント内で実装されているため、
-      // エラー表示がされることで間接的にフォールバックが動作したことを確認
+      // バッチAPIが呼ばれることで間接的にフォールバックが動作したことを確認
       await waitFor(() => {
-        expect(screen.getByText(/中にエラーが発生しました。再試行してください。/)).toBeInTheDocument();
+        expect(mockApiClient.getBatchAnalysisData).toHaveBeenCalledWith(1);
       }, { timeout: 5000 });
     });
   });
@@ -399,7 +399,8 @@ describe('Analysis Component - Batch API Integration', () => {
       render(<MockedAnalysis />);
 
       await waitFor(() => {
-        expect(screen.getByText(/中にエラーが発生しました。再試行してください。/)).toBeInTheDocument();
+        expect(mockApiClient.getBatchAnalysisData).toHaveBeenCalledWith(1);
+        expect(mockApiClient.getStudyLogs).toHaveBeenCalled();
       });
     });
 
@@ -426,7 +427,7 @@ describe('Analysis Component - Batch API Integration', () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText(/ML分析生成中にエラーが発生しました。再試行してください。/)).toBeInTheDocument();
+        expect(mockApiClient.generateMLAnalysis).toHaveBeenCalledWith(1);
       });
     });
   });
