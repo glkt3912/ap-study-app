@@ -76,6 +76,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             ...data.data.user,
             createdAt: new Date(data.data.user.createdAt),
           });
+          
+          // トークンの種類に応じて設定
+          if (fallbackToken) {
+            setToken(fallbackToken);
+          } else {
+            setToken('cookie-authenticated');
+          }
+          
           return true;
         }
       }
