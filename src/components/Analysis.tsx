@@ -124,7 +124,7 @@ function Analysis() {
       const errorMessage = handleError(error, 'ML分析データ取得');
       setMlError(errorMessage);
     }
-  }, [user?.id]);
+  }, [user?.id, handleError]);
 
   // フォールバック: 個別API呼び出し (バックエンド未対応時)
   const fetchAnalysisDataFallback = useCallback(async () => {
@@ -191,7 +191,7 @@ function Analysis() {
       const errorMessage = handleError(error, '分析データ取得');
       setMlError(errorMessage);
     }
-  }, [user?.id, fetchMLAnalysisDataFallback]);
+  }, [user?.id, fetchMLAnalysisDataFallback, handleError]);
 
   // バッチ処理: 分析データ一括取得 (7個API → 1個API)
   const fetchBatchAnalysisData = useCallback(async () => {
@@ -272,7 +272,7 @@ function Analysis() {
   };
 
   // ML分析生成関数
-  const generateMLAnalysis = async () => {
+  const generateMLAnalysis = useCallback(async () => {
     if (!user?.id) return;
 
     try {
@@ -289,7 +289,7 @@ function Analysis() {
     } finally {
       setIsGeneratingML(false);
     }
-  };
+  }, [user?.id, fetchMLAnalysisDataFallback, handleError]);
 
   // パフォーマンス最適化: メモ化されたデータ計算
   const weeklyData = useMemo(() => {

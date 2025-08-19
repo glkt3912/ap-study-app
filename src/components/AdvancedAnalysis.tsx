@@ -239,20 +239,20 @@ function AdvancedAnalysis() {
   const dayNames = ['日', '月', '火', '水', '木', '金', '土'];
 
   // パフォーマンス最適化: メモ化された計算
-  const memoizedChartData = useMemo(() => {
-    const hourlyChartData = performanceMetrics?.hourlyEfficiency?.map(h => ({
+  const { hourlyChartData, subjectChartData } = useMemo(() => {
+    const hourlyData = performanceMetrics?.hourlyEfficiency?.map(h => ({
       ...h,
       hour: `${h.hour}:00`,
       efficiencyScore: Math.round(h.efficiencyScore * 100) / 100,
     })) || [];
 
-    const subjectChartData = performanceMetrics?.subjectEfficiency?.map(s => ({
+    const subjectData = performanceMetrics?.subjectEfficiency?.map(s => ({
       ...s,
       learningVelocity: Math.round(s.learningVelocity * 100) / 100,
       completionRate: Math.round(s.completionRate * 100),
     })) || [];
 
-    return { hourlyChartData, subjectChartData };
+    return { hourlyChartData: hourlyData, subjectChartData: subjectData };
   }, [performanceMetrics]);
 
   return (

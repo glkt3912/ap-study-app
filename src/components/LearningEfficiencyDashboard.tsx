@@ -98,7 +98,7 @@ function LearningEfficiencyDashboard() {
     } finally {
       setLoading(false);
     }
-  }, [dateRange.startDate, dateRange.endDate]);
+  }, [dateRange.startDate, dateRange.endDate, handleError]);
 
   useEffect(() => {
     generateAnalysis();
