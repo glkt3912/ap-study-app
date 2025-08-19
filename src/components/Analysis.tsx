@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo, memo } from 'react';
 
 // 直接インポート（SSR問題回避）
 import { StudyTimeChart, ProgressChart, UnderstandingRadarChart } from './charts/AnalysisCharts';
@@ -63,7 +63,7 @@ interface AnalysisResult {
   overallScore: number;
 }
 
-export default function Analysis() {
+function Analysis() {
   const { user } = useAuth();
   const [studyLogs, setStudyLogs] = useState<StudyLog[]>([]);
   const [morningTests, setMorningTests] = useState<MorningTest[]>([]);
@@ -84,6 +84,26 @@ export default function Analysis() {
   const [isGeneratingML, setIsGeneratingML] = useState(false);
   const [mlError, setMlError] = useState<string | null>(null);
 
+  // 統一エラーハンドリング関数
+  const handleError = useCallback((error: unknown, context: string): string => {
+    console.error(`${context} error:`, error);
+    
+    if (error instanceof Error) {
+      if (error.message.includes('fetch')) {
+        return 'ネットワークに接続できません。インターネット接続を確認してください。';
+      }
+      if (error.message.includes('404')) {
+        return 'データが見つかりません。';
+      }
+      if (error.message.includes('500')) {
+        return 'サーバーエラーが発生しました。しばらく待ってから再試行してください。';
+      }
+      return error.message;
+    }
+    
+    return `${context}中にエラーが発生しました。再試行してください。`;
+  }, []);
+
   // ML分析データ個別取得（フォールバック用）
   const fetchMLAnalysisDataFallback = useCallback(async () => {
     if (!user?.id) return;
@@ -101,12 +121,8 @@ export default function Analysis() {
       setPersonalizedRecommendations(recommendations);
       setAdvancedWeakPoints(weakPoints);
     } catch (error) {
-      setMlError('ML分析データの取得に失敗しました');
-      // エラーログは開発環境でのみ出力
-      if (process.env.NODE_ENV === 'development') {
-        // eslint-disable-next-line no-console
-        console.error('ML分析データ取得エラー:', error);
-      }
+      const errorMessage = handleError(error, 'ML分析データ取得');
+      setMlError(errorMessage);
     }
   }, [user?.id]);
 
@@ -172,12 +188,8 @@ export default function Analysis() {
         await fetchMLAnalysisDataFallback();
       }
     } catch (error) {
-      setMlError('データの取得に失敗しました。再度お試しください。');
-      // エラーログは開発環境でのみ出力
-      if (process.env.NODE_ENV === 'development') {
-        // eslint-disable-next-line no-console
-        console.error('分析データ取得エラー:', error);
-      }
+      const errorMessage = handleError(error, '分析データ取得');
+      setMlError(errorMessage);
     }
   }, [user?.id, fetchMLAnalysisDataFallback]);
 
@@ -206,13 +218,8 @@ export default function Analysis() {
       await fetchLatestAnalysis();
     } catch (error) {
       // バッチAPI失敗時はフォールバックを使用
+      console.warn('バッチAPI失敗、フォールバックを使用:', error);
       await fetchAnalysisDataFallback();
-
-      // エラーログは開発環境でのみ出力
-      if (process.env.NODE_ENV === 'development') {
-        // eslint-disable-next-line no-console
-        console.error('バッチ分析データ取得エラー、フォールバックを使用:', error);
-      }
     } finally {
       setIsLoading(false);
     }
@@ -277,45 +284,41 @@ export default function Analysis() {
       // 生成後に関連データも再取得
       await fetchMLAnalysisDataFallback();
     } catch (error) {
-      setMlError('ML分析の生成に失敗しました');
-      // エラーログは開発環境でのみ出力
-      if (process.env.NODE_ENV === 'development') {
-        // eslint-disable-next-line no-console
-        console.error('ML分析生成エラー:', error);
-      }
+      const errorMessage = handleError(error, 'ML分析生成');
+      setMlError(errorMessage);
     } finally {
       setIsGeneratingML(false);
     }
   };
 
-  // 学習時間の週別データ
-  const getWeeklyStudyData = () => {
-    const weeklyData: { [key: string]: number } = {};
+  // パフォーマンス最適化: メモ化されたデータ計算
+  const weeklyData = useMemo(() => {
+    const weeklyDataMap: { [key: string]: number } = {};
     studyLogs.forEach(log => {
       const date = new Date(log.date);
       const weekStart = new Date(date.setDate(date.getDate() - date.getDay()));
       const week = weekStart.toISOString().split('T')[0];
       if (week) {
-        weeklyData[week] = (weeklyData[week] || 0) + log.studyTime;
+        weeklyDataMap[week] = (weeklyDataMap[week] || 0) + log.studyTime;
       }
     });
 
-    return Object.entries(weeklyData)
+    return Object.entries(weeklyDataMap)
       .map(([week, time]) => ({
         week: new Date(week).toLocaleDateString('ja-JP', { month: 'short', day: 'numeric' }),
         time: Math.round((time / 60) * 10) / 10, // 時間に変換
       }))
       .slice(-8); // 直近8週間
-  };
+  }, [studyLogs]);
 
-  // 科目別学習時間
-  const getSubjectStudyData = () => {
-    const subjectData: { [key: string]: number } = {};
+  // 科目別学習時間 (メモ化)
+  const subjectData = useMemo(() => {
+    const subjectDataMap: { [key: string]: number } = {};
     studyLogs.forEach(log => {
-      subjectData[log.subject] = (subjectData[log.subject] || 0) + log.studyTime;
+      subjectDataMap[log.subject] = (subjectDataMap[log.subject] || 0) + log.studyTime;
     });
 
-    return Object.entries(subjectData)
+    return Object.entries(subjectDataMap)
       .map(([subject, time]) => ({
         subject: subject.length > 10 ? subject.substring(0, 10) + '...' : subject,
         time: Math.round((time / 60) * 10) / 10,
@@ -323,10 +326,10 @@ export default function Analysis() {
       }))
       .sort((a, b) => b.time - a.time)
       .slice(0, 6);
-  };
+  }, [studyLogs]);
 
-  // 理解度分析
-  const getUnderstandingData = () => {
+  // 理解度分析 (メモ化)
+  const understandingData = useMemo(() => {
     const subjectUnderstanding: { [key: string]: { total: number; count: number } } = {};
     studyLogs.forEach(log => {
       if (!subjectUnderstanding[log.subject]) {
@@ -346,24 +349,30 @@ export default function Analysis() {
         fullSubject: subject,
       }))
       .sort((a, b) => a.understanding - b.understanding);
-  };
+  }, [studyLogs]);
 
-  // 統計情報の計算
-  const getTotalStudyTime = () => studyLogs.reduce((total, log) => total + log.studyTime, 0);
-  const getAverageUnderstanding = () => {
+  // 統計情報の計算 (メモ化)
+  const totalStudyTime = useMemo(() => 
+    studyLogs.reduce((total, log) => total + log.studyTime, 0), 
+    [studyLogs]
+  );
+  
+  const averageUnderstanding = useMemo(() => {
     if (studyLogs.length === 0) return 0;
     return studyLogs.reduce((total, log) => total + log.understanding, 0) / studyLogs.length;
-  };
-  const getMorningTestAverage = () => {
+  }, [studyLogs]);
+  
+  const morningTestAverage = useMemo(() => {
     if (morningTests.length === 0) return 0;
     const totalCorrect = morningTests.reduce((total, test) => total + test.correctAnswers, 0);
     const totalQuestions = morningTests.reduce((total, test) => total + test.totalQuestions, 0);
     return totalQuestions > 0 ? (totalCorrect / totalQuestions) * 100 : 0;
-  };
-  const getAfternoonTestAverage = () => {
+  }, [morningTests]);
+  
+  const afternoonTestAverage = useMemo(() => {
     if (afternoonTests.length === 0) return 0;
     return afternoonTests.reduce((total, test) => total + test.score, 0) / afternoonTests.length;
-  };
+  }, [afternoonTests]);
 
   if (isLoading) {
     return (
@@ -386,13 +395,7 @@ export default function Analysis() {
       </div>
     );
   }
-  const weeklyData = getWeeklyStudyData();
-  const subjectData = getSubjectStudyData();
-  const understandingData = getUnderstandingData();
-  const totalStudyTime = getTotalStudyTime();
-  const averageUnderstanding = getAverageUnderstanding();
-  const morningTestAverage = getMorningTestAverage();
-  const afternoonTestAverage = getAfternoonTestAverage();
+  // メモ化された変数はすでに上で定義されているため、ここでは削除
 
   return (
     <div className='space-y-6'>
@@ -921,3 +924,6 @@ export default function Analysis() {
     </div>
   );
 }
+
+// React.memo でパフォーマンス最適化
+export default memo(Analysis);
