@@ -648,7 +648,7 @@ class ApiClient {
   }
 
   // 拡張された分析API
-  async getPerformanceMetrics(period?: number): Promise<{
+  async getPerformanceMetrics(period?: number, userId?: number): Promise<{
     period: number;
     studyConsistency: any;
     learningEfficiency: any;
@@ -656,8 +656,12 @@ class ApiClient {
     categoryBalance: any[];
   }> {
     try {
-      const params = period ? `?period=${period}` : '';
-      return await this.request(`/api/analysis/performance-metrics${params}`);
+      const params = new URLSearchParams({
+        period: (period || 30).toString(),
+        userId: (userId || 1).toString()
+      });
+      const response = await this.request<ApiResponse<any>>(`/api/analysis/performance-metrics?${params}`);
+      return response.data;
     } catch (error) {
       // エラー時はデフォルト値を返す
       return {
@@ -680,7 +684,7 @@ class ApiClient {
     }
   }
 
-  async evaluateExamReadiness(options: { examDate: string; targetScore?: number }): Promise<{
+  async evaluateExamReadiness(options: { examDate: string; targetScore?: number; userId?: number }): Promise<{
     examDate: string;
     daysToExam: number;
     targetScore: number;
@@ -690,13 +694,15 @@ class ApiClient {
     studyRecommendations: any[];
     passProbability: number;
   }> {
-    return this.request('/api/analysis/exam-readiness', {
+    const userId = options.userId || 1;
+    const response = await this.request<ApiResponse<any>>(`/api/analysis/exam-readiness?userId=${userId}`, {
       method: 'POST',
       body: JSON.stringify(options),
     });
+    return response.data;
   }
 
-  async getLearningPattern(): Promise<{
+  async getLearningPattern(userId?: number): Promise<{
     timePattern: any[];
     frequencyPattern: any[];
     volumePerformanceCorrelation: any[];
@@ -706,7 +712,11 @@ class ApiClient {
       recommendedDailyQuestions: number;
     };
   }> {
-    return this.request('/api/analysis/learning-pattern');
+    const params = new URLSearchParams({
+      userId: (userId || 1).toString()
+    });
+    const response = await this.request<ApiResponse<any>>(`/api/analysis/learning-pattern?${params}`);
+    return response.data;
   }
 
   // 試験設定API
@@ -881,7 +891,7 @@ class ApiClient {
     }>;
     overallScore: number;
   }> {
-    return this.request('/api/learning-efficiency-analysis/generate', {
+    const response = await this.request<ApiResponse<any>>('/api/analysis/learning-efficiency', {
       method: 'POST',
       body: JSON.stringify({
         userId: options.userId,
@@ -891,6 +901,7 @@ class ApiClient {
         },
       }),
     });
+    return response.data;
   }
 
   async getLearningEfficiencyAnalysis(analysisId: string): Promise<any> {

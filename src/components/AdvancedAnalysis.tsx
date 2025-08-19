@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, lazy, Suspense } from 'react';
+import React, { useState, useEffect, useCallback, lazy, Suspense, memo } from 'react';
 import { apiClient, type ExamConfig } from '../lib/api';
 import { ExamConfigModal } from './ExamConfigModal';
 import { useAuth } from '../contexts/AuthContext';
@@ -100,7 +100,7 @@ const calculateRemainingDays = (examDate: string): number => {
   return Math.ceil((new Date(examDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
 };
 
-export function AdvancedAnalysis() {
+function AdvancedAnalysis() {
   const { userId } = useAuth();
   const [activeTab, setActiveTab] = useState<'performance' | 'readiness' | 'pattern' | 'efficiency'>('performance');
   const [performanceMetrics, setPerformanceMetrics] = useState<PerformanceMetrics | null>(null);
@@ -108,6 +108,26 @@ export function AdvancedAnalysis() {
   const [learningPattern, setLearningPattern] = useState<LearningPattern | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // 統一エラーハンドリング関数
+  const handleError = useCallback((error: unknown, context: string): string => {
+    console.error(`${context} error:`, error);
+    
+    if (error instanceof Error) {
+      if (error.message.includes('fetch')) {
+        return 'ネットワークに接続できません。インターネット接続を確認してください。';
+      }
+      if (error.message.includes('404')) {
+        return 'データが見つかりません。';
+      }
+      if (error.message.includes('500')) {
+        return 'サーバーエラーが発生しました。しばらく待ってから再試行してください。';
+      }
+      return error.message;
+    }
+    
+    return `${context}中にエラーが発生しました。再試行してください。`;
+  }, []);
 
   // 試験設定モーダル管理
   const [isExamConfigModalOpen, setIsExamConfigModalOpen] = useState(false);
@@ -133,14 +153,26 @@ export function AdvancedAnalysis() {
   }, [userId]);
 
   useEffect(() => {
+    if (!userId) return;
+    
     if (activeTab === 'performance') {
-      loadPerformanceMetrics();
+      setLoading(true);
+      setError(null);
+      apiClient.getPerformanceMetrics(30, userId)
+        .then(data => setPerformanceMetrics(data))
+        .catch(err => setError(handleError(err, 'パフォーマンス指標取得')))
+        .finally(() => setLoading(false));
     } else if (activeTab === 'pattern') {
-      loadLearningPattern();
+      setLoading(true);
+      setError(null);
+      apiClient.getLearningPattern(userId)
+        .then(data => setLearningPattern(data))
+        .catch(err => setError(handleError(err, '学習パターン分析')))
+        .finally(() => setLoading(false));
     } else if (activeTab === 'readiness') {
       loadExamConfig();
     }
-  }, [activeTab, userId, loadExamConfig]);
+  }, [activeTab, userId, loadExamConfig, handleError]);
 
   // モーダル保存ハンドラー
   const handleExamConfigSave = (savedConfig: ExamConfig) => {
@@ -150,18 +182,6 @@ export function AdvancedAnalysis() {
     setIsExamConfigModalOpen(false);
   };
 
-  const loadPerformanceMetrics = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await apiClient.getPerformanceMetrics(30);
-      setPerformanceMetrics(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'パフォーマンス指標の取得に失敗しました');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const loadExamReadiness = async () => {
     if (!examConfig && !examDate) {
@@ -175,27 +195,17 @@ export function AdvancedAnalysis() {
       const data = await apiClient.evaluateExamReadiness({
         examDate: examConfig?.examDate || examDate,
         targetScore: examConfig?.targetScore || targetScore,
+        userId: userId,
       });
       setExamReadiness(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '試験準備度評価に失敗しました');
+      const errorMessage = handleError(err, '試験準備度評価');
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
-  const loadLearningPattern = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await apiClient.getLearningPattern();
-      setLearningPattern(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : '学習パターン分析に失敗しました');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const getReadinessColor = (level: string) => {
     switch (level) {
@@ -213,6 +223,7 @@ export function AdvancedAnalysis() {
   };
 
   const dayNames = ['日', '月', '火', '水', '木', '金', '土'];
+
 
   return (
     <div className='card-primary p-6'>
@@ -337,7 +348,7 @@ export function AdvancedAnalysis() {
                         label={({ category, proportion }) => `${category}: ${Math.round(proportion)}%`}
                         labelLine={false}
                       >
-                        {performanceMetrics?.categoryBalance?.map((entry, index) => (
+                        {performanceMetrics?.categoryBalance?.map((_, index) => (
                           <Cell key={`cell-${index}`} fill={`hsl(${index * 45}, 70%, 60%)`} />
                         ))}
                       </Pie>
@@ -680,3 +691,7 @@ export function AdvancedAnalysis() {
 const LearningEfficiencyDashboardComponent = lazy(() =>
   import('./LearningEfficiencyDashboard')
 );
+
+// React.memo でパフォーマンス最適化
+export { AdvancedAnalysis };
+export default memo(AdvancedAnalysis);

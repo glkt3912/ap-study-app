@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, lazy, Suspense, useCallback } from 'react';
+import React, { useState, useEffect, lazy, Suspense, useCallback, memo, useMemo } from 'react';
 import { apiClient } from '../lib/api';
 
 const BarChart = lazy(() => import('recharts').then(module => ({ default: module.BarChart })));
@@ -51,10 +51,30 @@ interface LearningEfficiencyAnalysis {
   overallScore: number;
 }
 
-export function LearningEfficiencyDashboard() {
+function LearningEfficiencyDashboard() {
   const [analysis, setAnalysis] = useState<LearningEfficiencyAnalysis | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // 統一エラーハンドリング関数
+  const handleError = useCallback((error: unknown, context: string): string => {
+    console.error(`${context} error:`, error);
+    
+    if (error instanceof Error) {
+      if (error.message.includes('fetch')) {
+        return 'ネットワークに接続できません。インターネット接続を確認してください。';
+      }
+      if (error.message.includes('404')) {
+        return 'データが見つかりません。';
+      }
+      if (error.message.includes('500')) {
+        return 'サーバーエラーが発生しました。しばらく待ってから再試行してください。';
+      }
+      return error.message;
+    }
+    
+    return `${context}中にエラーが発生しました。再試行してください。`;
+  }, []);
   const [dateRange, setDateRange] = useState({
     startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
     endDate: new Date().toISOString().split('T')[0],
@@ -73,11 +93,12 @@ export function LearningEfficiencyDashboard() {
       });
       setAnalysis(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '学習効率分析の生成に失敗しました');
+      const errorMessage = handleError(err, '学習効率分析生成');
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
-  }, [dateRange.startDate, dateRange.endDate]);
+  }, [dateRange.startDate, dateRange.endDate, handleError]);
 
   useEffect(() => {
     generateAnalysis();
@@ -109,21 +130,21 @@ export function LearningEfficiencyDashboard() {
     }
   };
 
-  // 時間帯のグラフ用データ変換
-  const hourlyChartData =
-    analysis?.hourlyEfficiency?.map(h => ({
+  // パフォーマンス最適化: グラフデータのメモ化
+  const chartData = useMemo(() => ({
+    hourlyChartData: analysis?.hourlyEfficiency?.map(h => ({
       ...h,
       hour: `${h.hour}:00`,
       efficiencyScore: Math.round(h.efficiencyScore * 100) / 100,
-    })) || [];
-
-  // 分野別効率のグラフ用データ変換
-  const subjectChartData =
-    analysis?.subjectEfficiency?.map(s => ({
+    })) || [],
+    subjectChartData: analysis?.subjectEfficiency?.map(s => ({
       ...s,
       learningVelocity: Math.round(s.learningVelocity * 100) / 100,
       completionRate: Math.round(s.completionRate * 100),
-    })) || [];
+    })) || []
+  }), [analysis]);
+
+  const { hourlyChartData, subjectChartData } = chartData;
 
   return (
     <div className='card-primary rounded-lg shadow-md p-6'>
@@ -341,5 +362,6 @@ export function LearningEfficiencyDashboard() {
   );
 }
 
-// default exportを追加
-export default LearningEfficiencyDashboard;
+// React.memo でパフォーマンス最適化
+export { LearningEfficiencyDashboard };
+export default memo(LearningEfficiencyDashboard);
