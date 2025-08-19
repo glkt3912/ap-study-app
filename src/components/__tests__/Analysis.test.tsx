@@ -27,28 +27,38 @@ vi.mock('../../lib/api', () => ({
     getBatchAnalysisData: vi.fn(),
 
     // Fallback API methods
-    getStudyLogs: vi.fn(),
-    getMorningTests: vi.fn(),
-    getAfternoonTests: vi.fn(),
-    getStudyLogStats: vi.fn(),
-    getPredictiveAnalysis: vi.fn(),
-    getPersonalizedRecommendations: vi.fn(),
-    getAdvancedWeakPoints: vi.fn(),
+    getStudyLogs: vi.fn().mockResolvedValue([]),
+    getMorningTests: vi.fn().mockResolvedValue([]),
+    getAfternoonTests: vi.fn().mockResolvedValue([]),
+    getStudyLogStats: vi.fn().mockResolvedValue({
+      totalTime: 0,
+      totalSessions: 0,
+      averageSessionTime: 0,
+      averageUnderstanding: 0,
+    }),
+    getPredictiveAnalysis: vi.fn().mockResolvedValue(null),
+    getPersonalizedRecommendations: vi.fn().mockResolvedValue(null),
+    getAdvancedWeakPoints: vi.fn().mockResolvedValue(null),
 
     // Other analysis methods
-    getLatestAnalysis: vi.fn(),
-    runAnalysis: vi.fn(),
-    generateMLAnalysis: vi.fn(),
+    getLatestAnalysis: vi.fn().mockResolvedValue(null),
+    runAnalysis: vi.fn().mockResolvedValue(null),
+    generateMLAnalysis: vi.fn().mockResolvedValue(null),
   },
 }));
 
 // Mock unified API client
 vi.mock('../../lib/unified-api', () => ({
   unifiedApiClient: {
-    getTestSessions: vi.fn(),
-    getStudyLogs: vi.fn(),
-    getStudyStats: vi.fn(),
-    getUserAnalysis: vi.fn(),
+    getTestSessions: vi.fn().mockResolvedValue([]),
+    getStudyLogs: vi.fn().mockResolvedValue([]),
+    getStudyStats: vi.fn().mockResolvedValue({
+      totalTime: 0,
+      totalSessions: 0,
+      averageSessionTime: 0,
+      averageUnderstanding: 0,
+    }),
+    getUserAnalysis: vi.fn().mockResolvedValue([]),
   },
 }));
 
@@ -69,16 +79,15 @@ const MockedAnalysis = () => (
 );
 
 describe('Analysis Component - Batch API Integration', () => {
-  beforeEach(async () => {
+  beforeEach(() => {
     vi.clearAllMocks();
     
-    // Default mock for unifiedApiClient
-    const { unifiedApiClient } = await import('../../lib/unified-api');
-    const mockUnifiedApiClient = vi.mocked(unifiedApiClient);
-    mockUnifiedApiClient.getUserAnalysis.mockResolvedValue(null as any);
-    mockUnifiedApiClient.getTestSessions.mockResolvedValue([]);
-    mockUnifiedApiClient.getStudyLogs.mockResolvedValue([]);
-    mockUnifiedApiClient.getStudyStats.mockResolvedValue(null as any);
+    // Ensure default return values are set after clearing
+    vi.mocked(mockApiClient.getBatchAnalysisData).mockRejectedValue(new Error('Default batch API failure'));
+    vi.mocked(mockApiClient.getLatestAnalysis).mockResolvedValue(null);
+    vi.mocked(mockApiClient.getStudyLogs).mockResolvedValue([]);
+    vi.mocked(mockApiClient.getMorningTests).mockResolvedValue([]);
+    vi.mocked(mockApiClient.getAfternoonTests).mockResolvedValue([]);
   });
 
   describe('Batch API Data Loading', () => {
@@ -208,8 +217,11 @@ describe('Analysis Component - Batch API Integration', () => {
       // バッチAPIは失敗
       vi.mocked(mockApiClient.getBatchAnalysisData).mockRejectedValue(new Error('Batch API not available'));
 
-      // その他のAPIも成功にセット
-      vi.mocked(mockApiClient.getLatestAnalysis).mockResolvedValue(null as any);
+      // フォールバック用のAPIも失敗させる
+      vi.mocked(mockApiClient.getLatestAnalysis).mockResolvedValue(null);
+      vi.mocked(mockApiClient.getPredictiveAnalysis).mockRejectedValue(new Error('Predictive analysis failed'));
+      vi.mocked(mockApiClient.getPersonalizedRecommendations).mockRejectedValue(new Error('Recommendations failed'));
+      vi.mocked(mockApiClient.getAdvancedWeakPoints).mockRejectedValue(new Error('Weak points failed'));
 
       render(<MockedAnalysis />);
 
@@ -221,7 +233,7 @@ describe('Analysis Component - Batch API Integration', () => {
       // フォールバック処理はコンポーネント内で実装されているため、
       // エラー表示がされることで間接的にフォールバックが動作したことを確認
       await waitFor(() => {
-        expect(screen.getByText('データの取得に失敗しました。再度お試しください。')).toBeInTheDocument();
+        expect(screen.getByText(/中にエラーが発生しました。再試行してください。/)).toBeInTheDocument();
       }, { timeout: 5000 });
     });
   });
@@ -382,11 +394,12 @@ describe('Analysis Component - Batch API Integration', () => {
     it('should display error message when batch API fails and fallback also fails', async () => {
       vi.mocked(mockApiClient.getBatchAnalysisData).mockRejectedValue(new Error('Batch API error'));
       vi.mocked(mockApiClient.getStudyLogs).mockRejectedValue(new Error('Fallback error'));
+      vi.mocked(mockApiClient.getPredictiveAnalysis).mockRejectedValue(new Error('ML analysis failed'));
 
       render(<MockedAnalysis />);
 
       await waitFor(() => {
-        expect(screen.getByText(/データの取得に失敗しました/)).toBeInTheDocument();
+        expect(screen.getByText(/中にエラーが発生しました。再試行してください。/)).toBeInTheDocument();
       });
     });
 
@@ -413,7 +426,7 @@ describe('Analysis Component - Batch API Integration', () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText(/ML分析の生成に失敗しました/)).toBeInTheDocument();
+        expect(screen.getByText(/ML分析生成中にエラーが発生しました。再試行してください。/)).toBeInTheDocument();
       });
     });
   });
