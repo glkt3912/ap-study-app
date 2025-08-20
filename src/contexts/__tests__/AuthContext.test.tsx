@@ -591,7 +591,10 @@ describe('AuthContext', () => {
         })
       );
 
-      expect(screen.getByTestId('token')).toHaveTextContent('cookie-authenticated');
+      // Wait for token to be set after authentication
+      await waitFor(() => {
+        expect(screen.getByTestId('token')).toHaveTextContent('cookie-authenticated');
+      });
     });
   });
 
