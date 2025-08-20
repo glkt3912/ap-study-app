@@ -28,6 +28,8 @@ export default function StudyLog() {
   const [error, setError] = useState<string | null>(null);
   const [topicInput, setTopicInput] = useState('');
   const [selectedSubject, setSelectedSubject] = useState<string>('');
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedDateRange, setSelectedDateRange] = useState<'all' | 'week' | 'month'>('all');
   const [sortBy, setSortBy] = useState<'date' | 'subject' | 'time' | 'understanding'>('date');
 
@@ -107,6 +109,45 @@ export default function StudyLog() {
     }
   };
 
+  // 候補取得処理
+  const fetchSuggestions = async (query: string, subject?: string) => {
+    try {
+      const options: { query?: string; subject?: string } = { query };
+      if (subject) {
+        options.subject = subject;
+      }
+      const result = await apiClient.getTopicSuggestions(options);
+      setSuggestions(result.suggestions);
+      setShowSuggestions(true);
+    } catch (err) {
+      console.warn('候補の取得に失敗しました:', err);
+      setSuggestions([]);
+      setShowSuggestions(false);
+    }
+  };
+
+  // 学習項目入力時の候補表示処理
+  const handleTopicInputChange = (value: string) => {
+    setTopicInput(value);
+    if (value.trim().length > 0) {
+      fetchSuggestions(value, newLog.subject);
+    } else {
+      setShowSuggestions(false);
+    }
+  };
+
+  // 候補選択処理
+  const selectSuggestion = (suggestion: string) => {
+    if (!newLog.topics.includes(suggestion)) {
+      setNewLog({
+        ...newLog,
+        topics: [...newLog.topics, suggestion],
+      });
+    }
+    setTopicInput('');
+    setShowSuggestions(false);
+  };
+
   const addTopic = () => {
     if (topicInput.trim() && !newLog.topics.includes(topicInput.trim())) {
       setNewLog({
@@ -114,6 +155,7 @@ export default function StudyLog() {
         topics: [...newLog.topics, topicInput.trim()],
       });
       setTopicInput('');
+      setShowSuggestions(false);
     }
   };
 
@@ -237,7 +279,13 @@ export default function StudyLog() {
                 <label className='label-primary'>科目</label>
                 <select
                   value={newLog.subject}
-                  onChange={e => setNewLog({ ...newLog, subject: e.target.value })}
+                  onChange={e => {
+                    setNewLog({ ...newLog, subject: e.target.value });
+                    // 科目変更時に候補を更新
+                    if (topicInput.trim().length > 0) {
+                      fetchSuggestions(topicInput, e.target.value);
+                    }
+                  }}
                   className='input-primary'
                   required
                 >
@@ -284,17 +332,57 @@ export default function StudyLog() {
             </div>
 
             {/* 学習項目入力 */}
-            <div>
+            <div className='relative'>
               <label className='label-primary'>学習項目</label>
-              <div className='flex space-x-2 mb-2'>
-                <input
-                  type='text'
-                  value={topicInput}
-                  onChange={e => setTopicInput(e.target.value)}
-                  onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addTopic())}
-                  className='flex-1 input-primary'
-                  placeholder='学習項目を入力 (例: SQL基礎)'
-                />
+              <div className='flex space-x-2 mb-2 relative'>
+                <div className='flex-1 relative'>
+                  <input
+                    type='text'
+                    value={topicInput}
+                    onChange={e => handleTopicInputChange(e.target.value)}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        addTopic();
+                      } else if (e.key === 'Escape') {
+                        setShowSuggestions(false);
+                      }
+                    }}
+                    onFocus={() => {
+                      if (topicInput.trim().length > 0) {
+                        fetchSuggestions(topicInput, newLog.subject);
+                      } else {
+                        // 空の場合でも科目が選択されていれば候補を表示
+                        if (newLog.subject) {
+                          fetchSuggestions('', newLog.subject);
+                        }
+                      }
+                    }}
+                    onBlur={() => {
+                      // 少し遅延させて候補選択処理を完了できるようにする
+                      setTimeout(() => setShowSuggestions(false), 200);
+                    }}
+                    className='w-full input-primary'
+                    placeholder='学習項目を入力 (例: SQL基礎)'
+                    autoComplete='off'
+                  />
+                  
+                  {/* 候補リスト */}
+                  {showSuggestions && suggestions.length > 0 && (
+                    <div className='absolute z-10 w-full mt-1 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-md shadow-lg max-h-48 overflow-y-auto'>
+                      {suggestions.map((suggestion, index) => (
+                        <button
+                          key={index}
+                          type='button'
+                          onClick={() => selectSuggestion(suggestion)}
+                          className='w-full px-3 py-2 text-left hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100 border-b border-slate-200 dark:border-slate-700 last:border-b-0'
+                        >
+                          {suggestion}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
                 <button
                   type='button'
                   onClick={addTopic}

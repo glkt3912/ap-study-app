@@ -402,6 +402,18 @@ class ApiClient {
     return this.request('/api/studylog/stats');
   }
 
+  async getTopicSuggestions(options?: { query?: string; subject?: string }): Promise<{
+    suggestions: string[];
+    query?: string;
+    subject?: string;
+  }> {
+    const params = new URLSearchParams();
+    if (options?.query) params.append('q', options.query);
+    if (options?.subject) params.append('subject', options.subject);
+    const query = params.toString();
+    return this.request(`/api/studylog/topics/suggestions${query ? `?${query}` : ''}`);
+  }
+
   // 午前問題記録API
   async getMorningTests(): Promise<MorningTest[]> {
     return this.request<MorningTest[]>('/api/test/morning');
