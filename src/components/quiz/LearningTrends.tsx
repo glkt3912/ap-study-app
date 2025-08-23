@@ -94,8 +94,8 @@ function DailyTrendsChart({
             <Tooltip
               labelFormatter={value => new Date(value).toLocaleDateString('ja-JP')}
               formatter={(value, name) => [
-                formatTooltipValue(value, name),
-                name === 'daily_questions' ? '問題数' : name === 'avg_score' ? '平均点' : name
+                formatTooltipValue(value, String(name)),
+                name === 'daily_questions' ? '問題数' : name === 'avg_score' ? '平均点' : String(name)
               ]}
               contentStyle={{
                 backgroundColor: chartTheme.tooltip.background,

@@ -18,7 +18,7 @@ export function QuizResult({ result, onNewQuiz, onBackToDashboard }: QuizResultP
 
           <ResultMetrics result={result} />
           
-          <CategoryBadge category={result.category} />
+          {result.category && <CategoryBadge category={result.category} />}
 
           <ActionButtons 
             onNewQuiz={onNewQuiz}

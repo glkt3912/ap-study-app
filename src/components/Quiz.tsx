@@ -164,7 +164,7 @@ export default function Quiz() {
     const currentQuestion = quizEngine.session.questions[quizEngine.session.currentIndex];
     if (!currentQuestion) return null;
 
-    const userAnswer = quizEngine.session.answers[currentQuestion.id];
+    const userAnswer = quizEngine.session.answers[currentQuestion.id] || '';
 
     return (
       <QuizUI

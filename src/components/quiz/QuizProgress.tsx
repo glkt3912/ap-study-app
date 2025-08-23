@@ -29,7 +29,7 @@ interface WeakPoint {
 interface QuizProgressProps {
   progressData: QuizProgressData | null;
   weakPoints: WeakPoint[];
-  onStartQuiz: (_sessionType: string, _questionCount: number, _category?: string) => void;
+  onStartQuiz: (_sessionType: 'category' | 'random' | 'review' | 'weak_points', _questionCount: number, _category?: string) => Promise<void>;
 }
 
 export function QuizProgress({ progressData, weakPoints, onStartQuiz }: QuizProgressProps) {
@@ -111,7 +111,7 @@ function WeakPointsSection({
   onStartQuiz 
 }: { 
   weakPoints: WeakPoint[];
-  onStartQuiz: (_sessionType: string, _questionCount: number, _category?: string) => void;
+  onStartQuiz: (_sessionType: 'category' | 'random' | 'review' | 'weak_points', _questionCount: number, _category?: string) => Promise<void>;
 }) {
   if (weakPoints.length === 0) return null;
 
