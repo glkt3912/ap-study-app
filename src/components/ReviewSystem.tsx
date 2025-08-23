@@ -114,21 +114,21 @@ export function ReviewSystem() {
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
       case 'easy':
-        return 'text-green-600 bg-green-100';
+        return 'text-green-700 dark:text-green-300 bg-green-100 dark:bg-green-900/30';
       case 'medium':
-        return 'text-yellow-600 bg-yellow-100';
+        return 'text-yellow-700 dark:text-yellow-300 bg-yellow-100 dark:bg-yellow-900/30';
       case 'hard':
-        return 'text-red-600 bg-red-100';
+        return 'text-red-700 dark:text-red-300 bg-red-100 dark:bg-red-900/30';
       default:
         return 'text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700';
     }
   };
 
   const getPriorityColor = (score: number) => {
-    if (score >= 0.8) return 'text-red-600 bg-red-100';
-    if (score >= 0.6) return 'text-orange-600 bg-orange-100';
-    if (score >= 0.4) return 'text-yellow-600 bg-yellow-100';
-    return 'text-green-600 bg-green-100';
+    if (score >= 0.8) return 'text-red-700 dark:text-red-300 bg-red-100 dark:bg-red-900/30';
+    if (score >= 0.6) return 'text-orange-700 dark:text-orange-300 bg-orange-100 dark:bg-orange-900/30';
+    if (score >= 0.4) return 'text-yellow-700 dark:text-yellow-300 bg-yellow-100 dark:bg-yellow-900/30';
+    return 'text-green-700 dark:text-green-300 bg-green-100 dark:bg-green-900/30';
   };
 
   const getReviewIntervalText = (reviewCount: number) => {
@@ -219,7 +219,7 @@ export function ReviewSystem() {
       {!activeReview && !loading && (
         <div className='space-y-4'>
           <div className='flex items-center justify-between'>
-            <h3 className='text-lg font-semibold'>本日の復習項目 ({todayReviews.length}件)</h3>
+            <h3 className='heading-tertiary'>本日の復習項目 ({todayReviews.length}件)</h3>
             {todayReviews.length === 0 && <p className='text-gray-600 dark:text-gray-400'>本日の復習項目はありません。</p>}
           </div>
 
@@ -263,7 +263,7 @@ export function ReviewSystem() {
 
       {/* 忘却曲線の説明 */}
       <div className='mt-8 card-accent rounded-lg p-4'>
-        <h4 className='font-semibold mb-2'>忘却曲線に基づく復習システム</h4>
+        <h4 className='heading-quaternary mb-2'>忘却曲線に基づく復習システム</h4>
         <p className='text-sm text-gray-600 dark:text-gray-300 mb-2'>
           エビングハウスの忘却曲線理論に基づき、最適なタイミングで復習を提案します。
         </p>

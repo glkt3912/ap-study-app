@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback, lazy, Suspense, memo } from 'r
 import { apiClient, type ExamConfig } from '../lib/api';
 import { ExamConfigModal } from './ExamConfigModal';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 
 const PieChart = lazy(() => import('recharts').then(module => ({ default: module.PieChart })));
 const Pie = lazy(() => import('recharts').then(module => ({ default: module.Pie })));
@@ -16,6 +17,27 @@ const CartesianGrid = lazy(() => import('recharts').then(module => ({ default: m
 const Tooltip = lazy(() => import('recharts').then(module => ({ default: module.Tooltip })));
 const ResponsiveContainer = lazy(() => import('recharts').then(module => ({ default: module.ResponsiveContainer })));
 const Legend = lazy(() => import('recharts').then(module => ({ default: module.Legend })));
+
+// ダークモード対応の色パレット
+const getChartTheme = (isDark: boolean) => ({
+  grid: isDark ? '#374151' : '#e5e7eb',
+  text: isDark ? '#d1d5db' : '#374151',
+  background: isDark ? '#1f2937' : '#ffffff',
+  tooltip: {
+    background: isDark ? '#374151' : '#ffffff',
+    border: isDark ? '#4b5563' : '#e5e7eb',
+    text: isDark ? '#f9fafb' : '#111827',
+  },
+  colors: {
+    primary: isDark ? '#60a5fa' : '#3b82f6',
+    success: isDark ? '#34d399' : '#10b981',
+    warning: isDark ? '#fbbf24' : '#f59e0b',
+    purple: isDark ? '#a78bfa' : '#8b5cf6',
+    pieColors: isDark 
+      ? ['#60a5fa', '#34d399', '#fbbf24', '#f87171', '#a78bfa', '#fb7185', '#38bdf8', '#4ade80']
+      : ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#22c55e']
+  },
+});
 
 interface PerformanceMetrics {
   period: number;
@@ -102,6 +124,9 @@ const calculateRemainingDays = (examDate: string): number => {
 
 function AdvancedAnalysis() {
   const { userId } = useAuth();
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+  const chartTheme = getChartTheme(isDark);
   const [activeTab, setActiveTab] = useState<'performance' | 'readiness' | 'pattern' | 'efficiency'>('performance');
   const [performanceMetrics, setPerformanceMetrics] = useState<PerformanceMetrics | null>(null);
   const [examReadiness, setExamReadiness] = useState<ExamReadiness | null>(null);
@@ -343,16 +368,24 @@ function AdvancedAnalysis() {
                         cx='50%'
                         cy='50%'
                         outerRadius={60}
-                        fill='#8884d8'
+                        fill={chartTheme.colors.primary}
                         dataKey='questions_attempted'
                         label={({ category, proportion }) => `${category}: ${Math.round(proportion)}%`}
                         labelLine={false}
                       >
                         {performanceMetrics?.categoryBalance?.map((_, index) => (
-                          <Cell key={`cell-${index}`} fill={`hsl(${index * 45}, 70%, 60%)`} />
+                          <Cell key={`cell-${index}`} fill={chartTheme.colors.pieColors[index % chartTheme.colors.pieColors.length]} />
                         ))}
                       </Pie>
-                      <Tooltip formatter={(value: any) => [`${value}問`, 'カテゴリ']} />
+                      <Tooltip 
+                        formatter={(value: any) => [`${value}問`, 'カテゴリ']}
+                        contentStyle={{
+                          backgroundColor: chartTheme.tooltip.background,
+                          border: `1px solid ${chartTheme.tooltip.border}`,
+                          borderRadius: '8px',
+                          color: chartTheme.tooltip.text,
+                        }}
+                      />
                     </PieChart>
                   </ResponsiveContainer>
                 </Suspense>
@@ -394,14 +427,15 @@ function AdvancedAnalysis() {
               >
                 <ResponsiveContainer width='100%' height={300}>
                   <LineChart data={performanceMetrics.growthAnalysis}>
-                    <CartesianGrid strokeDasharray='3 3' />
+                    <CartesianGrid strokeDasharray='3 3' stroke={chartTheme.grid} />
                     <XAxis
                       dataKey='week_start'
                       tickFormatter={value =>
                         new Date(value).toLocaleDateString('ja-JP', { month: 'short', day: 'numeric' })
                       }
+                      tick={{ fill: chartTheme.text, fontSize: 12 }}
                     />
-                    <YAxis />
+                    <YAxis tick={{ fill: chartTheme.text, fontSize: 12 }} />
                     <Tooltip
                       labelFormatter={value => `週開始: ${new Date(value).toLocaleDateString('ja-JP')}`}
                       formatter={(value: any, name: any) => [
@@ -412,16 +446,32 @@ function AdvancedAnalysis() {
                             : `${value}回`,
                         name === 'avg_score' ? '平均スコア' : name === 'score_change' ? 'スコア変化' : 'セッション数',
                       ]}
+                      contentStyle={{
+                        backgroundColor: chartTheme.tooltip.background,
+                        border: `1px solid ${chartTheme.tooltip.border}`,
+                        borderRadius: '8px',
+                        color: chartTheme.tooltip.text,
+                      }}
                     />
-                    <Legend />
-                    <Line type='monotone' dataKey='avg_score' stroke='#3B82F6' strokeWidth={3} name='avg_score' />
+                    <Legend wrapperStyle={{ color: chartTheme.text }} />
+                    <Line 
+                      type='monotone' 
+                      dataKey='avg_score' 
+                      stroke={chartTheme.colors.primary} 
+                      strokeWidth={3} 
+                      name='avg_score'
+                      dot={{ fill: chartTheme.colors.primary, strokeWidth: 2, r: 4 }}
+                      activeDot={{ r: 6, stroke: chartTheme.colors.primary, strokeWidth: 2 }}
+                    />
                     <Line
                       type='monotone'
                       dataKey='score_change'
-                      stroke='#10B981'
+                      stroke={chartTheme.colors.success}
                       strokeWidth={2}
                       strokeDasharray='5 5'
                       name='score_change'
+                      dot={{ fill: chartTheme.colors.success, strokeWidth: 2, r: 3 }}
+                      activeDot={{ r: 5, stroke: chartTheme.colors.success, strokeWidth: 2 }}
                     />
                   </LineChart>
                 </ResponsiveContainer>

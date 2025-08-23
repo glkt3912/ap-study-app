@@ -105,6 +105,14 @@
     @apply text-lg sm:text-xl font-semibold text-slate-800 dark:text-slate-200;
   }
 
+  .heading-tertiary {
+    @apply text-lg font-semibold text-slate-900 dark:text-slate-100;
+  }
+
+  .heading-quaternary {
+    @apply text-base font-semibold text-slate-900 dark:text-slate-100;
+  }
+
   /* Status Badges */
   .badge-success {
     @apply bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 px-2 py-1 rounded-full text-xs font-medium;

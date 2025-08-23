@@ -197,7 +197,7 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
           <div className='flex items-center justify-between mb-4'>
             <div className='flex items-center space-x-2'>
               <span className='text-2xl'>🤖</span>
-              <h3 className='text-xl font-semibold text-slate-900 dark:text-white'>AI学習コーチ</h3>
+              <h3 className='heading-secondary'>AI学習コーチ</h3>
             </div>
             <div className='text-right'>
               <div className='metric-value text-purple-600 dark:text-purple-400'>
@@ -211,7 +211,7 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
             <div className='card-secondary p-4 hover-lift click-shrink'>
               <div className='flex items-center space-x-2 mb-2'>
                 <span className='text-lg'>📈</span>
-                <h4 className='font-semibold text-slate-900 dark:text-white'>学習予測</h4>
+                <h4 className='heading-quaternary'>学習予測</h4>
               </div>
               <div className='space-y-1 text-sm'>
                 <div className='flex justify-between'>
@@ -228,7 +228,7 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
             <div className='card-secondary p-4 hover-lift click-shrink'>
               <div className='flex items-center space-x-2 mb-2'>
                 <span className='text-lg'>⚠️</span>
-                <h4 className='font-semibold text-slate-900 dark:text-white'>注意点</h4>
+                <h4 className='heading-quaternary'>注意点</h4>
               </div>
               <div className='space-y-1'>
                 {(predictiveAnalysis?.riskFactors || []).slice(0, 2).map((factor, index) => (
@@ -245,7 +245,7 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
             <div className='card-secondary p-4 hover-lift click-shrink'>
               <div className='flex items-center space-x-2 mb-2'>
                 <span className='text-lg'>✨</span>
-                <h4 className='font-semibold text-slate-900 dark:text-white'>強み</h4>
+                <h4 className='heading-quaternary'>強み</h4>
               </div>
               <div className='space-y-1'>
                 {(predictiveAnalysis?.successFactors || []).slice(0, 2).map((factor, index) => (
@@ -267,7 +267,7 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
             <div className='mt-4 card-secondary p-4 hover-lift z-content'>
               <div className='flex items-center space-x-2 mb-3'>
                 <span className='text-lg'>📋</span>
-                <h4 className='font-semibold text-slate-900 dark:text-white'>今日の推奨アクション</h4>
+                <h4 className='heading-quaternary'>今日の推奨アクション</h4>
               </div>
               {(personalizedRecommendations?.dailyStudyPlan || []).slice(0, 1).map((plan, index) => (
                 <div key={index} className='space-y-2'>
@@ -307,7 +307,7 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
       <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
         <div className='card-primary hover-lift z-content'>
           <div className='p-6 border-b border-slate-200 dark:border-slate-700'>
-            <h3 className='text-lg font-semibold text-slate-900 dark:text-white'>今日の学習</h3>
+            <h3 className='heading-tertiary'>今日の学習</h3>
           </div>
           <div className='p-6'>
             {todayTask ? (
@@ -348,7 +348,7 @@ export default function Dashboard({ studyData, isLoading = false }: DashboardPro
 
         <div className='card-primary'>
           <div className='p-6 border-b border-slate-200 dark:border-slate-700'>
-            <h3 className='text-lg font-semibold text-slate-900 dark:text-white'>週別進捗</h3>
+            <h3 className='heading-tertiary'>週別進捗</h3>
           </div>
           <div className='p-6'>
             <div className='space-y-4'>
