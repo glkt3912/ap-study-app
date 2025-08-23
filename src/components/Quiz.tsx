@@ -399,7 +399,7 @@ export default function Quiz() {
 
           {/* 問題文 */}
           <div className='mb-8'>
-            <h3 className='text-xl font-semibold text-slate-900 dark:text-slate-100 mb-4'>問題 {currentQuestion.number}</h3>
+            <h3 className='heading-secondary mb-4'>問題 {currentQuestion.number}</h3>
             <p className='text-slate-700 dark:text-slate-200 leading-relaxed whitespace-pre-wrap'>{currentQuestion.question}</p>
           </div>
 
@@ -454,7 +454,7 @@ export default function Quiz() {
         <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
           {/* ランダム問題 */}
           <div className='interactive-card hover-lift'>
-            <h3 className='text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4'>ランダム問題</h3>
+            <h3 className='heading-tertiary mb-4'>ランダム問題</h3>
             <p className='text-slate-600 dark:text-slate-400 mb-6 text-sm'>全カテゴリからランダムに問題を出題します</p>
             <div className='space-y-3'>
               <button
@@ -474,7 +474,7 @@ export default function Quiz() {
 
           {/* カテゴリ別問題 */}
           <div className='interactive-card hover-lift hover-glow-success'>
-            <h3 className='text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4'>カテゴリ別問題</h3>
+            <h3 className='heading-tertiary mb-4'>カテゴリ別問題</h3>
             <p className='text-slate-600 dark:text-slate-400 mb-6 text-sm'>特定の分野に集中して学習できます</p>
             <div className='space-y-2'>
               {state.categories.map(category => (

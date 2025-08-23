@@ -219,7 +219,7 @@ export function ReviewSystem() {
       {!activeReview && !loading && (
         <div className='space-y-4'>
           <div className='flex items-center justify-between'>
-            <h3 className='text-lg font-semibold'>本日の復習項目 ({todayReviews.length}件)</h3>
+            <h3 className='heading-tertiary'>本日の復習項目 ({todayReviews.length}件)</h3>
             {todayReviews.length === 0 && <p className='text-gray-600 dark:text-gray-400'>本日の復習項目はありません。</p>}
           </div>
 
@@ -263,7 +263,7 @@ export function ReviewSystem() {
 
       {/* 忘却曲線の説明 */}
       <div className='mt-8 card-accent rounded-lg p-4'>
-        <h4 className='font-semibold mb-2'>忘却曲線に基づく復習システム</h4>
+        <h4 className='heading-quaternary mb-2'>忘却曲線に基づく復習システム</h4>
         <p className='text-sm text-gray-600 dark:text-gray-300 mb-2'>
           エビングハウスの忘却曲線理論に基づき、最適なタイミングで復習を提案します。
         </p>
