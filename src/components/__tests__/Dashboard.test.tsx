@@ -3,6 +3,67 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import Dashboard from '../Dashboard';
 import { ThemeProvider } from '../../contexts/ThemeContext';
 
+// Mock the new Dashboard components
+vi.mock('../dashboard/DashboardMetrics', () => ({
+  DashboardMetrics: ({ studyData }: { studyData: any[] }) => (
+    <div data-testid="dashboard-metrics">
+      <div>学習進捗</div>
+      {studyData.length > 0 && <div>{(studyData[0].progressPercentage || 0).toFixed(1)}%</div>}
+    </div>
+  ),
+}));
+
+vi.mock('../dashboard/AICoachSection', () => ({
+  AICoachSection: () => <div data-testid="ai-coach-section">AI学習コーチ</div>,
+}));
+
+vi.mock('../dashboard/TodayStudyTask', () => ({
+  TodayStudyTask: ({ studyData }: { studyData: any[] }) => (
+    <div data-testid="today-study-task">
+      {studyData.length === 0 || !studyData.find(w => w.days?.find((d: any) => !d.completed))
+        ? '今日の学習タスクはありません'
+        : studyData.find(w => w.days?.find((d: any) => !d.completed))?.title}
+    </div>
+  ),
+}));
+
+vi.mock('../dashboard/WeeklyProgress', () => ({
+  WeeklyProgress: ({ studyData }: { studyData: any[] }) => (
+    <div data-testid="weekly-progress">
+      {studyData.slice(0, 3).map(week => (
+        <div key={week.weekNumber}>{week.title}</div>
+      ))}
+    </div>
+  ),
+}));
+
+vi.mock('../dashboard/PhaseProgress', () => ({
+  PhaseProgress: ({ studyData }: { studyData: any[] }) => (
+    <div data-testid="phase-progress">学習フェーズ別進捗</div>
+  ),
+}));
+
+// Mock AIAnalysisProvider
+vi.mock('../providers/AIAnalysisProvider', () => ({
+  AIAnalysisProvider: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="ai-analysis-provider">{children}</div>
+  ),
+  useAIAnalysis: () => ({
+    predictiveAnalysis: {
+      examPassProbability: 85,
+      recommendedStudyHours: 3,
+      timeToReadiness: 14,
+      riskFactors: ['時間不足'],
+      successFactors: ['継続学習'],
+    },
+    personalizedRecommendations: null,
+    isLoading: false,
+    error: null,
+    fetchData: vi.fn(),
+    clearError: vi.fn(),
+  }),
+}));
+
 // Mock useAuth hook to avoid AuthProvider dependency
 vi.mock('../../contexts/AuthContext', () => ({
   useAuth: () => ({
@@ -52,11 +113,6 @@ const MockedDashboard = ({ studyData = [], isLoading = false }: { studyData?: an
 describe('Dashboard', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    // デフォルトモック設定
-    vi.mocked(mockApiClient.getBatchDashboardMLData).mockResolvedValue({
-      predictiveAnalysis: null,
-      personalizedRecommendations: null,
-    });
   });
 
   it('renders dashboard title', async () => {
@@ -122,9 +178,13 @@ describe('Dashboard', () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText('テスト週')).toBeInTheDocument();
+      expect(screen.getByTestId('weekly-progress')).toBeInTheDocument();
+      expect(screen.getByTestId('today-study-task')).toBeInTheDocument();
     });
 
+    // Check that data is displayed in the components
+    const weeklyProgress = screen.getByTestId('weekly-progress');
+    expect(weeklyProgress).toHaveTextContent('テスト週');
     expect(screen.getByText('50.0%')).toBeInTheDocument();
   });
 
@@ -148,91 +208,52 @@ describe('Dashboard', () => {
     expect(screen.getByText('今日の学習タスクはありません')).toBeInTheDocument();
   });
 
-  it('should use batch ML API for AI learning coach data', async () => {
-    const mockMLData = {
-      predictiveAnalysis: {
-        examPassProbability: 85,
-        recommendedStudyHours: 3,
-        timeToReadiness: 14,
-        riskFactors: ['時間不足'],
-        successFactors: ['継続学習'],
-        confidenceInterval: { lower: 80, upper: 90 },
-        weakAreaPredictions: [],
-      },
-      personalizedRecommendations: {
-        dailyStudyPlan: [
-          {
-            date: '2024-01-01',
-            subjects: ['Math'],
-            estimatedTime: 90,
-            priority: 'high' as const,
-            objectives: ['基礎理解'],
-            adaptiveAdjustments: {
-              basedOnPerformance: true,
-              basedOnTimeConstraints: false,
-              basedOnMotivation: true,
-            },
-          },
-        ],
-        prioritySubjects: [],
-        reviewSchedule: [],
-        motivationalInsights: [],
-        learningPathOptimization: {
-          currentPath: 'basic',
-          optimizedPath: 'advanced',
-          expectedImprovement: 15,
-        },
-      },
-    };
-
-    vi.mocked(mockApiClient.getBatchDashboardMLData).mockResolvedValue(mockMLData);
-
+  it('should display AI learning coach section', async () => {
     await act(async () => {
       render(<MockedDashboard studyData={[]} />);
     });
 
     await waitFor(() => {
-      expect(mockApiClient.getBatchDashboardMLData).toHaveBeenCalledWith(1);
       expect(screen.getByText('AI学習コーチ')).toBeInTheDocument();
-      expect(screen.getByText('85%')).toBeInTheDocument();
-      expect(screen.getByText('合格予測確率')).toBeInTheDocument();
     });
-
-    // 個別APIが呼ばれないことを確認
-    expect(mockApiClient.getPredictiveAnalysis).not.toHaveBeenCalled();
-    expect(mockApiClient.getPersonalizedRecommendations).not.toHaveBeenCalled();
   });
 
-  it('should fall back to individual APIs when batch ML API fails', async () => {
-    // バッチAPIは失敗
-    vi.mocked(mockApiClient.getBatchDashboardMLData).mockRejectedValue(new Error('Batch ML API not available'));
-
-    // 個別APIは成功
-    const mockPredictiveAnalysis = {
-      examPassProbability: 90,
-      recommendedStudyHours: 2,
-      timeToReadiness: 10,
-      riskFactors: ['集中力'],
-      successFactors: ['計画性'],
-      confidenceInterval: { lower: 85, upper: 95 },
-      weakAreaPredictions: [],
-    };
-
-    vi.mocked(mockApiClient.getPredictiveAnalysis).mockResolvedValue(mockPredictiveAnalysis);
-    vi.mocked(mockApiClient.getPersonalizedRecommendations).mockResolvedValue(null as any);
+  it('should display all dashboard components', async () => {
+    const mockData = [
+      {
+        id: 1,
+        weekNumber: 1,
+        title: 'テスト週',
+        phase: 'Foundation',
+        goals: ['Goal 1'],
+        days: [
+          {
+            id: 1,
+            day: 'Day 1',
+            subject: 'Math',
+            topics: ['Topic 1'],
+            estimatedTime: 60,
+            actualTime: 50,
+            completed: true,
+            understanding: 4,
+          },
+        ],
+        progressPercentage: 50,
+        totalStudyTime: 50,
+        averageUnderstanding: 2,
+      },
+    ];
 
     await act(async () => {
-      render(<MockedDashboard studyData={[]} />);
+      render(<MockedDashboard studyData={mockData} />);
     });
 
     await waitFor(() => {
-      expect(mockApiClient.getBatchDashboardMLData).toHaveBeenCalledWith(1);
-      // フォールバックAPIが呼ばれることを確認
-      expect(mockApiClient.getPredictiveAnalysis).toHaveBeenCalledWith(1);
-      expect(mockApiClient.getPersonalizedRecommendations).toHaveBeenCalledWith(1);
-
-      expect(screen.getByText('AI学習コーチ')).toBeInTheDocument();
-      expect(screen.getByText('90%')).toBeInTheDocument();
+      expect(screen.getByTestId('dashboard-metrics')).toBeInTheDocument();
+      expect(screen.getByTestId('ai-coach-section')).toBeInTheDocument();
+      expect(screen.getByTestId('today-study-task')).toBeInTheDocument();
+      expect(screen.getByTestId('weekly-progress')).toBeInTheDocument();
+      expect(screen.getByTestId('phase-progress')).toBeInTheDocument();
     });
   });
 });
