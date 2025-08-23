@@ -160,7 +160,7 @@ function AdvancedAnalysis() {
 
   // 試験日設定用（既存フォーム用）
   const [examDate, setExamDate] = useState('');
-  const [targetScore, setTargetScore] = useState(60);
+  const [, setTargetScore] = useState(60);
 
   // 試験設定を読み込む
   const loadExamConfig = useCallback(async () => {
