@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { apiClient, Question, QuizCategory, QuizSession } from '../lib/api';
+import { useTheme } from '../contexts/ThemeContext';
 
 const LineChart = lazy(() => import('recharts').then(module => ({ default: module.LineChart })));
 const Line = lazy(() => import('recharts').then(module => ({ default: module.Line })));
@@ -10,6 +11,24 @@ const YAxis = lazy(() => import('recharts').then(module => ({ default: module.YA
 const CartesianGrid = lazy(() => import('recharts').then(module => ({ default: module.CartesianGrid })));
 const Tooltip = lazy(() => import('recharts').then(module => ({ default: module.Tooltip })));
 const ResponsiveContainer = lazy(() => import('recharts').then(module => ({ default: module.ResponsiveContainer })));
+
+// ダークモード対応の色パレット
+const getChartTheme = (isDark: boolean) => ({
+  grid: isDark ? '#374151' : '#e5e7eb',
+  text: isDark ? '#d1d5db' : '#374151',
+  background: isDark ? '#1f2937' : '#ffffff',
+  tooltip: {
+    background: isDark ? '#374151' : '#ffffff',
+    border: isDark ? '#4b5563' : '#e5e7eb',
+    text: isDark ? '#f9fafb' : '#111827',
+  },
+  colors: {
+    primary: isDark ? '#60a5fa' : '#3b82f6',
+    success: isDark ? '#34d399' : '#10b981',
+    warning: isDark ? '#fbbf24' : '#f59e0b',
+    purple: isDark ? '#a78bfa' : '#8b5cf6',
+  },
+});
 
 interface QuizState {
   session: null | {
@@ -48,6 +67,10 @@ interface QuizState {
 }
 
 export default function Quiz() {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+  const chartTheme = getChartTheme(isDark);
+  
   const [state, setState] = useState<QuizState>({
     session: null,
     categories: [],
@@ -620,14 +643,15 @@ export default function Quiz() {
                 <Suspense fallback={<div className='h-64 flex items-center justify-center'>グラフを読み込み中...</div>}>
                   <ResponsiveContainer width='100%' height={300}>
                     <LineChart data={state.learningTrends.dailyTrends}>
-                      <CartesianGrid strokeDasharray='3 3' />
+                      <CartesianGrid strokeDasharray='3 3' stroke={chartTheme.grid} />
                       <XAxis
                         dataKey='study_date'
                         tickFormatter={value =>
                           new Date(value).toLocaleDateString('ja-JP', { month: 'short', day: 'numeric' })
                         }
+                        tick={{ fill: chartTheme.text, fontSize: 12 }}
                       />
-                      <YAxis />
+                      <YAxis tick={{ fill: chartTheme.text, fontSize: 12 }} />
                       <Tooltip
                         labelFormatter={value => new Date(value).toLocaleDateString('ja-JP')}
                         formatter={(value, name) => [
@@ -637,15 +661,31 @@ export default function Quiz() {
                               ? `${value}問`
                               : `${value}分`,
                         ]}
+                        contentStyle={{
+                          backgroundColor: chartTheme.tooltip.background,
+                          border: `1px solid ${chartTheme.tooltip.border}`,
+                          borderRadius: '8px',
+                          color: chartTheme.tooltip.text,
+                        }}
                       />
                       <Line
                         type='monotone'
                         dataKey='daily_questions'
-                        stroke='#3B82F6'
+                        stroke={chartTheme.colors.primary}
                         strokeWidth={2}
                         name='daily_questions'
+                        dot={{ fill: chartTheme.colors.primary, strokeWidth: 2, r: 4 }}
+                        activeDot={{ r: 6, stroke: chartTheme.colors.primary, strokeWidth: 2 }}
                       />
-                      <Line type='monotone' dataKey='avg_score' stroke='#10B981' strokeWidth={2} name='avg_score' />
+                      <Line 
+                        type='monotone' 
+                        dataKey='avg_score' 
+                        stroke={chartTheme.colors.success} 
+                        strokeWidth={2} 
+                        name='avg_score'
+                        dot={{ fill: chartTheme.colors.success, strokeWidth: 2, r: 3 }}
+                        activeDot={{ r: 5, stroke: chartTheme.colors.success, strokeWidth: 2 }}
+                      />
                     </LineChart>
                   </ResponsiveContainer>
                 </Suspense>
@@ -657,24 +697,33 @@ export default function Quiz() {
                 <Suspense fallback={<div className='h-64 flex items-center justify-center'>グラフを読み込み中...</div>}>
                   <ResponsiveContainer width='100%' height={300}>
                     <LineChart data={state.learningTrends.cumulativeProgress}>
-                      <CartesianGrid strokeDasharray='3 3' />
+                      <CartesianGrid strokeDasharray='3 3' stroke={chartTheme.grid} />
                       <XAxis
                         dataKey='study_date'
                         tickFormatter={value =>
                           new Date(value).toLocaleDateString('ja-JP', { month: 'short', day: 'numeric' })
                         }
+                        tick={{ fill: chartTheme.text, fontSize: 12 }}
                       />
-                      <YAxis />
+                      <YAxis tick={{ fill: chartTheme.text, fontSize: 12 }} />
                       <Tooltip
                         labelFormatter={value => new Date(value).toLocaleDateString('ja-JP')}
                         formatter={value => [`${value}問`, '累積問題数']}
+                        contentStyle={{
+                          backgroundColor: chartTheme.tooltip.background,
+                          border: `1px solid ${chartTheme.tooltip.border}`,
+                          borderRadius: '8px',
+                          color: chartTheme.tooltip.text,
+                        }}
                       />
                       <Line
                         type='monotone'
                         dataKey='cumulative_questions'
-                        stroke='#8B5CF6'
+                        stroke={chartTheme.colors.purple}
                         strokeWidth={3}
                         name='cumulative_questions'
+                        dot={{ fill: chartTheme.colors.purple, strokeWidth: 2, r: 4 }}
+                        activeDot={{ r: 6, stroke: chartTheme.colors.purple, strokeWidth: 2 }}
                       />
                     </LineChart>
                   </ResponsiveContainer>
