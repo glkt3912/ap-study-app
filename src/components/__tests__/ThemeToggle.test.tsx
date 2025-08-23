@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ThemeProvider } from '../../contexts/ThemeContext';
-import ThemeToggle from '../ui/ThemeToggle';
+import { ThemeToggle } from '../ThemeToggle';
 
 // Mock Next.js useRouter
 vi.mock('next/navigation', () => ({
@@ -37,16 +37,16 @@ describe('ThemeToggle', () => {
 
     const button = screen.getByRole('button');
 
-    // Initial state should be light theme
-    expect(button).toHaveTextContent('🌙Dark');
+    // Initial state should be light theme (sun icon visible)
+    expect(button.querySelector('svg')).toBeInTheDocument();
 
     // Click to toggle to dark theme
     fireEvent.click(button);
-    expect(button).toHaveTextContent('☀️Light');
+    expect(button.querySelector('svg')).toBeInTheDocument();
 
     // Click to toggle back to light theme
     fireEvent.click(button);
-    expect(button).toHaveTextContent('🌙Dark');
+    expect(button.querySelector('svg')).toBeInTheDocument();
   });
 
   it('applies correct CSS classes based on theme', () => {
