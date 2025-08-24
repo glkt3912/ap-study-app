@@ -104,6 +104,7 @@ class LegacyApiClient {
   getStudyRecommendations = studyClient.getStudyRecommendations.bind(studyClient);
   markRecommendationAsRead = studyClient.markRecommendationAsRead.bind(studyClient);
   getStudyEfficiency = studyClient.getStudyEfficiency.bind(studyClient);
+  getTopicSuggestions = studyClient.getTopicSuggestions.bind(studyClient);
 
   // Quiz methods
   startQuizSession = quizClient.startQuizSession.bind(quizClient);
@@ -129,6 +130,9 @@ class LegacyApiClient {
   getAfternoonTestStats = quizClient.getAfternoonTestStats.bind(quizClient);
   getReviewQuestions = quizClient.getReviewQuestions.bind(quizClient);
   markQuestionForReview = quizClient.markQuestionForReview.bind(quizClient);
+  getQuizCategories = quizClient.getCategories.bind(quizClient);
+  getQuizProgress = quizClient.getQuizStats.bind(quizClient);
+  getRecommendedQuestions = quizClient.getReviewQuestions.bind(quizClient);
 
   // Analysis methods
   getPredictiveAnalysis = analysisClient.getPredictiveAnalysis.bind(analysisClient);
@@ -170,6 +174,7 @@ class LegacyApiClient {
   getCacheStatistics = systemClient.getCacheStatistics.bind(systemClient);
   getDatabaseStatus = systemClient.getDatabaseStatus.bind(systemClient);
   optimizeDatabase = systemClient.optimizeDatabase.bind(systemClient);
+  exportQuizData = systemClient.exportUserData.bind(systemClient);
 }
 
 // Backward compatibility

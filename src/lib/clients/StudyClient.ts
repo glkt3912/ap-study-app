@@ -230,6 +230,20 @@ export class StudyClient extends BaseClient {
     const url = userId ? `/api/study/efficiency?userId=${userId}` : '/api/study/efficiency';
     return this.request(url);
   }
+
+  // トピック提案
+  async getTopicSuggestions(options: { 
+    subject?: string; 
+    difficulty?: string; 
+    count?: number 
+  }): Promise<{ suggestions: string[] }> {
+    const params = new URLSearchParams();
+    if (options.subject) params.append('subject', options.subject);
+    if (options.difficulty) params.append('difficulty', options.difficulty);
+    if (options.count) params.append('count', options.count.toString());
+    
+    return this.request<{ suggestions: string[] }>(`/api/study/topic-suggestions?${params.toString()}`);
+  }
 }
 
 // シングルトンインスタンス

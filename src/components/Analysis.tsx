@@ -733,39 +733,50 @@ function Analysis() {
                 </div>
 
                 <div>
-                  <h4 className='font-semibold text-slate-900 dark:text-white mb-3'>🏆 優先科目</h4>
+                  <h4 className='font-semibold text-slate-900 dark:text-white mb-3'>🏆 推奨学習分野</h4>
                   <div className='space-y-2'>
-                    {personalizedRecommendations.prioritySubjects.slice(0, 4).map((subject, index) => (
+                    {personalizedRecommendations.studyPlan?.focusAreas
+                      ?.slice(0, 4)
+                      .map((area: string, index: number) => (
                       <div key={index} className='card-secondary rounded-lg p-3'>
                         <div className='flex justify-between items-center'>
-                          <span className='text-sm font-medium text-slate-900 dark:text-white'>{subject.subject}</span>
-                          <span className='text-xs text-gray-500 dark:text-gray-400'>{subject.recommendedTime}分</span>
+                          <span className='text-sm font-medium text-slate-900 dark:text-white'>{area}</span>
+                          <span className='text-xs text-gray-500 dark:text-gray-400'>
+                            優先度: {personalizedRecommendations.priority}
+                          </span>
                         </div>
-                        <div className='text-xs text-slate-600 dark:text-slate-300 mt-1'>{subject.reason}</div>
+                        <div className='text-xs text-slate-600 dark:text-slate-300 mt-1'>
+                          重点学習分野として推奨されています
+                        </div>
                       </div>
-                    ))}
+                    )) || []}
                   </div>
                 </div>
               </div>
 
-              {/* 学習パス最適化 */}
-              {personalizedRecommendations.learningPathOptimization && (
-                <div className='mt-4 card-secondary rounded-lg p-4'>
-                  <h4 className='font-semibold text-slate-900 dark:text-white mb-2'>🛤️ 学習パス最適化</h4>
-                  <div className='text-sm text-slate-600 dark:text-slate-300'>
-                    <p>
-                      <strong>現在のパス:</strong> {personalizedRecommendations.learningPathOptimization.currentPath}
-                    </p>
-                    <p>
-                      <strong>最適化パス:</strong> {personalizedRecommendations.learningPathOptimization.optimizedPath}
-                    </p>
-                    <p>
-                      <strong>期待改善:</strong>{' '}
-                      {personalizedRecommendations.learningPathOptimization.expectedImprovement}%
-                    </p>
+              {/* 学習戦略 */}
+              <div className='mt-4 card-secondary rounded-lg p-4'>
+                <h4 className='font-semibold text-slate-900 dark:text-white mb-2'>🛤️ 学習戦略</h4>
+                
+                {/* 練習戦略 */}
+                <div className='mb-3'>
+                  <h5 className='text-sm font-medium text-slate-800 dark:text-slate-200 mb-1'>練習戦略</h5>
+                  <div className='text-xs text-slate-600 dark:text-slate-300'>
+                    推奨問題タイプ: {personalizedRecommendations.practiceStrategy?.recommendedQuestionTypes?.join(', ') || '未設定'}
+                  </div>
+                  <div className='text-xs text-slate-600 dark:text-slate-300'>
+                    強化分野: {personalizedRecommendations.practiceStrategy?.weaknessesToAddress?.join(', ') || '未設定'}
                   </div>
                 </div>
-              )}
+                
+                {/* 試験戦略 */}
+                <div>
+                  <h5 className='text-sm font-medium text-slate-800 dark:text-slate-200 mb-1'>試験戦略</h5>
+                  <div className='text-xs text-slate-600 dark:text-slate-300'>
+                    時間管理: {personalizedRecommendations.examStrategy?.timeManagement?.join(', ') || '未設定'}
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 
