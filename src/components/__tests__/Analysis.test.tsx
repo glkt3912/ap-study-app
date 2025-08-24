@@ -25,6 +25,7 @@ vi.mock('../../lib/api', () => ({
   apiClient: {
     // Batch API methods
     getBatchAnalysisData: vi.fn(),
+    getBatchDashboardMLData: vi.fn(),
 
     // Fallback API methods
     getStudyLogs: vi.fn().mockResolvedValue([]),
@@ -39,6 +40,8 @@ vi.mock('../../lib/api', () => ({
     getPredictiveAnalysis: vi.fn().mockResolvedValue(null),
     getPersonalizedRecommendations: vi.fn().mockResolvedValue(null),
     getAdvancedWeakPoints: vi.fn().mockResolvedValue(null),
+    getPerformanceInsights: vi.fn().mockResolvedValue([]),
+    generatePerformanceInsights: vi.fn().mockResolvedValue(null),
 
     // Other analysis methods
     getLatestAnalysis: vi.fn().mockResolvedValue(null),
@@ -84,10 +87,16 @@ describe('Analysis Component - Batch API Integration', () => {
     
     // Ensure default return values are set after clearing
     vi.mocked(mockApiClient.getBatchAnalysisData).mockRejectedValue(new Error('Default batch API failure'));
+    vi.mocked(mockApiClient.getBatchDashboardMLData).mockResolvedValue({
+      performanceInsights: [],
+      predictiveAnalysis: null,
+      recommendations: null
+    });
     vi.mocked(mockApiClient.getLatestAnalysis).mockResolvedValue(null);
     vi.mocked(mockApiClient.getStudyLogs).mockResolvedValue([]);
     vi.mocked(mockApiClient.getMorningTests).mockResolvedValue([]);
     vi.mocked(mockApiClient.getAfternoonTests).mockResolvedValue([]);
+    vi.mocked(mockApiClient.getPerformanceInsights).mockResolvedValue([]);
   });
 
   describe('Batch API Data Loading', () => {
@@ -155,7 +164,13 @@ describe('Analysis Component - Batch API Integration', () => {
         },
       };
 
+      // Setup successful batch API calls
       vi.mocked(mockApiClient.getBatchAnalysisData).mockResolvedValue(mockBatchData);
+      vi.mocked(mockApiClient.getBatchDashboardMLData).mockResolvedValue({
+        performanceInsights: [],
+        predictiveAnalysis: null,
+        recommendations: null
+      });
       vi.mocked(mockApiClient.getLatestAnalysis).mockResolvedValue({
         id: 1,
         userId: 1,
