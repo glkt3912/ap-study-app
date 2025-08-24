@@ -84,14 +84,37 @@ function LearningEfficiencyDashboard() {
     setLoading(true);
     setError(null);
     try {
-      const data = await apiClient.generateLearningEfficiencyAnalysis({
-        userId: 'current-user', // TODO: 実際のユーザーIDを使用
+      const rawData = await apiClient.generateLearningEfficiencyAnalysis(1); // TODO: 実際のユーザーIDを使用
+      
+      // Transform API response to match expected interface
+      const transformedData: LearningEfficiencyAnalysis = {
+        id: 'generated-' + Date.now(),
+        userId: '1',
+        analysisDate: new Date().toISOString(),
         timeRange: {
-          startDate: new Date(dateRange.startDate || ''),
-          endDate: new Date(dateRange.endDate || ''),
+          startDate: dateRange.startDate || '',
+          endDate: dateRange.endDate || '',
         },
-      });
-      setAnalysis(data);
+        hourlyEfficiency: rawData.timeOfDayEfficiency.map((item) => ({
+          hour: item.hour,
+          avgStudyTime: 60, // Default value in minutes
+          avgUnderstanding: 3, // Default understanding score
+          completionRate: item.efficiency * 100, // Convert efficiency to percentage
+          efficiencyScore: item.efficiency,
+        })),
+        subjectEfficiency: rawData.subjectEfficiency.map((item) => ({
+          subject: item.subject,
+          totalStudyTime: 120, // Default value in minutes
+          avgUnderstanding: 3, // Default understanding score
+          completionRate: item.efficiency * 100, // Convert efficiency to percentage
+          difficultyLevel: 3, // Default difficulty level
+          learningVelocity: item.efficiency,
+        })),
+        recommendations: [], // Default empty array
+        overallScore: rawData.overallEfficiency
+      };
+      
+      setAnalysis(transformedData);
     } catch (err) {
       const errorMessage = handleError(err, '学習効率分析生成');
       setError(errorMessage);

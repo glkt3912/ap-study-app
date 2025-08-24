@@ -75,7 +75,7 @@ describe.skip('Batch API Methods', () => {
         json: () => Promise.resolve(mockResponse),
       });
 
-      await apiClient.getBatchAnalysisData();
+      await apiClient.getBatchAnalysisData(1);
 
       expect(mockFetch).toHaveBeenCalledWith('http://localhost:8000/api/batch/analysis-data', expect.any(Object));
     });
@@ -133,7 +133,7 @@ describe.skip('Batch API Methods', () => {
         json: () => Promise.resolve(mockResponse),
       });
 
-      const result = await apiClient.getBatchQuizData();
+      const result = await apiClient.getBatchQuizData(1);
 
       expect(result.progress).toBeNull();
       expect(result.recommendations).toBeNull();
@@ -213,7 +213,7 @@ describe.skip('Batch API Methods', () => {
         status: 500,
       });
 
-      await expect(apiClient.getBatchQuizData()).rejects.toThrow('HTTP error! status: 500');
+      await expect(apiClient.getBatchQuizData(1)).rejects.toThrow('HTTP error! status: 500');
     });
 
     it('should handle network errors', async () => {
@@ -246,7 +246,7 @@ describe.skip('Batch API Methods', () => {
       const startTime = performance.now();
 
       try {
-        await apiClient.getBatchQuizData();
+        await apiClient.getBatchQuizData(1);
       } catch {
         // エラーは期待通り
       }
@@ -295,7 +295,7 @@ describe.skip('Batch API Methods', () => {
         json: () => Promise.resolve(mockResponse),
       });
 
-      await apiClient.getBatchQuizData();
+      await apiClient.getBatchQuizData(1);
 
       expect(mockFetch).toHaveBeenCalledWith(
         expect.any(String),

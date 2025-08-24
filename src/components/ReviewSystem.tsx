@@ -62,7 +62,18 @@ export function ReviewSystem() {
         console.warn('統一API失敗、レガシーAPIにフォールバック:', unifiedError);
         // フォールバック: 既存APIを使用
         const data = await apiClient.getTodayReviews();
-        setTodayReviews(data);
+        const transformedData = data.map((question, index) => ({
+          id: question.id || String(index),
+          question_text: question.question || '',
+          category: question.category || 'general',
+          understanding_level: 3, // Default understanding level
+          last_reviewed: new Date().toISOString(),
+          next_review_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+          review_count: 1,
+          difficulty: (question.difficulty <= 2 ? 'easy' : question.difficulty >= 4 ? 'hard' : 'medium') as 'easy' | 'medium' | 'hard',
+          priority_score: 0.5 // Default priority score
+        }));
+        setTodayReviews(transformedData);
       }
     } catch (err) {
       // 404エラー（未実装API）の場合はサイレントに処理

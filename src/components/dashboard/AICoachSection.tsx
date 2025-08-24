@@ -54,10 +54,15 @@ export function AICoachSection() {
         />
       </div>
 
-      {personalizedRecommendations?.dailyStudyPlan && 
-       personalizedRecommendations.dailyStudyPlan.length > 0 && (
+      {personalizedRecommendations?.studyPlan?.adjustments && 
+       personalizedRecommendations.studyPlan.adjustments.length > 0 && (
         <DailyRecommendationCard 
-          recommendations={personalizedRecommendations.dailyStudyPlan.slice(0, 1)}
+          recommendations={personalizedRecommendations.studyPlan.adjustments.slice(0, 1).map((adjustment: string) => ({
+            subjects: [adjustment],
+            priority: 'medium' as const,
+            estimatedTime: 30,
+            objectives: [adjustment]
+          }))}
         />
       )}
 

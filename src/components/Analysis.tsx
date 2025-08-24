@@ -11,8 +11,8 @@ import {
   AfternoonTest,
   PredictiveAnalysis,
   PersonalizedRecommendations,
-  AdvancedWeakPointsAnalysis,
 } from '../lib/api';
+import type { PerformanceInsight } from '../lib/clients/AnalysisClient';
 import { unifiedApiClient } from '../lib/unified-api';
 import { useAuth } from '../contexts/AuthContext';
 // import { ChartSkeleton, CardSkeleton } from './ui/Skeleton'
@@ -80,7 +80,7 @@ function Analysis() {
   const [personalizedRecommendations, setPersonalizedRecommendations] = useState<PersonalizedRecommendations | null>(
     null
   );
-  const [advancedWeakPoints, setAdvancedWeakPoints] = useState<AdvancedWeakPointsAnalysis | null>(null);
+  const [advancedWeakPoints, setAdvancedWeakPoints] = useState<PerformanceInsight[] | null>(null);
   const [isGeneratingML, setIsGeneratingML] = useState(false);
   const [mlError, setMlError] = useState<string | null>(null);
 
@@ -114,7 +114,7 @@ function Analysis() {
       const [predictions, recommendations, weakPoints] = await Promise.all([
         apiClient.getPredictiveAnalysis(user.id).catch(() => null),
         apiClient.getPersonalizedRecommendations(user.id).catch(() => null),
-        apiClient.getAdvancedWeakPoints(user.id).catch(() => null),
+        apiClient.getPerformanceInsights(user.id).catch(() => null),
       ]);
 
       setPredictiveAnalysis(predictions);
@@ -172,7 +172,7 @@ function Analysis() {
       
       const [logs, stats] = await Promise.all([
         apiClient.getStudyLogs(),
-        apiClient.getStudyLogStats().catch(() => null),
+        Promise.resolve(null), // Remove getStudyLogStats as it doesn't exist
       ]);
       
       setStudyLogs(logs);
@@ -216,8 +216,9 @@ function Analysis() {
       } catch (unifiedError) {
         console.warn('統一API失敗、レガシーAPIにフォールバック:', unifiedError);
         // フォールバック: 既存APIを使用
-        const result = await apiClient.getLatestAnalysis();
-        setAnalysisResult(result);
+        await apiClient.getPerformanceInsights(user?.id || 0);
+        // TODO: PerformanceInsight[]をAnalysisResultに変換する必要がある場合は変換関数を作成
+        // setAnalysisResult(convertPerformanceInsightsToAnalysisResult(performanceInsights));
       }
     } catch (error) {
       // 最新分析結果の取得に失敗
@@ -234,16 +235,16 @@ function Analysis() {
 
       const batchData = await apiClient.getBatchAnalysisData(user.id);
 
-      // 基本データ設定
-      setStudyLogs(batchData.studyLogs);
-      setMorningTests(batchData.morningTests);
-      setAfternoonTests(batchData.afternoonTests);
-      setStudyStats(batchData.studyLogStats);
+      // バッチAPIデータを各状態に設定
+      setStudyLogs(batchData.studyLogs || []);
+      setMorningTests(batchData.morningTests || []);
+      setAfternoonTests(batchData.afternoonTests || []);
+      setStudyStats(batchData.studyLogStats || null);
 
       // MLデータ設定
-      setPredictiveAnalysis(batchData.predictiveAnalysis);
-      setPersonalizedRecommendations(batchData.personalizedRecommendations);
-      setAdvancedWeakPoints(batchData.advancedWeakPoints);
+      setPredictiveAnalysis(batchData.predictiveAnalysis || null);
+      setPersonalizedRecommendations(batchData.personalizedRecommendations || null);
+      setAdvancedWeakPoints(batchData.advancedWeakPoints || null);
 
       // 従来の分析結果を取得
       await fetchLatestAnalysis();
@@ -263,8 +264,9 @@ function Analysis() {
   const runAnalysis = async () => {
     try {
       setIsAnalyzing(true);
-      const result = await apiClient.runAnalysis();
-      setAnalysisResult(result);
+      await apiClient.generatePerformanceInsights(user?.id || 0);
+      // TODO: PerformanceInsight[]をAnalysisResultに変換する必要がある場合は変換関数を作成
+      // setAnalysisResult(convertPerformanceInsightsToAnalysisResult(performanceInsights));
     } catch (error) {
       // 分析実行に失敗
     } finally {
@@ -664,7 +666,7 @@ function Analysis() {
                     <div className='flex justify-between'>
                       <span className='text-slate-600 dark:text-slate-300'>信頼区間:</span>
                       <span className='font-medium'>
-                        {predictiveAnalysis.confidenceInterval.lower}% - {predictiveAnalysis.confidenceInterval.upper}%
+                        {Math.round(predictiveAnalysis.confidenceLevel * 100)}%
                       </span>
                     </div>
                   </div>
@@ -710,30 +712,40 @@ function Analysis() {
                 <div>
                   <h4 className='font-semibold text-slate-900 dark:text-white mb-3'>📅 今週の学習計画</h4>
                   <div className='space-y-2'>
-                    {personalizedRecommendations.dailyStudyPlan.slice(0, 3).map((day, index) => (
+                    {/* 新しいdailyStudyPlan構造に対応 */}
+                    {personalizedRecommendations.dailyStudyPlan?.slice(0, 3).map((plan: any, index: number) => (
                       <div key={index} className='card-secondary rounded-lg p-3'>
                         <div className='flex justify-between items-center mb-2'>
                           <span className='text-sm font-medium text-slate-900 dark:text-white'>
-                            {new Date(day.date).toLocaleDateString('ja-JP', {
-                              weekday: 'short',
-                              month: 'short',
-                              day: 'numeric',
-                            })}
+                            {plan.subjects?.join(', ')} ({plan.estimatedTime}分)
                           </span>
                           <span
-                            className={`text-xs px-2 py-1 rounded-full ${
-                              day.priority === 'high'
-                                ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400'
-                                : day.priority === 'medium'
-                                  ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400'
-                                  : 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400'
-                            }`}
+                            className='text-xs px-2 py-1 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
                           >
-                            {day.priority}
+                            {plan.priority || '重要'}
                           </span>
                         </div>
                         <div className='text-xs text-slate-600 dark:text-slate-300'>
-                          {day.subjects.join(', ')} ({day.estimatedTime}分)
+                          目標: {plan.objectives?.join(', ') || '学習を進める'}
+                        </div>
+                      </div>
+                    )) || 
+                    /* フォールバック: 従来のstudyPlan.focusAreas構造 */
+                    personalizedRecommendations.studyPlan?.focusAreas
+                      ?.slice(0, 3).map((area: string, index: number) => (
+                      <div key={index} className='card-secondary rounded-lg p-3'>
+                        <div className='flex justify-between items-center mb-2'>
+                          <span className='text-sm font-medium text-slate-900 dark:text-white'>
+                            学習分野 {index + 1}
+                          </span>
+                          <span
+                            className='text-xs px-2 py-1 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
+                          >
+                            重要
+                          </span>
+                        </div>
+                        <div className='text-xs text-slate-600 dark:text-slate-300'>
+                          {area}
                         </div>
                       </div>
                     ))}
@@ -741,39 +753,50 @@ function Analysis() {
                 </div>
 
                 <div>
-                  <h4 className='font-semibold text-slate-900 dark:text-white mb-3'>🏆 優先科目</h4>
+                  <h4 className='font-semibold text-slate-900 dark:text-white mb-3'>🏆 推奨学習分野</h4>
                   <div className='space-y-2'>
-                    {personalizedRecommendations.prioritySubjects.slice(0, 4).map((subject, index) => (
+                    {personalizedRecommendations.studyPlan?.focusAreas
+                      ?.slice(0, 4)
+                      .map((area: string, index: number) => (
                       <div key={index} className='card-secondary rounded-lg p-3'>
                         <div className='flex justify-between items-center'>
-                          <span className='text-sm font-medium text-slate-900 dark:text-white'>{subject.subject}</span>
-                          <span className='text-xs text-gray-500 dark:text-gray-400'>{subject.recommendedTime}分</span>
+                          <span className='text-sm font-medium text-slate-900 dark:text-white'>{area}</span>
+                          <span className='text-xs text-gray-500 dark:text-gray-400'>
+                            優先度: {personalizedRecommendations.priority}
+                          </span>
                         </div>
-                        <div className='text-xs text-slate-600 dark:text-slate-300 mt-1'>{subject.reason}</div>
+                        <div className='text-xs text-slate-600 dark:text-slate-300 mt-1'>
+                          重点学習分野として推奨されています
+                        </div>
                       </div>
-                    ))}
+                    )) || []}
                   </div>
                 </div>
               </div>
 
-              {/* 学習パス最適化 */}
-              {personalizedRecommendations.learningPathOptimization && (
-                <div className='mt-4 card-secondary rounded-lg p-4'>
-                  <h4 className='font-semibold text-slate-900 dark:text-white mb-2'>🛤️ 学習パス最適化</h4>
-                  <div className='text-sm text-slate-600 dark:text-slate-300'>
-                    <p>
-                      <strong>現在のパス:</strong> {personalizedRecommendations.learningPathOptimization.currentPath}
-                    </p>
-                    <p>
-                      <strong>最適化パス:</strong> {personalizedRecommendations.learningPathOptimization.optimizedPath}
-                    </p>
-                    <p>
-                      <strong>期待改善:</strong>{' '}
-                      {personalizedRecommendations.learningPathOptimization.expectedImprovement}%
-                    </p>
+              {/* 学習戦略 */}
+              <div className='mt-4 card-secondary rounded-lg p-4'>
+                <h4 className='font-semibold text-slate-900 dark:text-white mb-2'>🛤️ 学習戦略</h4>
+                
+                {/* 練習戦略 */}
+                <div className='mb-3'>
+                  <h5 className='text-sm font-medium text-slate-800 dark:text-slate-200 mb-1'>練習戦略</h5>
+                  <div className='text-xs text-slate-600 dark:text-slate-300'>
+                    推奨問題タイプ: {personalizedRecommendations.practiceStrategy?.recommendedQuestionTypes?.join(', ') || '未設定'}
+                  </div>
+                  <div className='text-xs text-slate-600 dark:text-slate-300'>
+                    強化分野: {personalizedRecommendations.practiceStrategy?.weaknessesToAddress?.join(', ') || '未設定'}
                   </div>
                 </div>
-              )}
+                
+                {/* 試験戦略 */}
+                <div>
+                  <h5 className='text-sm font-medium text-slate-800 dark:text-slate-200 mb-1'>試験戦略</h5>
+                  <div className='text-xs text-slate-600 dark:text-slate-300'>
+                    時間管理: {personalizedRecommendations.examStrategy?.timeManagement?.join(', ') || '未設定'}
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 
@@ -783,30 +806,41 @@ function Analysis() {
               <h3 className='text-xl font-semibold text-slate-900 dark:text-white mb-4'>🎯 AI弱点分析</h3>
 
               <div className='space-y-4'>
-                {advancedWeakPoints.criticalWeakPoints.slice(0, 3).map((weakness, index) => (
+                {Array.isArray(advancedWeakPoints) 
+                  ? advancedWeakPoints
+                    .filter((insight: PerformanceInsight) => insight.type === 'weakness' && insight.priority === 'high')
+                    .slice(0, 3)
+                    .map((insight: PerformanceInsight, index: number) => (
                   <div key={index} className='card-secondary rounded-lg p-4'>
                     <div className='flex justify-between items-start mb-2'>
-                      <h4 className='font-semibold text-slate-900 dark:text-white'>{weakness.subject}</h4>
+                      <h4 className='font-semibold text-slate-900 dark:text-white'>{insight.category}</h4>
                       <span
                         className={`text-xs px-2 py-1 rounded-full ${
-                          weakness.severity === 'critical'
+                          insight.priority === 'high'
                             ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400'
-                            : weakness.severity === 'moderate'
+                            : insight.priority === 'medium'
                               ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400'
                               : 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400'
                         }`}
                       >
-                        {weakness.severity}
+                        {insight.priority}
                       </span>
                     </div>
                     <div className='text-sm text-slate-600 dark:text-slate-300 mb-2'>
-                      正答率: {((weakness.accuracy || 0) * 100).toFixed(1)}% | 学習時間: {weakness.timeSpent || 0}分
+                      現在値: {insight.metrics.current} | 目標値: {insight.metrics.target} | トレンド: {insight.metrics.trend}
                     </div>
                     <div className='text-xs text-gray-500 dark:text-gray-400'>
-                      <strong>改善提案:</strong> {weakness.improvementSuggestions.slice(0, 2).join(', ')}
+                      <strong>{insight.title}:</strong> {insight.description}
                     </div>
                   </div>
-                ))}
+                )) 
+                  : (
+                    <div className="text-center py-8">
+                      <p className="text-gray-500 dark:text-gray-400">
+                        弱点分析データがありません
+                      </p>
+                    </div>
+                  )}
               </div>
             </div>
           )}

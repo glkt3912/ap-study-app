@@ -22,7 +22,7 @@ export function ExamConfigModal({ isOpen, onClose, onSave, userId, initialConfig
     
     try {
       setLoading(true);
-      const config = await apiClient.getExamConfig(userId);
+      const config = await apiClient.getExamConfig(Number(userId));
       if (config) {
         const dateString = new Date(config.examDate).toISOString().split('T')[0];
         if (dateString) {
@@ -82,8 +82,8 @@ export function ExamConfigModal({ isOpen, onClose, onSave, userId, initialConfig
       };
 
       const savedConfig = initialConfig 
-        ? await apiClient.updateExamConfig(userId, configData)
-        : await apiClient.setExamConfig(userId, configData);
+        ? await apiClient.updateExamConfig(initialConfig.id, configData)
+        : await apiClient.createExamConfig(configData);
 
       onSave(savedConfig);
       onClose();
@@ -104,7 +104,7 @@ export function ExamConfigModal({ isOpen, onClose, onSave, userId, initialConfig
 
     try {
       setLoading(true);
-      await apiClient.deleteExamConfig(userId);
+      await apiClient.deleteExamConfig(initialConfig.id);
       onClose();
     } catch (error) {
       setError(error instanceof Error ? error.message : '削除に失敗しました');

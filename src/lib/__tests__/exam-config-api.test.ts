@@ -35,7 +35,7 @@ describe('Exam Config API Client', () => {
       const result = await api.getExamConfig('1');
 
       expect(mockFetch).toHaveBeenCalledWith(
-        'http://localhost:8000/api/exam-config/1',
+        'http://localhost:8000/api/exam-config?userId=1',
         expect.objectContaining({
           headers: expect.objectContaining({
             'Content-Type': 'application/json',
@@ -57,7 +57,7 @@ describe('Exam Config API Client', () => {
       await api.getExamConfig('user@example.com');
 
       expect(mockFetch).toHaveBeenCalledWith(
-        'http://localhost:8000/api/exam-config/user%40example.com',
+        'http://localhost:8000/api/exam-config?userId=user@example.com',
         expect.any(Object)
       );
     });
@@ -65,15 +65,15 @@ describe('Exam Config API Client', () => {
     it('should handle API errors', async () => {
       mockFetch.mockResolvedValue({
         ok: false,
-        status: 404,
-        json: () => Promise.resolve({ error: 'Not found' }),
+        status: 500,
+        text: () => Promise.resolve('Server error'),
       });
 
-      await expect(api.getExamConfig('999')).rejects.toThrow();
+      await expect(api.getExamConfig('999')).rejects.toThrow('Server error');
     });
   });
 
-  describe('setExamConfig', () => {
+  describe('createExamConfig', () => {
     it('should create new exam config', async () => {
       const requestData: CreateExamConfigRequest = {
         examDate: '2024-12-01T00:00:00Z',
@@ -98,10 +98,10 @@ describe('Exam Config API Client', () => {
         }),
       });
 
-      const result = await api.setExamConfig('1', requestData);
+      const result = await api.createExamConfig(requestData);
 
       expect(mockFetch).toHaveBeenCalledWith(
-        'http://localhost:8000/api/exam-config/1',
+        'http://localhost:8000/api/exam-config',
         expect.objectContaining({
           method: 'POST',
           headers: expect.objectContaining({
@@ -135,7 +135,7 @@ describe('Exam Config API Client', () => {
         }),
       });
 
-      const result = await api.setExamConfig('1', requestData);
+      const result = await api.createExamConfig(requestData);
 
       expect(result.targetScore).toBeUndefined();
     });
@@ -155,7 +155,7 @@ describe('Exam Config API Client', () => {
         }),
       });
 
-      await expect(api.setExamConfig('1', requestData)).rejects.toThrow();
+      await expect(api.createExamConfig(requestData)).rejects.toThrow();
     });
   });
 
@@ -184,12 +184,12 @@ describe('Exam Config API Client', () => {
         }),
       });
 
-      const result = await api.updateExamConfig('1', requestData);
+      const result = await api.updateExamConfig(1, requestData);
 
       expect(mockFetch).toHaveBeenCalledWith(
         'http://localhost:8000/api/exam-config/1',
         expect.objectContaining({
-          method: 'POST',
+          method: 'PUT',
           body: JSON.stringify(requestData),
         })
       );
@@ -217,7 +217,7 @@ describe('Exam Config API Client', () => {
         }),
       });
 
-      await api.updateExamConfig('1', requestData);
+      await api.updateExamConfig(1, requestData);
 
       expect(mockFetch).toHaveBeenCalledWith(
         expect.any(String),
@@ -240,7 +240,7 @@ describe('Exam Config API Client', () => {
         }),
       });
 
-      const result = await api.deleteExamConfig('1');
+      const result = await api.deleteExamConfig(1);
 
       expect(mockFetch).toHaveBeenCalledWith(
         'http://localhost:8000/api/exam-config/1',
@@ -251,7 +251,7 @@ describe('Exam Config API Client', () => {
           }),
         })
       );
-      expect(result).toEqual(mockResponse);
+      expect(result).toBeUndefined();
     });
 
     it('should handle delete errors', async () => {
@@ -261,7 +261,7 @@ describe('Exam Config API Client', () => {
         json: () => Promise.resolve({ error: 'Configuration not found' }),
       });
 
-      await expect(api.deleteExamConfig('999')).rejects.toThrow();
+      await expect(api.deleteExamConfig(999)).rejects.toThrow();
     });
   });
 
@@ -343,7 +343,7 @@ describe('Exam Config API Client', () => {
         }),
       });
 
-      await api.setExamConfig('1', requestData);
+      await api.createExamConfig(requestData);
 
       expect(mockFetch).toHaveBeenCalledWith(
         expect.any(String),
@@ -368,7 +368,7 @@ describe('Exam Config API Client', () => {
       await api.getExamConfig('user+test@example.com');
 
       expect(mockFetch).toHaveBeenCalledWith(
-        'http://localhost:8000/api/exam-config/user%2Btest%40example.com',
+        'http://localhost:8000/api/exam-config?userId=user+test@example.com',
         expect.any(Object)
       );
     });

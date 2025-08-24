@@ -51,12 +51,11 @@ export default function StudyProgress({ planId, plan: _plan, compact = false }: 
     const completedDays = studyPlan.weeks?.reduce((total: number, week: any) => 
       total + (week.days?.filter((day: any) => day.completed).length || 0), 0) || 0;
     
-    // 既存のStudyPlanProgress型に合わせたデータ構造を作成
+    // StudyPlanProgress型に合わせたデータ構造を作成
     return {
       planId: studyPlan.id,
       totalDays: totalDays,
       completedDays: completedDays,
-      progressPercentage: totalDays > 0 ? Math.round((completedDays / totalDays) * 100) : 0,
       totalHours: Math.round((studyPlan.weeks?.reduce((total: number, week: any) => 
         total + (week.days?.reduce((weekTotal: number, day: any) => 
           weekTotal + (day.actualTime || 0), 0) || 0), 0) || 0) / 60),
@@ -67,21 +66,8 @@ export default function StudyProgress({ planId, plan: _plan, compact = false }: 
       averageScore: calculateAverageUnderstanding(studyPlan.weeks || []) * 20, // 5段階 -> 100%変換
       streakDays: calculateStreakDays(studyPlan.weeks || []),
       lastStudyDate: getLastStudyDate(studyPlan.weeks || []),
-      weeklyProgress: studyPlan.weeks?.map((week: any) => ({
-        weekNumber: week.weekNumber,
-        completed: week.days?.filter((day: any) => day.completed).length || 0,
-        total: week.days?.length || 0,
-        progressPercentage: week.days?.length > 0 ? 
-          Math.round((week.days.filter((day: any) => day.completed).length / week.days.length) * 100) : 0
-      })) || [],
-      recentActivity: studyPlan.weeks?.slice(0, 3).map((week: any) => ({
-        type: 'study_unit' as const,
-        date: week.days?.[0]?.createdAt || new Date().toISOString(),
-        description: `第${week.weekNumber}週: ${week.title}`
-      })) || [],
-      createdAt: studyPlan.createdAt || new Date().toISOString(),
-      updatedAt: studyPlan.updatedAt || new Date().toISOString()
-    } as any;
+      upcomingMilestones: [] // TODO: 実際のマイルストーンデータが必要な場合は実装
+    };
   };
   
   const calculateAverageUnderstanding = (weeks: any[]): number => {

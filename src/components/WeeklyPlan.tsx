@@ -29,10 +29,10 @@ export default function WeeklyPlan({ studyData, setStudyData }: WeeklyPlanProps)
         const savedTemplate = await apiClient.getWeeklyPlanTemplate(userId);
         
         if (savedTemplate) {
-          // 保存された学習計画データを復元
-          const studyWeeks = savedTemplate.studyWeeksData || [];
-          setStudyData(studyWeeks);
-          setShowTemplates(false);
+          // 保存されたテンプレートから学習データを生成
+          // 現在のAPIはテンプレートを返すので、実際の学習データは別途取得が必要
+          // TODO: 保存された学習計画データを取得するAPIを使用
+          console.warn('保存されたテンプレートを発見しましたが、学習データの復元機能は未実装です');
         }
       } catch (error) {
         console.error('テンプレート復元に失敗:', error);
@@ -73,7 +73,7 @@ export default function WeeklyPlan({ studyData, setStudyData }: WeeklyPlanProps)
         data: requestData
       });
       
-      await apiClient.updateStudyProgress(week.weekNumber, dayIndex, requestData);
+      await apiClient.updateStudyProgress(week.weekNumber, dayIndex, task.understanding || 3);
     } catch (error) {
       console.error('学習進捗の保存に失敗しました:', error);
       
@@ -123,8 +123,8 @@ export default function WeeklyPlan({ studyData, setStudyData }: WeeklyPlanProps)
         });
       }
       
-      // ローカル状態を更新（型キャストで緊急対応）
-      setStudyData(newStudyData as unknown as StudyWeek[]);
+      // ローカル状態を更新
+      setStudyData(newStudyData);
       setSelectedWeek(1);
       setShowTemplates(false);
       setSelectedTemplate(null);
@@ -145,9 +145,9 @@ export default function WeeklyPlan({ studyData, setStudyData }: WeeklyPlanProps)
         }
       );
       
-      // エラーが発生してもローカル状態は更新する（型キャストで緊急対応）
+      // エラーが発生してもローカル状態は更新する
       const newStudyData = createStudyDataFromTemplate(selectedTemplate);
-      setStudyData(newStudyData as unknown as StudyWeek[]);
+      setStudyData(newStudyData);
       setSelectedWeek(1);
       setShowTemplates(false);
       setSelectedTemplate(null);

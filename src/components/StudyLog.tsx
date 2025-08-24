@@ -57,15 +57,28 @@ export default function StudyLog() {
     try {
       setIsLoading(true);
       const studyLogs = await apiClient.getStudyLogs();
+      
       setLogs(
-        studyLogs.map(log => ({
-          ...log,
-          date: new Date(log.date).toISOString().split('T')[0] || '',
-        }))
+        studyLogs.map(log => {
+          return {
+            ...log,
+            date: new Date(log.date).toISOString().split('T')[0] || '',
+            // topicsが配列でない場合の安全な変換
+            topics: Array.isArray(log.topics) 
+              ? log.topics.map((topic: any) => typeof topic === 'string' ? topic : String(topic))
+              : typeof log.topics === 'string' 
+                ? [log.topics] 
+                : []
+          };
+        })
       );
       setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '学習記録の取得に失敗しました');
+      console.error('StudyLog fetch error:', err);
+      const errorMessage = err instanceof Error ? err.message : '学習記録の取得に失敗しました';
+      setError(`学習記録の取得エラー: ${errorMessage}`);
+      // エラーでも空の配列で継続
+      setLogs([]);
     } finally {
       setIsLoading(false);
     }
@@ -86,6 +99,12 @@ export default function StudyLog() {
           {
             ...createdLog,
             date: new Date(createdLog.date).toISOString().split('T')[0] || '',
+            // topicsの安全な変換
+            topics: Array.isArray(createdLog.topics) 
+              ? createdLog.topics.map((topic: any) => typeof topic === 'string' ? topic : String(topic))
+              : typeof createdLog.topics === 'string' 
+                ? [createdLog.topics] 
+                : []
           },
           ...prevLogs,
         ]);
@@ -102,7 +121,9 @@ export default function StudyLog() {
         setTopicInput('');
         setError(null);
       } catch (err) {
-        setError(err instanceof Error ? err.message : '学習記録の作成に失敗しました');
+        console.error('StudyLog creation error:', err);
+        const errorMessage = err instanceof Error ? err.message : '学習記録の作成に失敗しました';
+        setError(`学習記録の作成エラー: ${errorMessage}`);
       } finally {
         setIsLoading(false);
       }
@@ -120,7 +141,7 @@ export default function StudyLog() {
       setSuggestions(result.suggestions);
       setShowSuggestions(true);
     } catch (err) {
-      console.warn('候補の取得に失敗しました:', err);
+      // 候補取得失敗は通常動作に影響しないため、サイレントに処理
       setSuggestions([]);
       setShowSuggestions(false);
     }
@@ -526,6 +547,16 @@ export default function StudyLog() {
                         <div>
                           <h4 className='font-medium text-slate-900 dark:text-slate-100'>{log.subject}</h4>
                           <p className='text-sm text-gray-600'>{log.date}</p>
+                          <div className='flex flex-wrap gap-1 mt-2'>
+                            {Array.isArray(log.topics) && log.topics.map((topic, topicIndex) => (
+                              <span
+                                key={topicIndex}
+                                className='text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded'
+                              >
+                                {typeof topic === 'string' ? topic : JSON.stringify(topic)}
+                              </span>
+                            ))}
+                          </div>
                         </div>
                         <div className='text-right'>
                           <div className='text-sm font-medium text-slate-900 dark:text-slate-100'>{log.studyTime}分</div>
