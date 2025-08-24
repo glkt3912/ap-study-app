@@ -731,7 +731,8 @@ function Analysis() {
                       </div>
                     )) || 
                     /* フォールバック: 従来のstudyPlan.focusAreas構造 */
-                    personalizedRecommendations.studyPlan?.focusAreas?.slice(0, 3).map((area: string, index: number) => (
+                    personalizedRecommendations.studyPlan?.focusAreas
+                      ?.slice(0, 3).map((area: string, index: number) => (
                       <div key={index} className='card-secondary rounded-lg p-3'>
                         <div className='flex justify-between items-center mb-2'>
                           <span className='text-sm font-medium text-slate-900 dark:text-white'>

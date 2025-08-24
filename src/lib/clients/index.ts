@@ -198,7 +198,14 @@ class LegacyApiClient {
   async getBatchAnalysisData(userId: number): Promise<any> {
     try {
       // 複数の分析データを一括取得 - Analysis.tsx で期待される形式に合わせる
-      const [studyLogs, morningTests, afternoonTests, performanceInsights, predictiveAnalysis, recommendations] = await Promise.all([
+      const [
+        studyLogs, 
+        morningTests, 
+        afternoonTests, 
+        performanceInsights, 
+        predictiveAnalysis, 
+        recommendations
+      ] = await Promise.all([
         this.getStudyLogs().catch(() => []),
         this.getMorningTests().catch(() => []),
         this.getAfternoonTests().catch(() => []),
@@ -252,12 +259,12 @@ class LegacyApiClient {
   }
 
   // Missing analysis methods for compatibility
-  async generatePerformanceInsights(userId: number): Promise<any> {
+  async generatePerformanceInsights(_userId: number): Promise<any> {
     try {
       // パフォーマンス洞察を生成する代替実装
       const studyLogs = await this.getStudyLogs().catch(() => []);
-      const morningTests = await this.getMorningTests().catch(() => []);
-      const afternoonTests = await this.getAfternoonTests().catch(() => []);
+      await this.getMorningTests().catch(() => []);
+      await this.getAfternoonTests().catch(() => []);
       
       return {
         insights: [
