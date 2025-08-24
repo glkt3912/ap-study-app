@@ -95,17 +95,45 @@ export interface StudyPlanPreferences {
 }
 
 export class SystemClient extends BaseClient {
-  // システム状態・監視
+  // システム状態・監視 (未実装のため代替実装)
   async getSystemInfo(): Promise<SystemInfo> {
-    return this.request<SystemInfo>('/api/system/info');
+    // TODO: バックエンドに /api/system/info エンドポイント実装後に有効化
+    console.warn('getSystemInfo: API not implemented, returning mock data');
+    return {
+      version: '1.0.0',
+      environment: process.env.NODE_ENV || 'development',
+      uptime: Date.now(),
+      memoryUsage: 0,
+      cpuUsage: 0,
+      databaseConnections: 1
+    };
   }
 
   async getHealthCheck(): Promise<HealthCheck> {
-    return this.request<HealthCheck>('/api/health');
+    // monitoring APIのヘルスチェックを利用
+    try {
+      return await this.request<HealthCheck>('/api/monitoring/health');
+    } catch (error) {
+      console.warn('getHealthCheck: Failed to get health status', error);
+      return {
+        status: 'unknown' as any,
+        timestamp: new Date().toISOString(),
+        version: '1.0.0',
+        uptime: 0,
+        services: { database: 'down', redis: 'down', ml: 'down' },
+        metrics: { responseTime: 0, memoryUsage: 0, cpuUsage: 0 }
+      };
+    }
   }
 
   async getSystemMetrics(): Promise<SystemMetrics> {
-    return this.request<SystemMetrics>('/api/system/metrics');
+    // TODO: バックエンドに /api/system/metrics エンドポイント実装後に有効化
+    console.warn('getSystemMetrics: API not implemented, returning mock data');
+    return {
+      performance: { averageResponseTime: 0, requestCount: 0, errorRate: 0, successRate: 100 },
+      usage: { activeUsers: 0, totalSessions: 0, avgSessionDuration: 0, peakConcurrentUsers: 0 },
+      ml: { modelVersion: '1.0', predictionAccuracy: 0, recommendationClickRate: 0, analysisGenerationTime: 0 }
+    };
   }
 
   // 設定管理
@@ -141,13 +169,27 @@ export class SystemClient extends BaseClient {
     });
   }
 
-  // 学習計画テンプレート
+  // 学習計画テンプレート (未実装のため代替実装)
   async getStudyPlanTemplates(): Promise<StudyPlanTemplate[]> {
-    return this.request<StudyPlanTemplate[]>('/api/study-plan-templates');
+    // TODO: バックエンドに /api/study-plan-templates エンドポイント実装後に有効化
+    console.warn('getStudyPlanTemplates: API not implemented, returning empty array');
+    return [];
   }
 
   async getStudyPlanTemplate(templateId: number): Promise<StudyPlanTemplate> {
-    return this.request<StudyPlanTemplate>(`/api/study-plan-templates/${templateId}`);
+    // TODO: バックエンドに /api/study-plan-templates エンドポイント実装後に有効化
+    console.warn('getStudyPlanTemplate: API not implemented, returning mock data');
+    return {
+      id: templateId,
+      name: 'Basic Study Plan',
+      description: 'A basic study plan template',
+      defaultPeriodDays: 90,
+      defaultWeeklyHours: 20,
+      targetAudience: 'beginners',
+      difficulty: 'beginner',
+      features: [],
+      isPopular: false
+    };
   }
 
   // 学習設定・環境設定

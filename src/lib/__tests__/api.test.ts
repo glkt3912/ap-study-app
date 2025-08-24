@@ -79,7 +79,7 @@ describe('API Client', () => {
 
       const result = await apiClient.createStudyLog(studyLog);
 
-      expect(mockFetch).toHaveBeenCalledWith('http://localhost:8000/api/study/logs', {
+      expect(mockFetch).toHaveBeenCalledWith('http://localhost:8000/api/studylog', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
