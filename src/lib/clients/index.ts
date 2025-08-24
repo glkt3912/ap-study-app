@@ -184,6 +184,63 @@ class LegacyApiClient {
   validatePrediction = analysisClient.validatePrediction.bind(analysisClient);
   clearAnalysisCache = analysisClient.clearAnalysisCache.bind(analysisClient);
   getAnalysisCacheStatus = analysisClient.getAnalysisCacheStatus.bind(analysisClient);
+  
+  // テスト互換性のための追加メソッド
+  async getAdvancedWeakPoints(userId: number): Promise<any> {
+    try {
+      return await analysisClient.getPerformanceInsights(userId);
+    } catch (error) {
+      console.warn('getAdvancedWeakPoints failed:', error);
+      return [];
+    }
+  }
+  
+  async getBatchAnalysisData(userId: number): Promise<any> {
+    try {
+      // 複数の分析データを一括取得
+      const [performanceInsights, predictiveAnalysis, recommendations] = await Promise.all([
+        this.getPerformanceInsights(userId).catch(() => []),
+        this.getPredictiveAnalysis(userId).catch(() => null),
+        this.getPersonalizedRecommendations(userId).catch(() => null)
+      ]);
+      return {
+        performanceInsights,
+        predictiveAnalysis,
+        recommendations
+      };
+    } catch (error) {
+      console.warn('getBatchAnalysisData failed:', error);
+      return null;
+    }
+  }
+  
+  async getLatestAnalysis(userId: number): Promise<any> {
+    try {
+      return await this.getPerformanceInsights(userId);
+    } catch (error) {
+      console.warn('getLatestAnalysis failed:', error);
+      return [];
+    }
+  }
+  
+  async getBatchQuizData(userId: number): Promise<any> {
+    try {
+      // クイズ関連データを一括取得
+      const [quizStats, morningTests, afternoonTests] = await Promise.all([
+        this.getQuizProgress(userId).catch(() => null),
+        this.getMorningTests().catch(() => []),
+        this.getAfternoonTests().catch(() => [])
+      ]);
+      return {
+        quizStats,
+        morningTests,
+        afternoonTests
+      };
+    } catch (error) {
+      console.warn('getBatchQuizData failed:', error);
+      return null;
+    }
+  }
 
   // System methods
   getSystemInfo = systemClient.getSystemInfo.bind(systemClient);

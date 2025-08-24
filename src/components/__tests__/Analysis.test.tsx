@@ -328,48 +328,22 @@ describe('Analysis Component - Batch API Integration', () => {
 
       vi.mocked(mockApiClient.getBatchAnalysisData).mockResolvedValue(mockBatchData);
       vi.mocked(mockApiClient.getLatestAnalysis).mockResolvedValue(null);
-      vi.mocked(mockApiClient.generateMLAnalysis).mockResolvedValue({
-        id: 1,
-        userId: 1,
-        analysisDate: '2024-01-01',
-        overallScore: 85,
-        studyPattern: {
-          totalStudyTime: 100,
-          averageStudyTime: 50,
-          studyFrequency: 5,
-          bestStudyTime: '18:00',
-          consistencyScore: 8,
-          preferredSubjects: ['Math'],
-          learningVelocity: 1.2,
-          concentrationSpan: 45,
+      vi.mocked(mockApiClient.generateMLAnalysis).mockResolvedValue([{
+        category: 'overall',
+        prediction: {
+          passProbability: 90,
+          recommendedStudyTime: 3,
+          difficultyAdjustment: 'medium'
         },
-        weaknessAnalysis: {
-          weakSubjects: [],
-          weakTopics: [],
-          improvementAreas: [],
-          rootCauses: [],
+        insights: {
+          learningPattern: 'consistent',
+          effectiveStudyMethods: ['visual'],
+          weaknessAreas: [],
+          strengthAreas: ['math'],
         },
-        studyRecommendation: {
-          dailyStudyTime: 120,
-          weeklyGoal: 840,
-          focusSubjects: ['Math'],
-          reviewSchedule: [],
-          adaptivePacing: {
-            currentPace: 'normal',
-            recommendedPace: 'fast',
-            reason: 'Good progress',
-          },
-        },
-        learningEfficiencyScore: 85,
-        predictions: {
-          examPassProbability: 90,
-          recommendedStudyHours: 3,
-          riskFactors: [],
-          successFactors: [],
-          milestonesPrediction: [],
-        },
-        personalizedRecommendations: [],
-      });
+        modelVersion: '1.0',
+        confidence: 85
+      }] as any);
 
       // ML分析生成後のデータ取得をモック
       vi.mocked(mockApiClient.getPredictiveAnalysis).mockResolvedValue(null as any);
