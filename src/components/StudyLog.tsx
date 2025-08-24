@@ -58,15 +58,8 @@ export default function StudyLog() {
       setIsLoading(true);
       const studyLogs = await apiClient.getStudyLogs();
       
-      // デバッグ用：APIレスポンスをログ出力
-      console.log('StudyLog API Response:', studyLogs);
-      
       setLogs(
         studyLogs.map(log => {
-          // デバッグ用：各ログエントリをチェック
-          console.log('Processing log:', log);
-          console.log('Topics type:', typeof log.topics, 'Topics value:', log.topics);
-          
           return {
             ...log,
             date: new Date(log.date).toISOString().split('T')[0] || '',
@@ -81,7 +74,6 @@ export default function StudyLog() {
       );
       setError(null);
     } catch (err) {
-      console.error('StudyLog fetch error:', err);
       setError(err instanceof Error ? err.message : '学習記録の取得に失敗しました');
     } finally {
       setIsLoading(false);
@@ -99,7 +91,6 @@ export default function StudyLog() {
         });
 
         // ローカル状態を更新
-        console.log('Created log response:', createdLog);
         setLogs(prevLogs => [
           {
             ...createdLog,
@@ -144,7 +135,7 @@ export default function StudyLog() {
       setSuggestions(result.suggestions);
       setShowSuggestions(true);
     } catch (err) {
-      console.warn('候補の取得に失敗しました:', err);
+      // 候補取得失敗は通常動作に影響しないため、サイレントに処理
       setSuggestions([]);
       setShowSuggestions(false);
     }

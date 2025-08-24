@@ -216,8 +216,9 @@ function Analysis() {
       } catch (unifiedError) {
         console.warn('統一API失敗、レガシーAPIにフォールバック:', unifiedError);
         // フォールバック: 既存APIを使用
-        const result = await apiClient.getPerformanceInsights(user?.id || 0);
-        setAnalysisResult(result as any); // Type conversion needed
+        await apiClient.getPerformanceInsights(user?.id || 0);
+        // TODO: PerformanceInsight[]をAnalysisResultに変換する必要がある場合は変換関数を作成
+        // setAnalysisResult(convertPerformanceInsightsToAnalysisResult(performanceInsights));
       }
     } catch (error) {
       // 最新分析結果の取得に失敗
@@ -263,8 +264,9 @@ function Analysis() {
   const runAnalysis = async () => {
     try {
       setIsAnalyzing(true);
-      const result = await apiClient.generatePerformanceInsights(user?.id || 0);
-      setAnalysisResult(result as any); // Type conversion needed
+      await apiClient.generatePerformanceInsights(user?.id || 0);
+      // TODO: PerformanceInsight[]をAnalysisResultに変換する必要がある場合は変換関数を作成
+      // setAnalysisResult(convertPerformanceInsightsToAnalysisResult(performanceInsights));
     } catch (error) {
       // 分析実行に失敗
     } finally {

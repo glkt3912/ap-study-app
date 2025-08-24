@@ -126,7 +126,8 @@ export abstract class BaseClient {
 
       const data = await response.json();
 
-      if (process.env.NODE_ENV === 'development') {
+      // 詳細ログは特定の環境変数でのみ有効
+      if (process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_DETAILED_API_LOGGING === 'true') {
         // eslint-disable-next-line no-console
         console.log('Response Data:', data);
       }
@@ -134,7 +135,7 @@ export abstract class BaseClient {
       // データが存在しない場合やsuccess プロパティがない場合の処理
       if (!data) {
         const error = new Error('No data returned from API');
-        if (process.env.NODE_ENV === 'development') {
+        if (process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_DETAILED_API_LOGGING === 'true') {
           console.error(`API returned null/undefined data: ${method} ${url}`);
         }
         
@@ -156,7 +157,7 @@ export abstract class BaseClient {
           
         const error = new Error(errorMessage);
 
-        if (process.env.NODE_ENV === 'development') {
+        if (process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_DETAILED_API_LOGGING === 'true') {
           console.error(`API business logic error: ${method} ${url} - ${errorMessage}`);
           console.error('Error data:', data);
         }
