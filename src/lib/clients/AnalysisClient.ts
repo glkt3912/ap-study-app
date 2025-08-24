@@ -11,23 +11,44 @@ export interface PredictiveAnalysis {
 }
 
 export interface PersonalizedRecommendations {
-  studyPlan: {
+  studyPlan?: {
     adjustments: string[];
     focusAreas: string[];
     timeAllocation: { subject: string; hours: number }[];
   };
-  practiceStrategy: {
+  // 新しい構造をサポート: dailyStudyPlan
+  dailyStudyPlan?: {
+    date: string;
+    subjects: string[];
+    estimatedTime: number;
+    priority: 'high' | 'medium' | 'low';
+    objectives: string[];
+    adaptiveAdjustments?: {
+      basedOnPerformance: boolean;
+      basedOnTimeConstraints: boolean;
+      basedOnMotivation: boolean;
+    };
+  }[];
+  prioritySubjects?: string[];
+  reviewSchedule?: any[];
+  motivationalInsights?: string[];
+  learningPathOptimization?: {
+    currentPath: string;
+    optimizedPath: string;
+    expectedImprovement: number;
+  };
+  practiceStrategy?: {
     recommendedQuestionTypes: string[];
     weaknessesToAddress: string[];
     strengthsToMaintain: string[];
   };
-  examStrategy: {
+  examStrategy?: {
     timeManagement: string[];
     answerTechniques: string[];
     mentalPreparation: string[];
   };
-  priority: 'high' | 'medium' | 'low';
-  validUntil: string;
+  priority?: 'high' | 'medium' | 'low';
+  validUntil?: string;
 }
 
 export interface MLAnalysisResult {
