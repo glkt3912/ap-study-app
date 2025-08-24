@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback, lazy, Suspense, memo } from 'react';
 import { apiClient, type ExamConfig } from '../lib/api';
+import type { PredictiveAnalysis } from '../lib/clients/AnalysisClient';
 import { ExamConfigModal } from './ExamConfigModal';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
@@ -68,29 +69,6 @@ interface PerformanceMetrics {
   }>;
 }
 
-interface ExamReadiness {
-  examDate: string;
-  daysToExam: number;
-  targetScore: number;
-  currentAbility: {
-    current_avg_score: number;
-    total_sessions: number;
-    target_achievement_rate: number;
-  };
-  categoryReadiness: Array<{
-    category: string;
-    questions_attempted: number;
-    accuracy_rate: number;
-    readiness_level: 'excellent' | 'good' | 'needs_improvement' | 'critical';
-  }>;
-  overallReadiness: string;
-  studyRecommendations: Array<{
-    type: string;
-    recommendation: string;
-    priority: string;
-  }>;
-  passProbability: number;
-}
 
 interface LearningPattern {
   timePattern: Array<{
@@ -129,7 +107,7 @@ function AdvancedAnalysis() {
   const chartTheme = getChartTheme(isDark);
   const [activeTab, setActiveTab] = useState<'performance' | 'readiness' | 'pattern' | 'efficiency'>('performance');
   const [performanceMetrics, setPerformanceMetrics] = useState<PerformanceMetrics | null>(null);
-  const [examReadiness, setExamReadiness] = useState<ExamReadiness | null>(null);
+  const [examReadiness, setExamReadiness] = useState<PredictiveAnalysis | null>(null);
   const [learningPattern, setLearningPattern] = useState<LearningPattern | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -262,20 +240,6 @@ function AdvancedAnalysis() {
   };
 
 
-  const getReadinessColor = (level: string) => {
-    switch (level) {
-      case 'excellent':
-        return 'badge-success';
-      case 'good':
-        return 'badge-info';
-      case 'needs_improvement':
-        return 'badge-warning';
-      case 'critical':
-        return 'badge-error';
-      default:
-        return 'badge-info';
-    }
-  };
 
   const dayNames = ['日', '月', '火', '水', '木', '金', '土'];
 
@@ -578,61 +542,56 @@ function AdvancedAnalysis() {
                 <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
                   <div className='text-center'>
                     <div className='text-2xl font-bold text-blue-600 dark:text-blue-400'>
-                      {examReadiness.daysToExam}日
+                      {examReadiness.timeToReadiness}時間
                     </div>
-                    <div className='text-sm text-gray-600 dark:text-gray-300'>試験まで</div>
+                    <div className='text-sm text-gray-600 dark:text-gray-300'>準備完了まで</div>
                   </div>
                   <div className='text-center'>
                     <div className='text-2xl font-bold text-green-600 dark:text-green-400'>
-                      {Math.round(examReadiness.passProbability)}%
+                      {Math.round(examReadiness.examPassProbability * 100)}%
                     </div>
                     <div className='text-sm text-gray-600 dark:text-gray-300'>合格予測</div>
                   </div>
                   <div className='text-center'>
                     <div
-                      className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${getReadinessColor(examReadiness.overallReadiness)}`}
+                      className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${examReadiness.confidenceLevel > 0.8 ? 'badge-success' : examReadiness.confidenceLevel > 0.6 ? 'badge-warning' : 'badge-error'}`}
                     >
-                      {examReadiness.overallReadiness}
+                      {examReadiness.confidenceLevel > 0.8 ? '高信頼度' : examReadiness.confidenceLevel > 0.6 ? '中信頼度' : '低信頼度'}
                     </div>
-                    <div className='text-sm text-gray-600 dark:text-gray-300 mt-1'>総合準備度</div>
+                    <div className='text-sm text-gray-600 dark:text-gray-300 mt-1'>予測信頼度</div>
                   </div>
                 </div>
               </div>
 
-              {/* カテゴリ別準備度 */}
+              {/* リスクファクター */}
               <div className='card-accent p-4'>
-                <h3 className='font-semibold text-lg mb-3 text-gray-800 dark:text-white'>カテゴリ別準備度</h3>
+                <h3 className='font-semibold text-lg mb-3 text-gray-800 dark:text-white'>リスクファクター</h3>
                 <div className='space-y-2'>
-                  {examReadiness?.categoryReadiness?.map((category, index) => (
-                    <div key={index} className='flex items-center justify-between'>
-                      <span className='text-sm font-medium text-gray-800 dark:text-gray-200'>{category.category}</span>
-                      <div className='flex items-center space-x-2'>
-                        <span className='text-sm text-gray-600 dark:text-gray-300'>
-                          {Math.round(category.accuracy_rate * 100)}%
-                        </span>
-                        <span className={`px-2 py-1 rounded text-xs ${getReadinessColor(category.readiness_level)}`}>
-                          {category.readiness_level}
-                        </span>
-                      </div>
+                  {examReadiness?.riskFactors?.map((risk: string, index: number) => (
+                    <div key={index} className='flex items-start space-x-2'>
+                      <span className='inline-block w-2 h-2 rounded-full mt-2 bg-red-500'></span>
+                      <span className='text-sm text-gray-700 dark:text-gray-300'>{risk}</span>
                     </div>
                   ))}
+                  {(!examReadiness?.riskFactors || examReadiness.riskFactors.length === 0) && (
+                    <div className='text-sm text-gray-500 dark:text-gray-400'>リスクファクターはありません</div>
+                  )}
                 </div>
               </div>
 
-              {/* 学習推奨 */}
+              {/* 成功要因 */}
               <div className='card-accent p-4'>
-                <h3 className='font-semibold text-lg mb-3 text-gray-800 dark:text-white'>学習推奨</h3>
+                <h3 className='font-semibold text-lg mb-3 text-gray-800 dark:text-white'>成功要因</h3>
                 <div className='space-y-2'>
-                  {examReadiness?.studyRecommendations?.map((rec, index) => (
+                  {examReadiness?.successFactors?.map((success: string, index: number) => (
                     <div key={index} className='flex items-start space-x-2'>
-                      <span
-                        className={`inline-block w-2 h-2 rounded-full mt-2 ${
-                          rec.priority === 'high' ? 'bg-red-500' : 'bg-yellow-500'
-                        }`}
-                      ></span>
-                      <span className='text-sm text-gray-700 dark:text-gray-300'>{rec.recommendation}</span>
+                      <span className='inline-block w-2 h-2 rounded-full mt-2 bg-green-500'></span>
+                      <span className='text-sm text-gray-700 dark:text-gray-300'>{success}</span>
                     </div>
                   ))}
+                  {(!examReadiness?.successFactors || examReadiness.successFactors.length === 0) && (
+                    <div className='text-sm text-gray-500 dark:text-gray-400'>成功要因が見つかりません</div>
+                  )}
                 </div>
               </div>
             </div>
