@@ -14,9 +14,10 @@ export type {
 // Study client
 export { StudyClient, studyClient } from './StudyClient';
 export type {
+  StudyLog,
+  CreateStudyLogRequest,
   StudyDay,
   StudyWeek,
-  StudyLog,
   StudyPlan,
   StudyPlanProgress,
   StudyMilestone,
@@ -90,8 +91,26 @@ class LegacyApiClient {
   getCurrentWeek = studyClient.getCurrentWeek.bind(studyClient);
   completeTask = studyClient.completeTask.bind(studyClient);
   updateTaskProgress = studyClient.updateTaskProgress.bind(studyClient);
-  createStudyLog = studyClient.createStudyLog.bind(studyClient);
-  getStudyLogs = studyClient.getStudyLogs.bind(studyClient);
+  // 学習記録作成（エラーハンドリング強化版）
+  async createStudyLog(log: any): Promise<any> {
+    try {
+      return await studyClient.createStudyLog(log);
+    } catch (error) {
+      console.error('StudyClient.createStudyLog failed:', error);
+      // より詳細なエラー情報を提供
+      throw new Error(`学習記録の作成に失敗しました: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+  // 学習記録取得（エラーハンドリング強化版）
+  async getStudyLogs(): Promise<any[]> {
+    try {
+      return await studyClient.getStudyLogs();
+    } catch (error) {
+      console.warn('StudyClient.getStudyLogs failed, returning empty array:', error);
+      // APIが利用できない場合は空の配列を返す
+      return [];
+    }
+  }
   updateStudyLog = studyClient.updateStudyLog.bind(studyClient);
   deleteStudyLog = studyClient.deleteStudyLog.bind(studyClient);
   getAllStudyPlans = studyClient.getAllStudyPlans.bind(studyClient);

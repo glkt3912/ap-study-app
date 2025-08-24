@@ -35,6 +35,8 @@ export interface StudyLog {
   efficiency?: number;
 }
 
+export type CreateStudyLogRequest = Omit<StudyLog, 'id' | 'efficiency'>;
+
 export interface StudyPlan {
   id: number;
   userId: number;

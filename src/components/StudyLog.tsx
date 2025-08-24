@@ -65,7 +65,7 @@ export default function StudyLog() {
             date: new Date(log.date).toISOString().split('T')[0] || '',
             // topicsが配列でない場合の安全な変換
             topics: Array.isArray(log.topics) 
-              ? log.topics.map(topic => typeof topic === 'string' ? topic : String(topic))
+              ? log.topics.map((topic: any) => typeof topic === 'string' ? topic : String(topic))
               : typeof log.topics === 'string' 
                 ? [log.topics] 
                 : []
@@ -74,7 +74,11 @@ export default function StudyLog() {
       );
       setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '学習記録の取得に失敗しました');
+      console.error('StudyLog fetch error:', err);
+      const errorMessage = err instanceof Error ? err.message : '学習記録の取得に失敗しました';
+      setError(`学習記録の取得エラー: ${errorMessage}`);
+      // エラーでも空の配列で継続
+      setLogs([]);
     } finally {
       setIsLoading(false);
     }
@@ -97,7 +101,7 @@ export default function StudyLog() {
             date: new Date(createdLog.date).toISOString().split('T')[0] || '',
             // topicsの安全な変換
             topics: Array.isArray(createdLog.topics) 
-              ? createdLog.topics.map(topic => typeof topic === 'string' ? topic : String(topic))
+              ? createdLog.topics.map((topic: any) => typeof topic === 'string' ? topic : String(topic))
               : typeof createdLog.topics === 'string' 
                 ? [createdLog.topics] 
                 : []
@@ -117,7 +121,9 @@ export default function StudyLog() {
         setTopicInput('');
         setError(null);
       } catch (err) {
-        setError(err instanceof Error ? err.message : '学習記録の作成に失敗しました');
+        console.error('StudyLog creation error:', err);
+        const errorMessage = err instanceof Error ? err.message : '学習記録の作成に失敗しました';
+        setError(`学習記録の作成エラー: ${errorMessage}`);
       } finally {
         setIsLoading(false);
       }
