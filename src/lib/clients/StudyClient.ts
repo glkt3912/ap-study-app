@@ -138,27 +138,27 @@ export class StudyClient extends BaseClient {
     });
   }
 
-  // 学習記録関連
+  // 学習記録関連 (統合APIに統一)
   async createStudyLog(log: Omit<StudyLog, 'id' | 'efficiency'>): Promise<StudyLog> {
-    return this.request<StudyLog>('/api/study/logs', {
+    return this.request<StudyLog>('/api/studylog', {
       method: 'POST',
       body: JSON.stringify(log),
     });
   }
 
   async getStudyLogs(): Promise<StudyLog[]> {
-    return this.request<StudyLog[]>('/api/study/logs');
+    return this.request<StudyLog[]>('/api/studylog');
   }
 
   async updateStudyLog(id: number, log: Partial<StudyLog>): Promise<StudyLog> {
-    return this.request<StudyLog>(`/api/study/logs/${id}`, {
+    return this.request<StudyLog>(`/api/studylog/${id}`, {
       method: 'PUT',
       body: JSON.stringify(log),
     });
   }
 
   async deleteStudyLog(id: number): Promise<void> {
-    await this.request(`/api/study/logs/${id}`, {
+    await this.request(`/api/studylog/${id}`, {
       method: 'DELETE',
     });
   }

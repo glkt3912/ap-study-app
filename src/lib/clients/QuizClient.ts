@@ -142,28 +142,39 @@ export class QuizClient extends BaseClient {
     return this.request<WeakPoint[]>(url);
   }
 
-  // 問題関連
-  async getQuestions(category?: string, difficulty?: number, limit?: number): Promise<Question[]> {
-    const params = new URLSearchParams();
-    if (category) params.append('category', category);
-    if (difficulty) params.append('difficulty', difficulty.toString());
-    if (limit) params.append('limit', limit.toString());
-    
-    const url = `/api/questions${params.toString() ? `?${params.toString()}` : ''}`;
-    return this.request<Question[]>(url);
+  // 問題関連 (未実装のため代替実装 - TODO: バックエンド実装後に有効化)
+  async getQuestions(_category?: string, _difficulty?: number, _limit?: number): Promise<Question[]> {
+    // TODO: バックエンドに /api/questions エンドポイント実装後に有効化
+    // 現在は /api/quiz 経由でクイズセッションを開始して問題を取得する必要がある
+    console.warn('getQuestions: Direct questions API not implemented. Use quiz session instead.');
+    return [];
   }
 
   async getQuestion(questionId: string): Promise<Question> {
-    return this.request<Question>(`/api/questions/${questionId}`);
+    // TODO: バックエンドに /api/questions エンドポイント実装後に有効化
+    console.warn('getQuestion: Direct question API not implemented');
+    throw new Error(`Question API not implemented. Use quiz session to get question: ${questionId}`);
   }
 
   async getCategories(): Promise<string[]> {
-    return this.request<string[]>('/api/questions/categories');
+    // TODO: バックエンドに /api/questions/categories エンドポイント実装後に有効化
+    // 暫定的に固定カテゴリを返す
+    console.warn('getCategories: API not implemented, returning fixed categories');
+    return [
+      'データベース',
+      'ネットワーク',
+      'セキュリティ',
+      'プログラミング',
+      'アルゴリズム',
+      'システム設計',
+      'マネジメント'
+    ];
   }
 
-  async getQuestionsByCategory(category: string, limit?: number): Promise<Question[]> {
-    const url = limit ? `/api/questions/category/${category}?limit=${limit}` : `/api/questions/category/${category}`;
-    return this.request<Question[]>(url);
+  async getQuestionsByCategory(_category: string, _limit?: number): Promise<Question[]> {
+    // TODO: バックエンドに /api/questions エンドポイント実装後に有効化
+    console.warn('getQuestionsByCategory: API not implemented. Use quiz session instead.');
+    return [];
   }
 
   // 模試記録関連

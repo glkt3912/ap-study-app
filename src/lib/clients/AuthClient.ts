@@ -80,12 +80,12 @@ export class AuthClient extends BaseClient {
     });
   }
 
-  // ユーザー情報更新
+  // ユーザー情報更新 (未実装のため代替実装)
   async updateUser(userId: number, updates: UpdateUserRequest): Promise<User> {
-    return this.request<User>(`/api/users/${userId}`, {
-      method: 'PUT',
-      body: JSON.stringify(updates),
-    });
+    // TODO: バックエンドに /api/users エンドポイント実装後に有効化
+    // 現在は認証システム経由でユーザー情報を取得・更新する必要がある
+    console.warn('updateUser: Direct users API not implemented');
+    throw new Error(`User update API not implemented for user: ${userId}. Updates: ${JSON.stringify(updates)}`);
   }
 
   // パスワードリセット要求
