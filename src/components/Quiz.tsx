@@ -1,7 +1,12 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { apiClient, QuizCategory, QuizSession } from '../lib/api';
+import { apiClient, QuizSession } from '../lib/api';
+
+interface QuizCategory {
+  category: string;
+  questionCount: number;
+}
 import { QuizEngine } from './quiz/QuizEngine';
 import { QuizProgress } from './quiz/QuizProgress';
 import { LearningTrends } from './quiz/LearningTrends';
@@ -81,11 +86,39 @@ export default function Quiz() {
 
         setState(prev => ({
           ...prev,
-          categories: categories.status === 'fulfilled' ? categories.value : [],
-          progress: progress.status === 'fulfilled' ? progress.value : null,
-          recommendations: recommendations.status === 'fulfilled' ? recommendations.value : null,
+          categories: categories.status === 'fulfilled' 
+            ? categories.value.map((categoryName: string) => ({
+                category: categoryName,
+                questionCount: 50 // Default question count - could be fetched from API
+              }))
+            : [],
+          progress: progress.status === 'fulfilled' 
+            ? {
+                overall: {
+                  totalQuestions: progress.value.totalSessions || 0,
+                  answeredQuestions: progress.value.totalSessions || 0,
+                  progressRate: progress.value.averageScore || 0
+                },
+                categoryProgress: [], // Could be derived from progress.value
+                recentActivity: [] // Could be fetched separately
+              }
+            : null,
+          recommendations: recommendations.status === 'fulfilled' 
+            ? {
+                reason: 'Based on your performance',
+                weakCategories: [], // Could be extracted from recommendations
+                questions: recommendations.value
+              }
+            : null,
           weakPoints: weakPoints.status === 'fulfilled' ? weakPoints.value : [],
-          learningTrends: learningTrends.status === 'fulfilled' ? learningTrends.value : null,
+          learningTrends: learningTrends.status === 'fulfilled' 
+            ? {
+                period: 30, // Default 30 days period
+                dailyTrends: learningTrends.value || [],
+                cumulativeProgress: [],
+                categoryTrends: []
+              }
+            : null,
           loading: false,
         }));
       } catch (error) {

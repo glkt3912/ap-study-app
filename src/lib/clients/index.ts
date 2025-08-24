@@ -105,6 +105,19 @@ class LegacyApiClient {
   markRecommendationAsRead = studyClient.markRecommendationAsRead.bind(studyClient);
   getStudyEfficiency = studyClient.getStudyEfficiency.bind(studyClient);
   getTopicSuggestions = studyClient.getTopicSuggestions.bind(studyClient);
+  generateLearningEfficiencyAnalysis = studyClient.getStudyEfficiency.bind(studyClient);
+  generateReviewSchedule = studyClient.getStudyRecommendations.bind(studyClient);
+  getTodayReviews = quizClient.getReviewQuestions.bind(quizClient);
+  async completeReview(questionId: string, understanding: number): Promise<void> {
+    // Mark for review if understanding is low
+    return quizClient.markQuestionForReview(questionId, understanding < 3);
+  }
+  getStudyPlanProgress = studyClient.getStudyProgress.bind(studyClient);
+  getWeeklyPlanTemplate = systemClient.getStudyPlanTemplate.bind(systemClient);
+  updateStudyProgress = studyClient.updateTaskProgress.bind(studyClient);
+  async saveWeeklyPlanTemplate(userId: string | number, planData: any): Promise<any> {
+    return studyClient.createStudyPlan(planData);
+  }
 
   // Quiz methods
   startQuizSession = quizClient.startQuizSession.bind(quizClient);

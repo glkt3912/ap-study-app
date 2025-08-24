@@ -120,17 +120,18 @@ export default function DataExport({ studyData }: DataExportProps) {
   const exportQuizData = async (format: 'json' | 'csv') => {
     setIsExporting(true);
     try {
-      const data = await apiClient.exportQuizData({
-        format,
-        period: 90, // 過去90日分
-      });
+      // ユーザーIDを取得（実際の実装では認証コンテキストから取得）
+      const userId = 1; // 仮のユーザーID
+      const data = await apiClient.exportQuizData(userId, format);
 
       if (format === 'csv') {
         // CSVの場合はBlobとして返される
-        const url = URL.createObjectURL(data);
+        // データを適切なBlob形式に変換
+        const blob = new Blob([String(data.data)], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = `quiz-data-${new Date().toISOString().split('T')[0]}.csv`;
+        link.download = data.filename || `quiz-data-${new Date().toISOString().split('T')[0]}.csv`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);

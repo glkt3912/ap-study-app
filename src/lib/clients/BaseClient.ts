@@ -96,8 +96,6 @@ export abstract class BaseClient {
           // エラーボディの読み取りに失敗した場合はデフォルトメッセージを使用
         }
 
-        const error = new Error(errorMessage);
-        
         // 開発環境でエラー情報をコンパクトに出力
         if (process.env.NODE_ENV === 'development') {
           // 404エラーは警告レベルで出力（よくある正常なケース）
@@ -107,12 +105,16 @@ export abstract class BaseClient {
           } else if (response.status >= 500) {
             // eslint-disable-next-line no-console
             console.error(`API ${response.status}: ${method} ${url} - ${errorMessage}`);
+            console.error('Error details:', errorDetails);
           } else {
             // eslint-disable-next-line no-console
             console.warn(`API ${response.status}: ${method} ${url} - ${errorMessage}`);
+            console.warn('Error details:', errorDetails);
           }
         }
 
+        const error = new Error(errorMessage);
+        
         // 監視システムにAPI エラーを記録
         if (typeof window !== 'undefined') {
           const { monitoring } = await import('../monitoring');
@@ -129,10 +131,36 @@ export abstract class BaseClient {
         console.log('Response Data:', data);
       }
 
-      if (!data.success) {
-        const error = new Error(data.error || 'API request failed');
+      // データが存在しない場合やsuccess プロパティがない場合の処理
+      if (!data) {
+        const error = new Error('No data returned from API');
+        if (process.env.NODE_ENV === 'development') {
+          console.error(`API returned null/undefined data: ${method} ${url}`);
+        }
+        
+        if (typeof window !== 'undefined') {
+          const { monitoring } = await import('../monitoring');
+          monitoring.trackApiCall(endpoint, method, duration, response.status, error);
+        }
+        
+        throw error;
+      }
 
-        // 監視システムにAPI エラーを記録
+      // success プロパティが存在し、false の場合
+      if ('success' in data && !data.success) {
+        const errorMessage = typeof data.error === 'string' 
+          ? data.error 
+          : data.message 
+          ? String(data.message)
+          : 'API request failed';
+          
+        const error = new Error(errorMessage);
+
+        if (process.env.NODE_ENV === 'development') {
+          console.error(`API business logic error: ${method} ${url} - ${errorMessage}`);
+          console.error('Error data:', data);
+        }
+
         if (typeof window !== 'undefined') {
           const { monitoring } = await import('../monitoring');
           monitoring.trackApiCall(endpoint, method, duration, response.status, error);
@@ -147,7 +175,8 @@ export abstract class BaseClient {
         monitoring.trackApiCall(endpoint, method, duration, response.status);
       }
 
-      return data.data;
+      // success プロパティがある場合は data.data を返す、ない場合は data をそのまま返す
+      return 'success' in data ? data.data : data;
     } catch (error) {
       const duration = performance.now() - startTime;
 
@@ -161,13 +190,27 @@ export abstract class BaseClient {
             // eslint-disable-next-line no-console
             console.warn(`API request error: ${method} ${url} - ${error.message}`);
           }
+        } else {
+          // eslint-disable-next-line no-console
+          console.warn(`API request error: ${method} ${url} - Unknown error:`, error);
         }
       }
 
       // 監視システムにネットワークエラーを記録
       if (typeof window !== 'undefined') {
         const { monitoring } = await import('../monitoring');
-        monitoring.trackApiCall(endpoint, method, duration, 0, error as Error);
+        monitoring.trackApiCall(
+          endpoint, 
+          method, 
+          duration, 
+          0, 
+          error instanceof Error ? error : new Error(String(error))
+        );
+      }
+
+      // Error オブジェクトでない場合は Error に変換
+      if (!(error instanceof Error)) {
+        throw new Error(typeof error === 'string' ? error : `API request failed: ${JSON.stringify(error)}`);
       }
 
       throw error;

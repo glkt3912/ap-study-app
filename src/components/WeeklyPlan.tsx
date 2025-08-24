@@ -30,7 +30,7 @@ export default function WeeklyPlan({ studyData, setStudyData }: WeeklyPlanProps)
         
         if (savedTemplate) {
           // 保存された学習計画データを復元
-          const studyWeeks = savedTemplate.studyWeeksData || [];
+          const studyWeeks = (savedTemplate as any).studyWeeksData || [];
           setStudyData(studyWeeks);
           setShowTemplates(false);
         }
@@ -73,7 +73,7 @@ export default function WeeklyPlan({ studyData, setStudyData }: WeeklyPlanProps)
         data: requestData
       });
       
-      await apiClient.updateStudyProgress(week.weekNumber, dayIndex, requestData);
+      await apiClient.updateStudyProgress(week.weekNumber, dayIndex, task.understanding || 3);
     } catch (error) {
       console.error('学習進捗の保存に失敗しました:', error);
       
