@@ -235,22 +235,6 @@ export class QuizClient extends BaseClient {
     return this.request<TestStats>('/api/tests/afternoon/stats');
   }
 
-  // 復習支援
-  async getReviewQuestions(userId?: number, limit?: number): Promise<Question[]> {
-    const params = new URLSearchParams();
-    if (userId) params.append('userId', userId.toString());
-    if (limit) params.append('limit', limit.toString());
-    
-    const url = `/api/quiz/review${params.toString() ? `?${params.toString()}` : ''}`;
-    return this.request<Question[]>(url);
-  }
-
-  async markQuestionForReview(questionId: string, needsReview: boolean): Promise<void> {
-    await this.request(`/api/quiz/questions/${questionId}/review`, {
-      method: 'POST',
-      body: JSON.stringify({ needsReview }),
-    });
-  }
 }
 
 // シングルトンインスタンス

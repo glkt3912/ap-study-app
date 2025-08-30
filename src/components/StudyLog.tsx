@@ -34,18 +34,16 @@ export default function StudyLog() {
   const [sortBy, setSortBy] = useState<'date' | 'subject' | 'time' | 'understanding'>('date');
 
   const subjects = [
-    'コンピュータの基礎理論',
-    'アルゴリズムとデータ構造',
-    'ハードウェア基礎',
-    'ソフトウェア基礎',
-    'データベース基礎',
-    'ネットワーク基礎',
-    'セキュリティ基礎',
-    'システム開発技法',
-    'プロジェクトマネジメント',
-    'サービスマネジメント',
-    '午前問題演習',
-    '午後問題演習',
+    'コンピュータシステム',
+    '技術要素',
+    '開発技術',
+    'マネジメント',
+    'ストラテジ',
+    'ネットワーク',
+    'データベース',
+    'セキュリティ',
+    '午後問題対策',
+    '午前問題演習'
   ];
 
   // データ取得
@@ -130,17 +128,26 @@ export default function StudyLog() {
     }
   };
 
-  // 候補取得処理
+  // 候補取得処理 (PR #27 style)
   const fetchSuggestions = async (query: string, subject?: string) => {
     try {
-      const options: { query?: string; subject?: string } = { query };
-      if (subject) {
-        options.subject = subject;
-      }
-      const result = await apiClient.getTopicSuggestions(options);
-      setSuggestions(result.suggestions);
+      console.log('Topic suggestions request:', { query, subject });
+      
+      // PR #27と同じオプション形式で呼び出し
+      const options: { subject?: string; query?: string } = {};
+      if (subject) options.subject = subject;
+      if (query.trim()) options.query = query.trim();
+      
+      const topicList = await apiClient.getTopicSuggestions(options);
+      
+      console.log('Topic suggestions response:', topicList);
+      
+      // バックエンドでフィルタリング済みなので、そのまま使用
+      setSuggestions(topicList);
       setShowSuggestions(true);
+      console.log('Setting suggestions:', topicList);
     } catch (err) {
+      console.error('Topic suggestions error:', err);
       // 候補取得失敗は通常動作に影響しないため、サイレントに処理
       setSuggestions([]);
       setShowSuggestions(false);

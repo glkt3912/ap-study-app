@@ -13,9 +13,6 @@ vi.mock('../dashboard/DashboardMetrics', () => ({
   ),
 }));
 
-vi.mock('../dashboard/AICoachSection', () => ({
-  AICoachSection: () => <div data-testid="ai-coach-section">AI学習コーチ</div>,
-}));
 
 vi.mock('../dashboard/TodayStudyTask', () => ({
   TodayStudyTask: ({ studyData }: { studyData: any[] }) => (
@@ -43,26 +40,6 @@ vi.mock('../dashboard/PhaseProgress', () => ({
   ),
 }));
 
-// Mock AIAnalysisProvider
-vi.mock('../providers/AIAnalysisProvider', () => ({
-  AIAnalysisProvider: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="ai-analysis-provider">{children}</div>
-  ),
-  useAIAnalysis: () => ({
-    predictiveAnalysis: {
-      examPassProbability: 85,
-      recommendedStudyHours: 3,
-      timeToReadiness: 14,
-      riskFactors: ['時間不足'],
-      successFactors: ['継続学習'],
-    },
-    personalizedRecommendations: null,
-    isLoading: false,
-    error: null,
-    fetchData: vi.fn(),
-    clearError: vi.fn(),
-  }),
-}));
 
 // Mock useAuth hook to avoid AuthProvider dependency
 vi.mock('../../contexts/AuthContext', () => ({
@@ -81,16 +58,10 @@ vi.mock('../../contexts/AuthContext', () => ({
   AuthProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
-// Mock API client with batch methods
+// Mock API client
 vi.mock('../../lib/api', () => ({
   apiClient: {
-    // Batch API methods
-    getBatchDashboardMLData: vi.fn(),
-
-    // Fallback API methods
     getStudyPlan: vi.fn(),
-    getPredictiveAnalysis: vi.fn(),
-    getPersonalizedRecommendations: vi.fn(),
   },
 }));
 
@@ -208,15 +179,6 @@ describe('Dashboard', () => {
     expect(screen.getByText('今日の学習タスクはありません')).toBeInTheDocument();
   });
 
-  it('should display AI learning coach section', async () => {
-    await act(async () => {
-      render(<MockedDashboard studyData={[]} />);
-    });
-
-    await waitFor(() => {
-      expect(screen.getByText('AI学習コーチ')).toBeInTheDocument();
-    });
-  });
 
   it('should display all dashboard components', async () => {
     const mockData = [
@@ -250,7 +212,6 @@ describe('Dashboard', () => {
 
     await waitFor(() => {
       expect(screen.getByTestId('dashboard-metrics')).toBeInTheDocument();
-      expect(screen.getByTestId('ai-coach-section')).toBeInTheDocument();
       expect(screen.getByTestId('today-study-task')).toBeInTheDocument();
       expect(screen.getByTestId('weekly-progress')).toBeInTheDocument();
       expect(screen.getByTestId('phase-progress')).toBeInTheDocument();
