@@ -309,34 +309,6 @@ class UnifiedApiClient {
     });
   }
 
-  // ===== REVIEW ENTRIES API =====
-
-  /**
-   * 復習項目一覧を取得
-   */
-  async getReviewEntries(userId: number, activeOnly = true): Promise<UnifiedReviewEntry[]> {
-    const url = activeOnly 
-      ? `/api/review-entries/${userId}?active=true`
-      : `/api/review-entries/${userId}`;
-    return this.request<UnifiedReviewEntry[]>(url);
-  }
-
-  /**
-   * 今日の復習項目を取得
-   */
-  async getTodayReviews(userId: number): Promise<UnifiedReviewEntry[]> {
-    return this.request<UnifiedReviewEntry[]>(`/api/review-entries/${userId}/today`);
-  }
-
-  /**
-   * 復習を完了
-   */
-  async completeReview(userId: number, entryId: number, understanding: number): Promise<UnifiedReviewEntry> {
-    return this.request<UnifiedReviewEntry>(`/api/review-entries/${userId}/${entryId}`, {
-      method: 'PUT',
-      body: JSON.stringify({ understanding }),
-    });
-  }
 
   // ===== LEGACY API互換性メソッド =====
 
@@ -399,17 +371,6 @@ class UnifiedApiClient {
     }
   }
 
-  /**
-   * 既存のgetTodayReviews()との互換性を保つ
-   */
-  async getTodayReviewsLegacy(): Promise<any[]> {
-    try {
-      return await this.getTodayReviews(1);
-    } catch (error) {
-      console.warn('統一API fallback: 既存APIへフォールバック', error);
-      return [];
-    }
-  }
 }
 
 export const unifiedApiClient = new UnifiedApiClient();
@@ -420,7 +381,6 @@ export const legacyCompatApiClient = {
   getMorningTests: () => unifiedApiClient.getMorningTestsLegacy(),
   getAfternoonTests: () => unifiedApiClient.getAfternoonTestsLegacy(),
   getLatestAnalysis: (userId?: string) => unifiedApiClient.getLatestAnalysisLegacy(userId),
-  getTodayReviews: () => unifiedApiClient.getTodayReviewsLegacy(),
   
   // 新しい統一API経由の更新メソッド
   updateStudyProgress: async (_weekNumber: number, _dayIndex: number, _data: any) => {
