@@ -134,10 +134,11 @@ export default function StudyLog() {
       console.log('Topic suggestions request:', { query, subject });
       
       // PR #27と同じオプション形式で呼び出し
-      const topicList = await apiClient.getTopicSuggestions({ 
-        subject: subject || undefined,
-        query: query.trim() || undefined 
-      });
+      const options: { subject?: string; query?: string } = {};
+      if (subject) options.subject = subject;
+      if (query.trim()) options.query = query.trim();
+      
+      const topicList = await apiClient.getTopicSuggestions(options);
       
       console.log('Topic suggestions response:', topicList);
       
