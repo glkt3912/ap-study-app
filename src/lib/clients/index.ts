@@ -114,15 +114,17 @@ class LegacyApiClient {
   getWeeklyPlanTemplate = systemClient.getStudyPlanTemplate.bind(systemClient);
   updateStudyProgress = studyClient.updateTaskProgress.bind(studyClient);
   async saveWeeklyPlanTemplate(userId: string | number, planData: any): Promise<any> {
-    // The backend POST endpoint now handles both create and update cases automatically
-    return authClient.request(`/api/study-plans/${userId}`, {
+    // Use unified API endpoint for study plan management
+    return authClient.request(`/api/study-plans`, {
       method: 'POST',
       body: JSON.stringify({
+        userId: userId,
         name: planData.templateName || 'Weekly Plan Template',
         description: `Study plan created from template: ${planData.templateName}`,
         templateId: planData.templateId,
         targetExamDate: planData.targetExamDate,
-        ...planData
+        studyWeeksData: planData.studyWeeksData,
+        estimatedHours: planData.estimatedHours
       })
     });
   }
