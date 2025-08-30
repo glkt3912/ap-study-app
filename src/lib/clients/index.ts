@@ -41,18 +41,6 @@ export type {
   WeakPoint,
 } from './QuizClient';
 
-// Analysis client
-export { AnalysisClient, analysisClient } from './AnalysisClient';
-export type {
-  PredictiveAnalysis,
-  PersonalizedRecommendations,
-  MLAnalysisResult,
-  BatchDashboardMLData,
-  SystemMetrics,
-  StudyPatternML,
-  LearningTrend,
-  PerformanceInsight,
-} from './AnalysisClient';
 
 // System client
 export { SystemClient, systemClient } from './SystemClient';
@@ -70,7 +58,6 @@ export type {
 import { authClient } from './AuthClient';
 import { studyClient } from './StudyClient';
 import { quizClient } from './QuizClient';
-import { analysisClient } from './AnalysisClient';
 import { systemClient } from './SystemClient';
 
 class LegacyApiClient {
@@ -123,19 +110,21 @@ class LegacyApiClient {
   getStudyRecommendations = studyClient.getStudyRecommendations.bind(studyClient);
   markRecommendationAsRead = studyClient.markRecommendationAsRead.bind(studyClient);
   getStudyEfficiency = studyClient.getStudyEfficiency.bind(studyClient);
-  getTopicSuggestions = studyClient.getTopicSuggestions.bind(studyClient);
-  generateLearningEfficiencyAnalysis = studyClient.getStudyEfficiency.bind(studyClient);
-  generateReviewSchedule = studyClient.getStudyRecommendations.bind(studyClient);
-  getTodayReviews = quizClient.getReviewQuestions.bind(quizClient);
-  async completeReview(questionId: string, understanding: number): Promise<void> {
-    // Mark for review if understanding is low
-    return quizClient.markQuestionForReview(questionId, understanding < 3);
-  }
   getStudyPlanProgress = studyClient.getStudyProgress.bind(studyClient);
   getWeeklyPlanTemplate = systemClient.getStudyPlanTemplate.bind(systemClient);
   updateStudyProgress = studyClient.updateTaskProgress.bind(studyClient);
   async saveWeeklyPlanTemplate(userId: string | number, planData: any): Promise<any> {
-    return studyClient.createStudyPlan(planData);
+    // The backend POST endpoint now handles both create and update cases automatically
+    return authClient.request(`/api/study-plans/${userId}`, {
+      method: 'POST',
+      body: JSON.stringify({
+        name: planData.templateName || 'Weekly Plan Template',
+        description: `Study plan created from template: ${planData.templateName}`,
+        templateId: planData.templateId,
+        targetExamDate: planData.targetExamDate,
+        ...planData
+      })
+    });
   }
 
   // Quiz methods
@@ -160,125 +149,43 @@ class LegacyApiClient {
   deleteAfternoonTest = quizClient.deleteAfternoonTest.bind(quizClient);
   getMorningTestStats = quizClient.getMorningTestStats.bind(quizClient);
   getAfternoonTestStats = quizClient.getAfternoonTestStats.bind(quizClient);
-  getReviewQuestions = quizClient.getReviewQuestions.bind(quizClient);
-  markQuestionForReview = quizClient.markQuestionForReview.bind(quizClient);
   getQuizCategories = quizClient.getCategories.bind(quizClient);
   getQuizProgress = quizClient.getQuizStats.bind(quizClient);
-  getRecommendedQuestions = quizClient.getReviewQuestions.bind(quizClient);
 
-  // Analysis methods
-  getPredictiveAnalysis = analysisClient.getPredictiveAnalysis.bind(analysisClient);
-  updatePredictiveAnalysis = analysisClient.updatePredictiveAnalysis.bind(analysisClient);
-  getPersonalizedRecommendations = analysisClient.getPersonalizedRecommendations.bind(analysisClient);
-  generatePersonalizedRecommendations = analysisClient.generatePersonalizedRecommendations.bind(analysisClient);
-  getBatchDashboardMLData = analysisClient.getBatchDashboardMLData.bind(analysisClient);
-  refreshBatchDashboardMLData = analysisClient.refreshBatchDashboardMLData.bind(analysisClient);
-  getMLAnalysisResults = analysisClient.getMLAnalysisResults.bind(analysisClient);
-  generateMLAnalysis = analysisClient.generateMLAnalysis.bind(analysisClient);
-  getStudyPatternAnalysis = analysisClient.getStudyPatternAnalysis.bind(analysisClient);
-  getLearningTrends = analysisClient.getLearningTrends.bind(analysisClient);
-  getPerformanceInsights = analysisClient.getPerformanceInsights.bind(analysisClient);
-  // generatePerformanceInsights - カスタム実装を使用（下記参照）
-  getComparisonAnalysis = analysisClient.getComparisonAnalysis.bind(analysisClient);
-  getModelMetadata = analysisClient.getModelMetadata.bind(analysisClient);
-  validatePrediction = analysisClient.validatePrediction.bind(analysisClient);
-  clearAnalysisCache = analysisClient.clearAnalysisCache.bind(analysisClient);
-  getAnalysisCacheStatus = analysisClient.getAnalysisCacheStatus.bind(analysisClient);
-  
-  // テスト互換性のための追加メソッド
-  async getAdvancedWeakPoints(userId: number): Promise<any> {
+  // Topic Suggestions (PR #27 style)
+  async getTopicSuggestions(options?: { subject?: string; query?: string }): Promise<string[]> {
     try {
-      return await analysisClient.getPerformanceInsights(userId);
-    } catch (error) {
-      console.warn('getAdvancedWeakPoints failed:', error);
-      return [];
-    }
-  }
-  
-  async getBatchAnalysisData(userId: number): Promise<any> {
-    try {
-      // 複数の分析データを一括取得 - Analysis.tsx で期待される形式に合わせる
-      const [
-        studyLogs, 
-        morningTests, 
-        afternoonTests, 
-        performanceInsights, 
-        predictiveAnalysis, 
-        recommendations
-      ] = await Promise.all([
-        this.getStudyLogs().catch(() => []),
-        this.getMorningTests().catch(() => []),
-        this.getAfternoonTests().catch(() => []),
-        this.getPerformanceInsights(userId).catch(() => []),
-        this.getPredictiveAnalysis(userId).catch(() => null),
-        this.getPersonalizedRecommendations(userId).catch(() => null)
-      ]);
+      const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const params = new URLSearchParams();
       
-      return {
-        studyLogs,
-        morningTests,
-        afternoonTests,
-        studyLogStats: null, // studyLogStatsは現在未対応
-        predictiveAnalysis,
-        personalizedRecommendations: recommendations,
-        advancedWeakPoints: performanceInsights // performanceInsightsをadvancedWeakPointsとして使用
-      };
+      if (options?.subject) {
+        params.append('subject', options.subject);
+      }
+      if (options?.query) {
+        params.append('query', options.query);
+      }
+      
+      const endpoint = `${backendUrl}/api/topic-suggestions${params.toString() ? '?' + params.toString() : ''}`;
+      console.log('Making topic suggestions request to:', endpoint);
+      
+      const response = await fetch(endpoint, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('Topic suggestions response:', data);
+      
+      return data.data || data;
     } catch (error) {
-      console.warn('getBatchAnalysisData failed:', error);
-      // エラー時でもテストが期待する形式を返す
+      console.error('Topic suggestions fetch error:', error);
       throw error;
-    }
-  }
-  
-  async getLatestAnalysis(userId: number): Promise<any> {
-    try {
-      return await this.getPerformanceInsights(userId);
-    } catch (error) {
-      console.warn('getLatestAnalysis failed:', error);
-      return [];
-    }
-  }
-  
-  async getBatchQuizData(userId: number): Promise<any> {
-    try {
-      // クイズ関連データを一括取得
-      const [quizStats, morningTests, afternoonTests] = await Promise.all([
-        this.getQuizProgress(userId).catch(() => null),
-        this.getMorningTests().catch(() => []),
-        this.getAfternoonTests().catch(() => [])
-      ]);
-      return {
-        quizStats,
-        morningTests,
-        afternoonTests
-      };
-    } catch (error) {
-      console.warn('getBatchQuizData failed:', error);
-      return null;
-    }
-  }
-
-  // Missing analysis methods for compatibility
-  async generatePerformanceInsights(_userId: number): Promise<any> {
-    try {
-      // パフォーマンス洞察を生成する代替実装
-      const studyLogs = await this.getStudyLogs().catch(() => []);
-      await this.getMorningTests().catch(() => []);
-      await this.getAfternoonTests().catch(() => []);
-      
-      return {
-        insights: [
-          {
-            insight: '学習継続性',
-            value: studyLogs.length > 0 ? '良好' : '要改善',
-            description: '定期的な学習記録が確認されています'
-          }
-        ],
-        generated: true
-      };
-    } catch (error) {
-      console.warn('generatePerformanceInsights failed:', error);
-      return null;
     }
   }
 

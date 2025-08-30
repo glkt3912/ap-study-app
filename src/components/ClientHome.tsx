@@ -26,16 +26,13 @@ export default function ClientHome() {
   const [examConfig, setExamConfig] = useState<ExamConfig | null>(null);
   const [isExamConfigModalOpen, setIsExamConfigModalOpen] = useState(false);
 
-  // タブ定義（メモ化で最適化）
+  // タブ定義（メモ化で最適化） - 簡素化済み
   const tabs = useMemo(() => [
     { id: 'dashboard', name: 'ダッシュボード', icon: '📊' },
     { id: 'plan', name: '学習計画', icon: '📅' },
     { id: 'log', name: '学習記録', icon: '✏️' },
     { id: 'test', name: '問題演習', icon: '📝' },
     { id: 'quiz', name: 'Quiz', icon: '🧭' },
-    { id: 'analysis', name: '分析', icon: '📈' },
-    { id: 'advanced', name: '高度分析', icon: '🎯' },
-    { id: 'review', name: '復習システム', icon: '🔄' },
     { id: 'export', name: 'エクスポート', icon: '💾' },
     { id: 'debug', name: '診断', icon: '🧪' },
   ], []);

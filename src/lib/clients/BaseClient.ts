@@ -51,7 +51,13 @@ export abstract class BaseClient {
       if (errorBody) {
         try {
           errorDetails = JSON.parse(errorBody);
-          errorMessage = errorDetails.error || errorDetails.message || errorMessage;
+          // エラーメッセージの適切な文字列化
+          const rawMessage = errorDetails.error || errorDetails.message;
+          if (rawMessage) {
+            errorMessage = typeof rawMessage === 'string' 
+              ? rawMessage 
+              : JSON.stringify(rawMessage);
+          }
         } catch {
           errorMessage = errorBody.length > 0 ? errorBody : errorMessage;
         }
@@ -227,9 +233,12 @@ export abstract class BaseClient {
     );
 
     if (!(error instanceof Error)) {
-      throw new Error(
-        typeof error === 'string' ? error : `API request failed: ${JSON.stringify(error)}`
-      );
+      const errorMessage = typeof error === 'string' 
+        ? error 
+        : typeof error === 'object' && error !== null
+        ? JSON.stringify(error)
+        : `API request failed: ${String(error)}`;
+      throw new Error(errorMessage);
     }
 
     throw error;

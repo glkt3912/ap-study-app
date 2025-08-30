@@ -76,12 +76,9 @@ export default function Quiz() {
       try {
         setState(prev => ({ ...prev, loading: true }));
 
-        const [categories, progress, recommendations, weakPoints, learningTrends] = await Promise.allSettled([
+        const [categories, progress] = await Promise.allSettled([
           apiClient.getQuizCategories(),
           apiClient.getQuizProgress(),
-          apiClient.getRecommendedQuestions(10),
-          apiClient.getWeakPoints(5),
-          apiClient.getLearningTrends(30),
         ]);
 
         setState(prev => ({
@@ -102,23 +99,14 @@ export default function Quiz() {
                 categoryProgress: [], // Could be derived from progress.value
                 recentActivity: [] // Could be fetched separately
               }
-            : null,
-          recommendations: recommendations.status === 'fulfilled' 
-            ? {
-                reason: 'Based on your performance',
-                weakCategories: [], // Could be extracted from recommendations
-                questions: recommendations.value
-              }
-            : null,
-          weakPoints: weakPoints.status === 'fulfilled' ? weakPoints.value : [],
-          learningTrends: learningTrends.status === 'fulfilled' 
-            ? {
-                period: 30, // Default 30 days period
-                dailyTrends: learningTrends.value || [],
-                cumulativeProgress: [],
-                categoryTrends: []
-              }
-            : null,
+            : {
+                overall: { totalQuestions: 0, answeredQuestions: 0, progressRate: 0 },
+                categoryProgress: [],
+                recentActivity: []
+              },
+          recommendations: null,
+          weakPoints: [],
+          learningTrends: null,
           loading: false,
         }));
       } catch (error) {

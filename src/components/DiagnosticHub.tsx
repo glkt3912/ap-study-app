@@ -2,26 +2,10 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { performanceAnalyzer } from '@/lib/performance-analyzer';
 import { errorHandler } from '@/lib/error-handler';
 
 export default function DiagnosticHub() {
-  const [performanceResults, setPerformanceResults] = useState<any>(null);
   const [errorStats, setErrorStats] = useState<any>(null);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-
-  const runPerformanceAnalysis = async () => {
-    setIsAnalyzing(true);
-    try {
-      const results = await performanceAnalyzer.analyzePerformance();
-      setPerformanceResults(results);
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error('パフォーマンス分析エラー:', error);
-    } finally {
-      setIsAnalyzing(false);
-    }
-  };
 
   const getErrorStatistics = () => {
     const stats = errorHandler.getErrorStatistics();
@@ -72,49 +56,8 @@ export default function DiagnosticHub() {
         ))}
       </div>
 
-      {/* 監視・パフォーマンスダッシュボード */}
-      <div className='mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6'>
-        {/* パフォーマンス分析 */}
-        <div className='card-primary border border-slate-200 dark:border-slate-700 rounded-lg p-6'>
-          <div className='flex items-center justify-between mb-4'>
-            <h3 className='text-lg font-semibold text-gray-900 dark:text-white'>📊 パフォーマンス分析</h3>
-            <button
-              onClick={runPerformanceAnalysis}
-              disabled={isAnalyzing}
-              className='btn-primary hover-lift click-shrink focus-ring interactive-disabled'
-            >
-              {isAnalyzing ? '分析中...' : '分析開始'}
-            </button>
-          </div>
-
-          {performanceResults ? (
-            <div className='space-y-3'>
-              <div className='flex justify-between'>
-                <span>総合スコア:</span>
-                <span
-                  className={`font-bold ${
-                    performanceResults.score.overall >= 90
-                      ? 'text-green-600'
-                      : performanceResults.score.overall >= 70
-                        ? 'text-yellow-600'
-                        : 'text-red-600'
-                  }`}
-                >
-                  {performanceResults.score.overall}/100
-                </span>
-              </div>
-              <div className='text-sm text-gray-600 dark:text-gray-400'>{performanceResults.summary}</div>
-              <div className='text-xs sm:text-sm'>
-                ボトルネック: {performanceResults.bottlenecks.length}件 | 提案: {performanceResults.suggestions.length}
-                件
-              </div>
-            </div>
-          ) : (
-            <div className='text-sm text-gray-500 dark:text-gray-400'>パフォーマンス分析を実行してください</div>
-          )}
-        </div>
-
-        {/* エラー統計 */}
+      {/* エラー統計ダッシュボード */}
+      <div className='mt-8'>
         <div className='card-primary border border-slate-200 dark:border-slate-700 rounded-lg p-6'>
           <div className='flex items-center justify-between mb-4'>
             <h3 className='text-lg font-semibold text-gray-900 dark:text-white'>🚨 エラー統計</h3>
